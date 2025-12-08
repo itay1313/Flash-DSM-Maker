@@ -39,7 +39,9 @@ export interface FlowCanvasRef {
   createNode: (type: string, position?: { x: number; y: number }) => Promise<string>
   getNextNodeType: () => string | null
   getNodes: () => Node[]
+  getEdges: () => Edge[]
   isFlowComplete: () => boolean
+  loadNodes: (nodesToLoad: Node[], edgesToLoad?: Edge[]) => void
 }
 
 const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(
@@ -299,14 +301,30 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(
     return nodeTypeOrder.every((type) => existingTypes.includes(type))
   }, [nodes, nodeTypeOrder])
 
+  // Load nodes and edges (for loading saved design systems)
+  const loadNodes = useCallback((nodesToLoad: Node[], edgesToLoad: Edge[] = []) => {
+    setNodes(nodesToLoad)
+    setEdges(edgesToLoad)
+    // Update nodeIdCounter to avoid ID conflicts
+    if (nodesToLoad.length > 0) {
+      const maxId = Math.max(...nodesToLoad.map(n => {
+        const numId = parseInt(n.id)
+        return isNaN(numId) ? 0 : numId
+      }))
+      nodeIdCounter.current = Math.max(nodeIdCounter.current, maxId)
+    }
+  }, [setNodes, setEdges])
+
   // Expose methods via ref
   useImperativeHandle(ref, () => ({
     updateNodeData,
     createNode,
     getNextNodeType,
     getNodes: () => nodes.filter((n) => n.type !== 'loading'),
+    getEdges: () => edges,
     isFlowComplete,
-  }), [updateNodeData, createNode, getNextNodeType, nodes, isFlowComplete])
+    loadNodes,
+  }), [updateNodeData, createNode, getNextNodeType, nodes, edges, isFlowComplete, loadNodes])
 
   const nodesWithSelection = useMemo(() => {
     return nodes.map((node) => ({

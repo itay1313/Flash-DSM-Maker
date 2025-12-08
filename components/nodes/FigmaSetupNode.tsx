@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Handle, Position, NodeProps } from 'reactflow'
 import FigmaConnectionModal from '../FigmaConnectionModal'
+import DesignSystemSelectionModal from '../DesignSystemSelectionModal'
 import { FlowNodeCard, FlowNodeHeader, FlowNodeBody } from '../ui/FlowNodeCard'
 import { FlowNodeField, FlowNodeInput } from '../ui/FlowNodeField'
 import { FlowNodeRadio } from '../ui/FlowNodeRadio'
@@ -10,6 +11,7 @@ import { FlowNodeButton } from '../ui/FlowNodeButton'
 import { FlowNodeFileCard } from '../ui/FlowNodeFileCard'
 import { FlowNodeCollapsible } from '../ui/FlowNodeCollapsible'
 import { FlowNodeTemplateGrid, Template } from '../ui/FlowNodeTemplateGrid'
+import { typography } from '../ui/typography'
 
 interface FigmaSetupNodeData {
   option: 'template' | 'ai'
@@ -26,6 +28,7 @@ export default function FigmaSetupNode({ data, selected, id }: NodeProps<FigmaSe
   const [editingField, setEditingField] = useState<string | null>(null)
   const [localData, setLocalData] = useState(data)
   const [showFigmaModal, setShowFigmaModal] = useState(false)
+  const [showDesignSystemModal, setShowDesignSystemModal] = useState(false)
   const [isTemplateDropdownOpen, setIsTemplateDropdownOpen] = useState(false)
 
   useEffect(() => {
@@ -78,7 +81,7 @@ export default function FigmaSetupNode({ data, selected, id }: NodeProps<FigmaSe
       <FlowNodeBody className="space-y-3">
         <div className="space-y-2">
           <FlowNodeRadio
-            label="Use Figma template"
+            label="Upload a Figma file"
             checked={localData.option === "template"}
             onChange={() => handleOptionClick("template")}
             selected={selected}
@@ -108,39 +111,28 @@ export default function FigmaSetupNode({ data, selected, id }: NodeProps<FigmaSe
                 </FlowNodeButton>
               )}
               {!localData.figmaFile && (
-                <FlowNodeCollapsible
-                  label="Or select a template"
-                  isOpen={isTemplateDropdownOpen}
-                  onToggle={() => setIsTemplateDropdownOpen(!isTemplateDropdownOpen)}
-                  selected={selected}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setShowDesignSystemModal(true)
+                  }}
+                  className={`w-full flex items-center justify-between ${typography.small} hover:text-white transition-colors ${selected ? '' : 'opacity-60'}`}
                 >
-                  <div className="space-y-2">
-                    <FlowNodeTemplateGrid
-                      templates={templates}
-                      selectedTemplate={localData.template}
-                      onSelectTemplate={(name) => {
-                        updateField("template", name)
-                        setIsTemplateDropdownOpen(false)
-                      }}
+                  <span>Or select a template</span>
+                  <svg
+                    className="w-3 h-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
                     />
-                    <FlowNodeButton
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        console.log("Create new design system")
-                      }}
-                      selected={selected}
-                      size="small"
-                      icon={
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                      }
-                      className="w-full"
-                    >
-                      Create new design system
-                    </FlowNodeButton>
-                  </div>
-                </FlowNodeCollapsible>
+                  </svg>
+                </button>
               )}
             </div>
           )}
@@ -186,6 +178,16 @@ export default function FigmaSetupNode({ data, selected, id }: NodeProps<FigmaSe
           updateField("template", file.name)
         }}
         currentSelection={localData.figmaFile?.key}
+      />
+
+      {/* Design System Selection Modal */}
+      <DesignSystemSelectionModal
+        isOpen={showDesignSystemModal}
+        onClose={() => setShowDesignSystemModal(false)}
+        onSelectSystem={(systemName) => {
+          updateField("template", systemName)
+        }}
+        selectedSystem={localData.template}
       />
     </FlowNodeCard>
   )

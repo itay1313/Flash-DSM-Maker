@@ -52,7 +52,7 @@ export default function CodeStackNode({ data, selected, id }: NodeProps<CodeStac
       <FlowNodeBody className="space-y-4">
         <FlowNodeField label="Project type">
           <FlowNodeButtonGroup>
-            {['Next.js', 'WordPress'].map((type) => (
+            {['Next.js', 'React', 'Vue', 'Svelte', 'Remix'].map((type) => (
               <FlowNodeCheckbox
                 key={type}
                 label={type}

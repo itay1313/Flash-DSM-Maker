@@ -62,7 +62,14 @@ export function FlowNodeInput({
             onFocus={onFocus}
             autoFocus
             rows={rows}
-            className={`w-full bg-transparent ${typography.input} placeholder:text-white/40 focus:outline-none caret-white resize-none pr-8`}
+            className={`w-full bg-transparent ${typography.input} placeholder:text-white/40 focus:outline-none caret-white resize-none ${rightAction ? 'pr-12' : 'pr-2'}`}
+            style={{ 
+              height: `${rows * 1.5}rem`,
+              minHeight: `${rows * 1.5}rem`,
+              maxHeight: `${rows * 1.5}rem`,
+              overflow: 'auto',
+              lineHeight: '1.5rem'
+            }}
             onClick={(e) => e.stopPropagation()}
             placeholder={placeholder}
           />
@@ -74,7 +81,7 @@ export function FlowNodeInput({
             onBlur={onBlur}
             onFocus={onFocus}
             autoFocus
-            className={`w-full bg-transparent ${typography.input} placeholder:text-white/40 focus:outline-none caret-white`}
+            className={`w-full bg-transparent ${typography.input} placeholder:text-white/40 focus:outline-none caret-white ${rightAction ? 'pr-12' : 'pr-2'}`}
             onClick={(e) => e.stopPropagation()}
             placeholder={placeholder}
           />
@@ -91,7 +98,15 @@ export function FlowNodeInput({
   return (
     <div className={baseClasses} onClick={onClick}>
       <span
-        className={`${value ? typography.body : typography.bodyMuted} ${type === 'textarea' ? 'line-clamp-4 flex-1' : ''}`}
+        className={`${value ? typography.body : typography.bodyMuted} ${type === 'textarea' ? 'line-clamp-2 flex-1 block' : ''} ${rightAction ? 'pr-12' : 'pr-2'}`}
+        style={type === 'textarea' ? { 
+          minHeight: `${rows * 1.5}rem`,
+          maxHeight: `${rows * 1.5}rem`,
+          height: `${rows * 1.5}rem`,
+          display: 'block',
+          overflow: 'hidden',
+          lineHeight: '1.5rem'
+        } : {}}
       >
         {value || placeholder}
       </span>

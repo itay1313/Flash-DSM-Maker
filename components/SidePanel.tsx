@@ -362,7 +362,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal }:
         )
 
       case 'codeStack':
-        const projectTypes = ['Next.js', 'WordPress']
+        const projectTypes = ['Next.js', 'React', 'Vue', 'Svelte', 'Remix']
         const designSystemBases = ['From scratch', 'Tailwind CSS', 'MUI', 'Ant Design', 'shadcn']
 
         return (

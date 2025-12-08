@@ -11,8 +11,18 @@ interface FlowNodeFileCardProps {
 }
 
 export function FlowNodeFileCard({ name, subtitle, icon, onChange, selected = false, className = '' }: FlowNodeFileCardProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (selected && onChange) {
+      onChange()
+    }
+  }
+
   return (
-    <div className={`p-3 rounded-[8px] bg-white/10 border border-white/0 ${className}`}>
+    <div 
+      className={`p-3 rounded-[8px] bg-white/10 border border-white/0 ${selected && onChange ? 'cursor-pointer hover:bg-white/15 transition-colors' : ''} ${className}`}
+      onClick={handleClick}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2 flex-1 min-w-0">
           {icon && (
