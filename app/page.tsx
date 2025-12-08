@@ -79,32 +79,6 @@ export default function Home() {
     }
   }, [])
 
-  const handleNodeUpdate = (nodeId: string, data: any) => {
-    if (flowCanvasRef.current) {
-      flowCanvasRef.current.updateNodeData(nodeId, data)
-    }
-  }
-
-  const handleCreateNode = async (type: string) => {
-    setIsCreating(true)
-    try {
-      if (flowCanvasRef.current) {
-        await flowCanvasRef.current.createNode(type)
-        // Update next node type after a short delay to allow state to update
-        setTimeout(updateNextNodeType, 100)
-      }
-    } finally {
-      setIsCreating(false)
-    }
-  }
-
-  // Get the label for the next node type
-  const getNextNodeLabel = () => {
-    if (!nextNodeType) return null
-    const nodeType = NODE_TYPES.find((nt) => nt.id === nextNodeType)
-    return nodeType?.label || null
-  }
-
   // Generate prompt from all node data
   const generatePrompt = useCallback(() => {
     if (!flowCanvasRef.current) return
@@ -171,7 +145,7 @@ export default function Home() {
     }
     prompt += '\n'
 
-    // Code Stack
+    // Technical Stack
     prompt += `## Technical Stack\n\n`
     prompt += `- **Framework:** ${techStack}\n`
     prompt += `- **Styling:** ${stylingApproach}\n`
@@ -194,6 +168,36 @@ export default function Home() {
     setGeneratedPrompt(prompt)
     setShowPrompt(true)
   }, [])
+
+  const handleCreateNode = async (type: string) => {
+    setIsCreating(true)
+    try {
+      if (flowCanvasRef.current) {
+        await flowCanvasRef.current.createNode(type)
+        // Update next node type after a short delay to allow state to update
+        setTimeout(updateNextNodeType, 100)
+      }
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
+  // Get the label for the next node type
+  const getNextNodeLabel = () => {
+    if (!nextNodeType) return null
+    const nodeType = NODE_TYPES.find((nt) => nt.id === nextNodeType)
+    return nodeType?.label || null
+  }
+
+  const handleNodeUpdate = useCallback((nodeId: string, data: any) => {
+    if (flowCanvasRef.current) {
+      flowCanvasRef.current.updateNodeData(nodeId, data)
+      // Regenerate prompt immediately if flow is complete
+      if (isFlowComplete) {
+        generatePrompt()
+      }
+    }
+  }, [isFlowComplete, generatePrompt])
 
   // Check if flow is complete and auto-generate
   const checkFlowComplete = useCallback(() => {
@@ -273,7 +277,7 @@ export default function Home() {
         <LeftSidebar activeView={activeView} onViewChange={setActiveView} />
         
         {/* Main Content Area */}
-        <div className="flex-1 relative overflow-hidden">
+        <div className={`flex-1 relative ${activeView === 'flow' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           {activeView === 'flow' && (
             <>
               <FlowCanvas 

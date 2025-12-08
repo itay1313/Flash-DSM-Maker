@@ -14,7 +14,7 @@ export default function ExportPage() {
   ]
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="min-h-full flex flex-col">
       <div className="p-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-white mb-2">Export Design System</h1>
