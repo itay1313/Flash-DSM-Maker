@@ -9,9 +9,11 @@ interface SidePanelProps {
   selectedNode: Node | null
   onNodeUpdate: (nodeId: string, data: any) => void
   onShowAIModal: () => void
+  onCreateNextNode?: () => void
+  nextNodeLabel?: string | null
 }
 
-export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal }: SidePanelProps) {
+export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, onCreateNextNode, nextNodeLabel }: SidePanelProps) {
   const [localData, setLocalData] = useState<any>(null)
   const [showFigmaModal, setShowFigmaModal] = useState(false)
   const [isTemplateDropdownOpen, setIsTemplateDropdownOpen] = useState(false)
@@ -433,6 +435,17 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal }:
         </h2>
       )}
       <div className={showTemplateSelection ? '' : 'mt-6'}>{renderNodeEditor()}</div>
+
+      {onCreateNextNode && nextNodeLabel && (
+        <div className="mt-6">
+          <button
+            onClick={onCreateNextNode}
+            className="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
+          >
+            Next: {nextNodeLabel}
+          </button>
+        </div>
+      )}
       
       {/* Figma Connection Modal */}
       {selectedNode?.type === 'figmaSetup' && (
@@ -471,4 +484,3 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal }:
     </div>
   )
 }
-

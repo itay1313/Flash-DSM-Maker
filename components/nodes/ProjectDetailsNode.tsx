@@ -21,6 +21,7 @@ export default function ProjectDetailsNode({ data, selected, id }: NodeProps<Pro
   const [localData, setLocalData] = useState(data)
   const [showAIModal, setShowAIModal] = useState(false)
   const [showUploadModal, setShowUploadModal] = useState(false)
+  const [showAIGuide, setShowAIGuide] = useState(false)
   const [mode, setMode] = useState<'manual' | 'ai'>(data.mode || 'manual')
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
 
@@ -53,7 +54,7 @@ export default function ProjectDetailsNode({ data, selected, id }: NodeProps<Pro
     <button
       onClick={(e) => {
         e.stopPropagation()
-        setShowAIModal(true)
+        setShowAIGuide(true)
       }}
       className="p-1.5 rounded-[6px] bg-white/10 hover:bg-white/15 transition-colors"
       title="Use AI to generate description"
@@ -132,6 +133,62 @@ export default function ProjectDetailsNode({ data, selected, id }: NodeProps<Pro
         }}
       />
 
+      {/* AI Guide Modal */}
+      {showAIGuide && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99999] flex items-center justify-center"
+          onClick={() => setShowAIGuide(false)}
+        >
+          <div
+            className="bg-gray-900 rounded-xl shadow-2xl border border-gray-800 w-full max-w-md mx-4 p-6 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-white">Need help with description?</h3>
+              <button
+                onClick={() => setShowAIGuide(false)}
+                className="p-1.5 rounded bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="space-y-3 text-sm text-gray-300">
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">1</div>
+                <p>Provide a short description of your project and goals.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">2</div>
+                <p>Optionally upload a spec to enrich the context.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">3</div>
+                <p>Use AI to auto-fill description, goals, and audience.</p>
+              </div>
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={() => {
+                  setShowAIGuide(false)
+                  setShowAIModal(true)
+                }}
+                className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                Use AI now
+              </button>
+              <button
+                onClick={() => setShowAIGuide(false)}
+                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Upload Source Modal */}
       <UploadSourceModal
         isOpen={showUploadModal}
@@ -151,7 +208,18 @@ export default function ProjectDetailsNode({ data, selected, id }: NodeProps<Pro
       />
 
       <Handle type="source" position={Position.Right} />
-      <Handle type="target" position={Position.Left} />
+      <Handle
+        type="source"
+        position={Position.Right}
+        onMouseDown={(e) => {
+          e.stopPropagation()
+          window.dispatchEvent(new Event('createNextNode'))
+        }}
+      />
+      <Handle
+        type="target"
+        position={Position.Left}
+      />
     </FlowNodeCard>
   )
 }

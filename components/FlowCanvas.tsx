@@ -293,6 +293,20 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(
     }
   }, [onNodeUpdate, updateNodeData])
 
+  // Handle "create next node" requests (e.g., clicking the handle dot)
+  useEffect(() => {
+    const handleCreateNextNode = async () => {
+      const next = getNextNodeType()
+      if (next) {
+        await createNode(next)
+      }
+    }
+    window.addEventListener('createNextNode', handleCreateNextNode as EventListener)
+    return () => {
+      window.removeEventListener('createNextNode', handleCreateNextNode as EventListener)
+    }
+  }, [getNextNodeType, createNode])
+
   // Check if flow is complete (all 3 nodes exist)
   const isFlowComplete = useCallback((): boolean => {
     const existingTypes = nodes

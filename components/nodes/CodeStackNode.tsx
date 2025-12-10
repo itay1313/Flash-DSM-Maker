@@ -77,7 +77,14 @@ export default function CodeStackNode({ data, selected, id }: NodeProps<CodeStac
           </FlowNodeButtonGroup>
         </FlowNodeField>
       </FlowNodeBody>
-      <Handle type="source" position={Position.Right} />
+      <Handle
+        type="source"
+        position={Position.Right}
+        onMouseDown={(e) => {
+          e.stopPropagation()
+          window.dispatchEvent(new Event('createNextNode'))
+        }}
+      />
       <Handle type="target" position={Position.Left} />
     </FlowNodeCard>
   )

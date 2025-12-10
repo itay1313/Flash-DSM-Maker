@@ -73,6 +73,7 @@ export default function FigmaSetupNode({ data, selected, id }: NodeProps<FigmaSe
     { name: "Soft Pop", accent: "bg-green-400" },
     { name: "Neo Brutalism", accent: "bg-red-500" },
     { name: "Vintage", accent: "bg-amber-600" },
+    { name: "Generic DS (Test)", accent: "bg-indigo-500" },
   ]
 
   return (
@@ -162,7 +163,14 @@ export default function FigmaSetupNode({ data, selected, id }: NodeProps<FigmaSe
           )}
         </div>
       </FlowNodeBody>
-      <Handle type="source" position={Position.Right} />
+      <Handle
+        type="source"
+        position={Position.Right}
+        onMouseDown={(e) => {
+          e.stopPropagation()
+          window.dispatchEvent(new Event('createNextNode'))
+        }}
+      />
       <Handle type="target" position={Position.Left} />
 
       {/* Figma Connection Modal */}

@@ -12,6 +12,7 @@ import SettingsPage from './pages/SettingsPage'
 import ProjectAIModal from './ProjectAIModal'
 import { Node } from 'reactflow'
 import { SavedDesignSystem } from './Dashboard'
+import SystemComponents from './SystemComponents'
 
 interface DesignSystemWizardProps {
   designSystem?: SavedDesignSystem
@@ -35,6 +36,8 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
   const [showPrompt, setShowPrompt] = useState(false)
   const [showAIModal, setShowAIModal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [savedSystems, setSavedSystems] = useState<SavedDesignSystem[]>([])
+  const [currentSystemId, setCurrentSystemId] = useState<string | null>(designSystem?.id || null)
   const flowCanvasRef = useRef<FlowCanvasRef>(null)
 
   // Load design system data if editing
@@ -51,6 +54,7 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
           }
         }, 100)
       }
+      setCurrentSystemId(designSystem.id)
     }
   }, [designSystem])
 
@@ -199,6 +203,22 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
     }
   }
 
+  const handleCreateNextNode = async () => {
+    if (!nextNodeType || !flowCanvasRef.current) return
+    await handleCreateNode(nextNodeType)
+  }
+
+  const handleSwitchSystem = (id: string) => {
+    const system = savedSystems.find((s) => s.id === id)
+    if (system) {
+      setCurrentSystemId(system.id)
+      // Optionally load nodes/edges for preview
+      if (flowCanvasRef.current) {
+        flowCanvasRef.current.loadNodes(system.nodes || [], system.edges || [])
+      }
+    }
+  }
+
   const getNextNodeLabel = () => {
     if (!nextNodeType) return null
     const nodeType = NODE_TYPES.find((nt) => nt.id === nextNodeType)
@@ -231,6 +251,20 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
 
       console.log('Saving design system:', systemToSave)
       onSave(systemToSave)
+      setCurrentSystemId(systemToSave.id)
+      setActiveView('components')
+      // refresh saved systems
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('dsm-design-systems')
+        if (saved) {
+          try {
+            const systems = JSON.parse(saved)
+            setSavedSystems(systems)
+          } catch (e) {
+            console.error('Failed to parse saved systems:', e)
+          }
+        }
+      }
       
       // Show success feedback
       setTimeout(() => {
@@ -274,6 +308,21 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
     
     return () => clearInterval(interval)
   }, [updateNextNodeType, checkFlowComplete])
+
+  // Load saved systems list
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('dsm-design-systems')
+      if (saved) {
+        try {
+          const systems = JSON.parse(saved)
+          setSavedSystems(systems)
+        } catch (e) {
+          console.error('Failed to parse saved systems:', e)
+        }
+      }
+    }
+  }, [])
 
   // Get project name from nodes
   const getProjectName = () => {
@@ -338,6 +387,18 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
             </div>
           )}
           <button
+            onClick={() => {
+              generatePrompt()
+            }}
+            disabled={!isFlowComplete}
+            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 disabled:bg-gray-700 disabled:text-gray-400 text-white rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Generate</span>
+          </button>
+          <button
             onClick={handleSave}
             disabled={isSaving}
             className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-all flex items-center space-x-2"
@@ -384,7 +445,17 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
               />
             </>
           )}
-          {activeView === 'components' && <ComponentsPage />}
+          {activeView === 'components' && (
+            <SystemComponents
+              designSystemName={
+                savedSystems.find((s) => s.id === currentSystemId)?.projectName ||
+                designSystem?.projectName ||
+                'Untitled Design System'
+              }
+              availableSystems={savedSystems.map((s) => ({ id: s.id, projectName: s.projectName }))}
+              onSwitchSystem={handleSwitchSystem}
+            />
+          )}
           {activeView === 'tokens' && <TokensPage />}
           {activeView === 'templates' && <TemplatesPage />}
           {activeView === 'export' && <ExportPage />}
@@ -443,6 +514,8 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
               selectedNode={selectedNode} 
               onNodeUpdate={handleNodeUpdate}
               onShowAIModal={() => setShowAIModal(true)}
+              onCreateNextNode={nextNodeType ? handleCreateNextNode : undefined}
+              nextNodeLabel={getNextNodeLabel()}
             />
             )}
           </div>

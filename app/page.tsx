@@ -27,6 +27,11 @@ export default function Home() {
   }
 
   const handleCreateNew = () => {
+    // Start clean: remove any previously stored flow data
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('dsm-flow-nodes')
+      localStorage.removeItem('dsm-flow-edges')
+    }
     setIsCreatingNew(true)
     setCurrentDesignSystem(null)
   }

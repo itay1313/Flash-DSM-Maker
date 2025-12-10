@@ -28,6 +28,7 @@ const defaultDesignSystems: DesignSystem[] = [
   { id: 'vintage', name: 'Vintage Paper', accent: 'bg-amber-600', preview: '📜' },
   { id: 'modern-minimal', name: 'Modern Minimal', accent: 'bg-blue-500', preview: '🔵' },
   { id: 'bubblegum', name: 'Bubblegum', accent: 'bg-pink-400', preview: '💗' },
+  { id: 'generic-ds', name: 'Generic DS (Test)', accent: 'bg-indigo-500', preview: '🧩' },
 ]
 
 export default function DesignSystemSelectionModal({
