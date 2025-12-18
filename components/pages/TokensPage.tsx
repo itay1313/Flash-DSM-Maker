@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface Token {
   name: string
@@ -13,8 +13,7 @@ interface TokenCategory {
   tokens: Token[]
 }
 
-export default function TokensPage() {
-  const [tokenCategories, setTokenCategories] = useState<TokenCategory[]>([
+const DEFAULT_TOKENS: TokenCategory[] = [
     {
       name: 'Colors',
       tokens: [
@@ -42,10 +41,37 @@ export default function TokensPage() {
         { name: 'spacing-24', value: '1.5rem', type: 'size' },
       ],
     },
-  ])
+]
+
+export default function TokensPage() {
+  const [tokenCategories, setTokenCategories] = useState<TokenCategory[]>(DEFAULT_TOKENS)
 
   const [editingToken, setEditingToken] = useState<{ categoryIndex: number; tokenIndex: number } | null>(null)
   const [colorPickerPosition, setColorPickerPosition] = useState<{ x: number; y: number } | null>(null)
+
+  // Load tokens from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('dsm-tokens')
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setTokenCategories(parsed)
+          }
+        } catch (e) {
+          console.error('Failed to load tokens:', e)
+        }
+      }
+    }
+  }, [])
+
+  // Save tokens to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined' && tokenCategories.length > 0) {
+      localStorage.setItem('dsm-tokens', JSON.stringify(tokenCategories))
+    }
+  }, [tokenCategories])
 
   const handleEditClick = (categoryIndex: number, tokenIndex: number, e: React.MouseEvent) => {
     const token = tokenCategories[categoryIndex].tokens[tokenIndex]

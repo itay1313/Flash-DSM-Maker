@@ -47,7 +47,9 @@ export function FlowNodeInput({
   className = '',
   rightAction,
 }: FlowNodeInputProps) {
-  const baseClasses = `w-full md:w-[240px] relative inline-flex items-start px-3 py-3 rounded-[8px] bg-white/10 border border-white/0 ${
+  // Textareas should be full width, regular inputs can have constrained width
+  const widthClass = type === 'textarea' ? 'w-full' : 'w-full md:w-[240px]'
+  const baseClasses = `${widthClass} relative inline-flex items-start px-3 py-3 rounded-[8px] bg-white/10 border border-white/0 ${
     selected ? 'cursor-text' : ''
   } ${className}`
 

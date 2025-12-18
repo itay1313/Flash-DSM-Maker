@@ -18,7 +18,7 @@ export function FlowNodeCheckbox({ label, checked, onChange, selected = false, c
       <div
         className={`w-4 h-4 border-2 rounded flex-shrink-0 flex items-center justify-center transition-colors ${
           checked
-            ? 'bg-indigo-500 border-indigo-500'
+            ? 'bg-palette-slate border-palette-slate'
             : 'border-gray-500'
         }`}
       >

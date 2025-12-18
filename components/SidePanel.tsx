@@ -69,7 +69,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                 type="text"
                 value={localData.projectName || ''}
                 onChange={(e) => updateField('projectName', e.target.value)}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-palette-slate"
                 placeholder="Enter project name"
               />
             </div>
@@ -82,15 +82,15 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                   value={localData.shortDescription || ''}
                   onChange={(e) => updateField('shortDescription', e.target.value)}
                   rows={16}
-                  className="w-full px-3 py-2 pr-12 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                  className="w-full px-3 py-2 pr-12 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-palette-slate resize-none"
                   placeholder="Enter project description or use AI to generate one"
                 />
                 <button
                   onClick={onShowAIModal}
-                  className="absolute top-3 right-3 p-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 transition-colors z-10"
+                  className="absolute top-3 right-3 p-1.5 rounded-lg bg-palette-slate/20 hover:bg-palette-slate/30 border border-palette-slate/30 transition-colors z-10"
                   title="Use AI to generate description"
                 >
-                  <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-palette-cornflower" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </button>
@@ -152,7 +152,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                       }}
                       className={`relative p-4 rounded-lg border-2 transition-all hover:scale-105 ${
                         localData.template === template.name
-                          ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/20'
+                          ? 'border-palette-slate bg-palette-slate/10 shadow-lg shadow-palette-slate/20'
                           : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
                       }`}
                     >
@@ -170,7 +170,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                       </div>
                       <p className="text-sm text-white font-medium text-center">{template.name}</p>
                       {localData.template === template.name && (
-                        <div className="absolute top-2 right-2 w-4 h-4 bg-indigo-500 rounded-full flex items-center justify-center shadow-lg">
+                        <div className="absolute top-2 right-2 w-4 h-4 bg-palette-slate rounded-full flex items-center justify-center shadow-lg">
                           <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
@@ -211,7 +211,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                     value="template"
                     checked={localData.option === 'template'}
                     onChange={(e) => updateField('option', e.target.value)}
-                    className="w-4 h-4 text-indigo-500 focus:ring-indigo-500"
+                    className="w-4 h-4 text-palette-slate focus:ring-palette-slate"
                   />
                   <span className="text-sm text-gray-300">Use Figma template</span>
                 </label>
@@ -222,7 +222,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                     value="ai"
                     checked={localData.option === 'ai'}
                     onChange={(e) => updateField('option', e.target.value)}
-                    className="w-4 h-4 text-indigo-500 focus:ring-indigo-500"
+                    className="w-4 h-4 text-palette-slate focus:ring-palette-slate"
                   />
                   <span className="text-sm text-gray-300">Use AI model to build a design system in Figma</span>
                 </label>
@@ -248,7 +248,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                         </div>
                         <button
                           onClick={() => setShowFigmaModal(true)}
-                          className="ml-3 px-3 py-1.5 text-xs text-indigo-400 hover:text-indigo-300 hover:bg-gray-700 rounded transition-colors"
+                          className="ml-3 px-3 py-1.5 text-xs text-palette-cornflower hover:text-palette-slate hover:bg-gray-700 rounded transition-colors"
                         >
                           Change
                         </button>
@@ -301,7 +301,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                               onClick={() => updateField('template', template.name)}
                               className={`relative p-3 rounded-lg border-2 transition-all hover:scale-105 ${
                                 localData.template === template.name
-                                  ? 'border-indigo-500 bg-indigo-500/10'
+                                  ? 'border-palette-slate bg-palette-slate/10'
                                   : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
                               }`}
                             >
@@ -319,7 +319,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                               </div>
                               <p className="text-xs text-white font-medium text-center">{template.name}</p>
                               {localData.template === template.name && (
-                                <div className="absolute top-1 right-1 w-3 h-3 bg-indigo-500 rounded-full flex items-center justify-center">
+                                <div className="absolute top-1 right-1 w-3 h-3 bg-palette-slate rounded-full flex items-center justify-center">
                                   <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                   </svg>
@@ -355,7 +355,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                   value={localData.aiDescription || ''}
                   onChange={(e) => updateField('aiDescription', e.target.value)}
                   rows={4}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-palette-slate resize-none"
                   placeholder="Describe your design system style"
                 />
               </div>
@@ -386,7 +386,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                           : current.filter((t: string) => t !== type)
                         updateField('projectTypes', updated)
                       }}
-                      className="w-4 h-4 text-indigo-500 rounded focus:ring-indigo-500"
+                      className="w-4 h-4 text-indigo-500 rounded focus:ring-palette-slate"
                     />
                     <span className="text-sm text-gray-300">{type}</span>
                   </label>
@@ -410,7 +410,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                           : current.filter((b: string) => b !== base)
                         updateField('designSystemBases', updated)
                       }}
-                      className="w-4 h-4 text-indigo-500 rounded focus:ring-indigo-500"
+                      className="w-4 h-4 text-indigo-500 rounded focus:ring-palette-slate"
                     />
                     <span className="text-sm text-gray-300">{base}</span>
                   </label>
@@ -440,7 +440,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
         <div className="mt-6">
           <button
             onClick={onCreateNextNode}
-            className="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
+            className="w-full px-3 py-2 bg-palette-slate hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors"
           >
             Next: {nextNodeLabel}
           </button>
