@@ -139,9 +139,9 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
     const figmaSetup = nodesByType.figmaSetup?.data || {}
     const codeStack = nodesByType.codeStack?.data || {}
 
-    // Determine tech stack
-    const projectTypes = codeStack.projectTypes || []
-    const designSystemBases = codeStack.designSystemBases || []
+    // Determine tech stack - use modern defaults
+    const projectTypes = codeStack.projectTypes || ['Next.js']
+    const designSystemBases = codeStack.designSystemBases || ['shadcn/ui']
     
     let techStack = 'Next.js'
     if (projectTypes.includes('Next.js')) {
@@ -156,15 +156,15 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
       techStack = 'Remix'
     }
 
-    let stylingApproach = 'Tailwind CSS'
-    if (designSystemBases.includes('From scratch')) {
+    let stylingApproach = 'shadcn/ui with Tailwind CSS'
+    if (designSystemBases.includes('shadcn') || designSystemBases.includes('shadcn/ui')) {
+      stylingApproach = 'shadcn/ui with Tailwind CSS'
+    } else if (designSystemBases.includes('From scratch')) {
       stylingApproach = 'from scratch using CSS modules'
     } else if (designSystemBases.includes('MUI')) {
       stylingApproach = 'Material-UI (MUI)'
     } else if (designSystemBases.includes('Ant Design')) {
       stylingApproach = 'Ant Design'
-    } else if (designSystemBases.includes('shadcn')) {
-      stylingApproach = 'shadcn/ui with Tailwind CSS'
     } else if (designSystemBases.includes('Tailwind CSS')) {
       stylingApproach = 'Tailwind CSS'
     }
@@ -186,10 +186,21 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
     }
 
     prompt += `## Design System Setup\n\n`
-    if (figmaSetup.option === 'template' && figmaSetup.template) {
-      prompt += `- Use Figma template: ${figmaSetup.template}\n`
-    } else if (figmaSetup.option === 'ai' && figmaSetup.aiDescription) {
-      prompt += `- AI-generated design system style: ${figmaSetup.aiDescription}\n`
+    if (figmaSetup.option === 'website' && figmaSetup.websiteUrl) {
+      prompt += `- Scan website: ${figmaSetup.websiteUrl}\n`
+      if (figmaSetup.scannedComponents && figmaSetup.scannedComponents.length > 0) {
+        prompt += `- Found ${figmaSetup.scannedComponents.length} components from website\n`
+      }
+    } else if (figmaSetup.option === 'ai') {
+      if (figmaSetup.inspirationUrl) {
+        prompt += `- Inspiration website: ${figmaSetup.inspirationUrl}\n`
+      }
+      if (figmaSetup.inspirationImages && figmaSetup.inspirationImages.length > 0) {
+        prompt += `- ${figmaSetup.inspirationImages.length} inspiration images uploaded\n`
+      }
+      if (figmaSetup.aiDescription) {
+        prompt += `- Additional description: ${figmaSetup.aiDescription}\n`
+      }
     }
     prompt += '\n'
 
@@ -212,7 +223,6 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
     prompt += `Please provide a complete, production-ready implementation with all necessary configuration files, components, and utilities.`
 
     setGeneratedPrompt(prompt)
-    setShowPrompt(true)
   }, [])
 
   const handleCreateNode = async (type: string) => {
@@ -526,6 +536,13 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
           onViewChange={handleViewChange}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          onShowPrompt={() => {
+            if (!generatedPrompt) {
+              generatePrompt()
+            }
+            setShowPrompt(true)
+          }}
+          hasGeneratedPrompt={!!generatedPrompt}
         />
         
         {/* Main Content Area */}
@@ -567,54 +584,9 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
           {activeView === 'settings' && <SettingsPage />}
         </div>
 
-        {/* Side Panel - only show on flow view when a node is selected or prompt is shown */}
-        {activeView === 'flow' && (selectedNode || showPrompt) && (
+        {/* Side Panel - only show on flow view when a node is selected */}
+        {activeView === 'flow' && selectedNode && (
           <div className="w-80 bg-gray-900 border-l border-gray-800 overflow-y-auto">
-          {showPrompt && generatedPrompt ? (
-            <div className="p-6 h-full flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-white">Generated Prompt</h2>
-                <button
-                  onClick={() => {
-                    setShowPrompt(false)
-                    setSelectedNode(null)
-                  }}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto">
-                <pre className="text-sm text-gray-300 whitespace-pre-wrap font-mono bg-gray-900 p-4 rounded-lg border border-gray-700">
-                  {generatedPrompt}
-                </pre>
-              </div>
-              <div className="mt-4 flex space-x-2">
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(generatedPrompt)
-                  }}
-                  className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  <span>Copy Prompt</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setShowPrompt(false)
-                    setSelectedNode(null)
-                  }}
-                  className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          ) : (
             <SidePanel 
               selectedNode={selectedNode} 
               onNodeUpdate={handleNodeUpdate}
@@ -622,7 +594,6 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
               onCreateNextNode={nextNodeType ? handleCreateNextNode : undefined}
               nextNodeLabel={getNextNodeLabel()}
             />
-            )}
           </div>
         )}
       </div>
@@ -645,6 +616,70 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
           setShowAIModal(false)
         }}
       />
+
+      {/* Generated Prompt Modal */}
+      {showPrompt && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setShowPrompt(false)}
+          />
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-gray-900 border border-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-800">
+                <h2 className="text-xl font-semibold text-white">Generated Prompt</h2>
+                <button
+                  onClick={() => setShowPrompt(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-6">
+                {generatedPrompt ? (
+                  <pre className="text-sm text-gray-300 whitespace-pre-wrap font-mono bg-gray-950 p-4 rounded-lg border border-gray-700">
+                    {generatedPrompt}
+                  </pre>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 border-2 border-gray-700 border-t-palette-slate rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-400">Generating prompt...</p>
+                  </div>
+                )}
+              </div>
+              {/* Footer */}
+              {generatedPrompt && (
+                <div className="p-6 border-t border-gray-800 flex space-x-2">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(generatedPrompt)
+                      // Show toast or feedback
+                    }}
+                    className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span>Copy Prompt</span>
+                  </button>
+                  <button
+                    onClick={() => setShowPrompt(false)}
+                    className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }

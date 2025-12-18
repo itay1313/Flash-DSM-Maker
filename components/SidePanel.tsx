@@ -2,7 +2,6 @@
 
 import { Node } from 'reactflow'
 import { useState, useEffect } from 'react'
-import FigmaConnectionModal from './FigmaConnectionModal'
 import UploadSourceModal from './UploadSourceModal'
 
 interface SidePanelProps {
@@ -15,20 +14,14 @@ interface SidePanelProps {
 
 export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, onCreateNextNode, nextNodeLabel }: SidePanelProps) {
   const [localData, setLocalData] = useState<any>(null)
-  const [showFigmaModal, setShowFigmaModal] = useState(false)
-  const [isTemplateDropdownOpen, setIsTemplateDropdownOpen] = useState(false)
-  const [showTemplateSelection, setShowTemplateSelection] = useState(false)
   const [showUploadModal, setShowUploadModal] = useState(false)
 
   useEffect(() => {
     if (selectedNode) {
       // Ensure data exists, use empty object if undefined
       setLocalData(selectedNode.data || {})
-      // Reset template selection view when node changes
-      setShowTemplateSelection(false)
     } else {
       setLocalData(null)
-      setShowTemplateSelection(false)
     }
   }, [selectedNode])
 
@@ -111,92 +104,7 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
         )
 
       case 'figmaSetup':
-        // Template selection view
-        if (showTemplateSelection) {
-          return (
-            <div className="space-y-4" style={{ animation: 'slideIn 0.3s ease-out' }}>
-              {/* Back button header */}
-              <div className="flex items-center space-x-3 mb-4">
-                <button
-                  onClick={() => setShowTemplateSelection(false)}
-                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors group"
-                >
-                  <svg 
-                    className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <h3 className="text-lg font-semibold text-white">Select a Template</h3>
-              </div>
-
-              {/* Template grid */}
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3 max-h-[calc(100vh-300px)] overflow-y-auto pr-1">
-                  {[
-                    { name: 'Base', color: 'gray', accent: 'bg-gray-500' },
-                    { name: 'Mono', color: 'slate', accent: 'bg-slate-500' },
-                    { name: 'Cosmic Night', color: 'purple', accent: 'bg-purple-500' },
-                    { name: 'Soft Pop', color: 'green', accent: 'bg-green-400' },
-                    { name: 'Neo Brutalism', color: 'red', accent: 'bg-red-500' },
-                    { name: 'Vintage', color: 'amber', accent: 'bg-amber-600' },
-                  ].map((template) => (
-                    <button
-                      key={template.name}
-                      onClick={() => {
-                        updateField('template', template.name)
-                        setShowTemplateSelection(false)
-                      }}
-                      className={`relative p-4 rounded-lg border-2 transition-all hover:scale-105 ${
-                        localData.template === template.name
-                          ? 'border-palette-slate bg-palette-slate/10 shadow-lg shadow-palette-slate/20'
-                          : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
-                      }`}
-                    >
-                      {/* Thumbnail Preview */}
-                      <div className="aspect-[4/3] bg-gray-900 rounded mb-3 p-2.5 flex flex-col">
-                        <div className="flex-1 bg-white rounded p-2 space-y-1.5">
-                          <div className="h-2 bg-gray-200 rounded w-3/4"></div>
-                          <div className="h-1.5 bg-gray-200 rounded w-1/2"></div>
-                          <div className="flex-1 flex items-end space-x-1.5">
-                            <div className={`h-10 flex-1 rounded ${template.accent} opacity-60`}></div>
-                            <div className={`h-8 w-5 rounded ${template.accent} opacity-40`}></div>
-                            <div className={`h-12 w-4 rounded ${template.accent} opacity-50`}></div>
-                          </div>
-                        </div>
-                      </div>
-                      <p className="text-sm text-white font-medium text-center">{template.name}</p>
-                      {localData.template === template.name && (
-                        <div className="absolute top-2 right-2 w-4 h-4 bg-palette-slate rounded-full flex items-center justify-center shadow-lg">
-                          <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  onClick={() => {
-                    // Handle create new design system
-                    console.log('Create new design system')
-                  }}
-                  className="w-full px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 rounded-lg text-white text-sm font-medium transition-all flex items-center justify-center space-x-2 mt-4"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  <span>Create new design system</span>
-                </button>
-              </div>
-            </div>
-          )
-        }
-
-        // Main figma setup view
+        // Main website scanning view
         return (
           <div className="space-y-4">
             <div>
@@ -208,12 +116,12 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                   <input
                     type="radio"
                     name="option"
-                    value="template"
-                    checked={localData.option === 'template'}
+                    value="website"
+                    checked={localData.option === 'website'}
                     onChange={(e) => updateField('option', e.target.value)}
                     className="w-4 h-4 text-palette-slate focus:ring-palette-slate"
                   />
-                  <span className="text-sm text-gray-300">Use Figma template</span>
+                  <span className="text-sm text-gray-300">Scan existing website</span>
                 </label>
                 <label className="flex items-center space-x-2 cursor-pointer">
                   <input
@@ -224,151 +132,154 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                     onChange={(e) => updateField('option', e.target.value)}
                     className="w-4 h-4 text-palette-slate focus:ring-palette-slate"
                   />
-                  <span className="text-sm text-gray-300">Use AI model to build a design system in Figma</span>
+                  <span className="text-sm text-gray-300">Inspiration</span>
                 </label>
               </div>
             </div>
-            {localData.option === 'template' && (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Website URL
+                </label>
+                <input
+                  type="url"
+                  value={localData.option === 'website' ? (localData.websiteUrl || '') : (localData.inspirationUrl || '')}
+                  onChange={(e) => updateField(localData.option === 'website' ? 'websiteUrl' : 'inspirationUrl', e.target.value)}
+                  placeholder={localData.option === 'website' ? 'https://example.com' : 'apple.com'}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-palette-slate"
+                />
+                {localData.scannedComponents && localData.scannedComponents.length > 0 && (
+                  <p className="mt-2 text-xs text-green-400">
+                    ✓ Found {localData.scannedComponents.length} components
+                  </p>
+                )}
+              </div>
+            </div>
+            {localData.option === 'ai' && (
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Connect to Figma
+                    Upload images for inspiration
                   </label>
-                  {localData.figmaFile ? (
-                    <div className="p-3 bg-gray-800 border border-gray-700 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3 flex-1 min-w-0">
-                          <svg className="w-5 h-5 text-purple-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M15.852 8.981h-4.588v-1.506c0-.944.653-1.506 1.6-1.506.876 0 1.575.441 1.575 1.506v1.506zm-4.589 0H6.148v-1.506c0-.944.653-1.506 1.6-1.506.876 0 1.575.441 1.575 1.506v1.506zm4.589 0v1.505c0 .944-.653 1.506-1.6 1.506-.876 0-1.575-.441-1.575-1.506V8.981zm-4.589 0v1.505c0 .944-.653 1.506-1.6 1.506-.876 0-1.575-.441-1.575-1.506V8.981zm8.486-2.459v9.836c0 .944-.743 1.506-1.6 1.506H3.6c-.857 0-1.6-.562-1.6-1.506V6.522c0-.944.743-1.506 1.6-1.506h1.6v-.877c0-1.506 1.2-2.459 2.4-2.459 1.2 0 2.4.953 2.4 2.459v.877h3.2v-.877c0-1.506 1.2-2.459 2.4-2.459 1.2 0 2.4.953 2.4 2.459v.877h1.6c.857 0 1.6.562 1.6 1.506z"/>
-                          </svg>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-white truncate font-medium">{localData.figmaFile.name}</p>
-                            <p className="text-xs text-gray-400 truncate">{localData.figmaFile.projectName}</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setShowFigmaModal(true)}
-                          className="ml-3 px-3 py-1.5 text-xs text-palette-cornflower hover:text-palette-slate hover:bg-gray-700 rounded transition-colors"
-                        >
-                          Change
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setShowFigmaModal(true)}
-                      className="w-full px-4 py-3 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 hover:border-purple-500/50 rounded-lg text-white text-sm font-medium transition-all flex items-center justify-center space-x-2"
-                    >
-                      <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M15.852 8.981h-4.588v-1.506c0-.944.653-1.506 1.6-1.506.876 0 1.575.441 1.575 1.506v1.506zm-4.589 0H6.148v-1.506c0-.944.653-1.506 1.6-1.506.876 0 1.575.441 1.575 1.506v1.506zm4.589 0v1.505c0 .944-.653 1.506-1.6 1.506-.876 0-1.575-.441-1.575-1.506V8.981zm-4.589 0v1.505c0 .944-.653 1.506-1.6 1.506-.876 0-1.575-.441-1.575-1.506V8.981zm8.486-2.459v9.836c0 .944-.743 1.506-1.6 1.506H3.6c-.857 0-1.6-.562-1.6-1.506V6.522c0-.944.743-1.506 1.6-1.506h1.6v-.877c0-1.506 1.2-2.459 2.4-2.459 1.2 0 2.4.953 2.4 2.459v.877h3.2v-.877c0-1.506 1.2-2.459 2.4-2.459 1.2 0 2.4.953 2.4 2.459v.877h1.6c.857 0 1.6.562 1.6 1.506z"/>
+                  <label className="relative inline-flex items-center justify-center w-full px-3 py-3 rounded-lg bg-gray-800 border border-gray-700 cursor-pointer hover:bg-gray-700 transition-colors">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || [])
+                        if (files.length > 0) {
+                          updateField('inspirationImages', [...(localData.inspirationImages || []), ...files])
+                        }
+                      }}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <span>Connect to Figma</span>
-                    </button>
+                      <span className="text-sm text-gray-300">Choose images</span>
+                    </div>
+                  </label>
+                  {localData.inspirationImages && localData.inspirationImages.length > 0 && (
+                    <div className="space-y-2 mt-2">
+                      {localData.inspirationImages.map((file: File, index: number) => (
+                        <div key={index} className="flex items-center gap-2 p-2 rounded-lg bg-gray-800">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-gray-300 truncate">{file.name}</p>
+                            <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              const newImages = [...(localData.inspirationImages || [])]
+                              newImages.splice(index, 1)
+                              updateField('inspirationImages', newImages)
+                            }}
+                            className="p-1 rounded hover:bg-gray-700 transition-colors"
+                          >
+                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
-                {!localData.figmaFile && (
-                  <div>
-                    <button
-                      onClick={() => {
-                        setShowTemplateSelection(true)
-                        setIsTemplateDropdownOpen(false)
-                      }}
-                      className="w-full flex items-center justify-between text-sm font-medium text-gray-300 mb-2 hover:text-white transition-colors group"
-                    >
-                      <span>Or select a template</span>
-                      <svg
-                        className="w-4 h-4 transition-transform group-hover:translate-x-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                    {isTemplateDropdownOpen && (
-                      <div className="mt-3 space-y-3">
-                        <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1">
-                          {[
-                            { name: 'Base', color: 'gray', accent: 'bg-gray-500' },
-                            { name: 'Mono', color: 'slate', accent: 'bg-slate-500' },
-                            { name: 'Cosmic Night', color: 'purple', accent: 'bg-purple-500' },
-                            { name: 'Soft Pop', color: 'green', accent: 'bg-green-400' },
-                            { name: 'Neo Brutalism', color: 'red', accent: 'bg-red-500' },
-                            { name: 'Vintage', color: 'amber', accent: 'bg-amber-600' },
-                          ].map((template) => (
-                            <button
-                              key={template.name}
-                              onClick={() => updateField('template', template.name)}
-                              className={`relative p-3 rounded-lg border-2 transition-all hover:scale-105 ${
-                                localData.template === template.name
-                                  ? 'border-palette-slate bg-palette-slate/10'
-                                  : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
-                              }`}
-                            >
-                              {/* Thumbnail Preview */}
-                              <div className="aspect-[4/3] bg-gray-900 rounded mb-2 p-2 flex flex-col">
-                                <div className="flex-1 bg-white rounded p-1.5 space-y-1">
-                                  <div className="h-1.5 bg-gray-200 rounded w-3/4"></div>
-                                  <div className="h-1 bg-gray-200 rounded w-1/2"></div>
-                                  <div className="flex-1 flex items-end space-x-1">
-                                    <div className={`h-8 flex-1 rounded ${template.accent} opacity-60`}></div>
-                                    <div className={`h-6 w-4 rounded ${template.accent} opacity-40`}></div>
-                                    <div className={`h-10 w-3 rounded ${template.accent} opacity-50`}></div>
-                                  </div>
-                                </div>
-                              </div>
-                              <p className="text-xs text-white font-medium text-center">{template.name}</p>
-                              {localData.template === template.name && (
-                                <div className="absolute top-1 right-1 w-3 h-3 bg-palette-slate rounded-full flex items-center justify-center">
-                                  <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                  </svg>
-                                </div>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                        <button
-                          onClick={() => {
-                            // Handle create new design system
-                            console.log('Create new design system')
-                          }}
-                          className="w-full px-4 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 rounded-lg text-white text-sm font-medium transition-all flex items-center justify-center space-x-2 mt-4"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                          </svg>
-                          <span>Create new design system</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-            {localData.option === 'ai' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Describe your design system style
-                </label>
-                <textarea
-                  value={localData.aiDescription || ''}
-                  onChange={(e) => updateField('aiDescription', e.target.value)}
-                  rows={4}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-palette-slate resize-none"
-                  placeholder="Describe your design system style"
-                />
               </div>
             )}
           </div>
         )
 
       case 'codeStack':
-        const projectTypes = ['Next.js', 'React', 'Vue', 'Svelte', 'Remix']
-        const designSystemBases = ['From scratch', 'Tailwind CSS', 'MUI', 'Ant Design', 'shadcn']
+        const projectTypes = ['Next.js', 'React', 'Vue', 'Angular', 'Svelte', 'Remix']
+        const designSystemBases = ['From scratch', 'Tailwind CSS', 'MUI', 'Ant Design', 'shadcn/ui', 'Angular Material']
+        const selectedProjectType = localData.projectTypes?.[0] || 'Next.js'
+        const selectedDesignSystemBase = localData.designSystemBases?.[0] || 'shadcn/ui'
+        const isDefaultStack = selectedProjectType === 'Next.js' && selectedDesignSystemBase === 'shadcn/ui'
 
         return (
           <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-3">
+                Selected Technology
+              </label>
+              <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    {isDefaultStack && (
+                      <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                    )}
+                    <span className="text-sm font-medium text-white">{selectedProjectType}</span>
+                    <span className="text-xs text-gray-400">+</span>
+                    <span className="text-sm font-medium text-white">{selectedDesignSystemBase}</span>
+                  </div>
+                </div>
+                {isDefaultStack ? (
+                  <>
+                    <p className="text-xs text-gray-400 leading-relaxed mb-3">
+                      Next.js 14+ with App Router and shadcn/ui for the most modern, performant, and maintainable stack.
+                    </p>
+                    <div className="space-y-1.5">
+                      <div className="flex items-start gap-2">
+                        <svg className="w-3 h-3 text-indigo-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-xs text-gray-300">Server Components & RSC for optimal performance</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <svg className="w-3 h-3 text-indigo-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-xs text-gray-300">Built-in TypeScript support</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <svg className="w-3 h-3 text-indigo-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-xs text-gray-300">Excellent developer experience</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <svg className="w-3 h-3 text-indigo-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-xs text-gray-300">Production-ready component library</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <svg className="w-3 h-3 text-indigo-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-xs text-gray-300">Accessible by default</span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    Custom technology stack selected
+                  </p>
+                )}
+              </div>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-3">
                 Project type
@@ -377,16 +288,13 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                 {projectTypes.map((type) => (
                   <label key={type} className="flex items-center space-x-2 cursor-pointer">
                     <input
-                      type="checkbox"
-                      checked={(localData.projectTypes || []).includes(type)}
-                      onChange={(e) => {
-                        const current = localData.projectTypes || []
-                        const updated = e.target.checked
-                          ? [...current, type]
-                          : current.filter((t: string) => t !== type)
-                        updateField('projectTypes', updated)
+                      type="radio"
+                      name="projectType"
+                      checked={selectedProjectType === type}
+                      onChange={() => {
+                        updateField('projectTypes', [type])
                       }}
-                      className="w-4 h-4 text-indigo-500 rounded focus:ring-palette-slate"
+                      className="w-4 h-4 text-indigo-500 focus:ring-palette-slate"
                     />
                     <span className="text-sm text-gray-300">{type}</span>
                   </label>
@@ -401,16 +309,13 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                 {designSystemBases.map((base) => (
                   <label key={base} className="flex items-center space-x-2 cursor-pointer">
                     <input
-                      type="checkbox"
-                      checked={(localData.designSystemBases || []).includes(base)}
-                      onChange={(e) => {
-                        const current = localData.designSystemBases || []
-                        const updated = e.target.checked
-                          ? [...current, base]
-                          : current.filter((b: string) => b !== base)
-                        updateField('designSystemBases', updated)
+                      type="radio"
+                      name="designSystemBase"
+                      checked={selectedDesignSystemBase === base}
+                      onChange={() => {
+                        updateField('designSystemBases', [base])
                       }}
-                      className="w-4 h-4 text-indigo-500 rounded focus:ring-palette-slate"
+                      className="w-4 h-4 text-indigo-500 focus:ring-palette-slate"
                     />
                     <span className="text-sm text-gray-300">{base}</span>
                   </label>
@@ -427,14 +332,12 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
 
   return (
     <div className="p-6">
-      {!showTemplateSelection && (
-        <h2 className="text-lg font-semibold text-white mb-2">
+      <h2 className="text-lg font-semibold text-white mb-2">
         {selectedNode.type === 'projectDetails' && 'Project details'}
         {selectedNode.type === 'figmaSetup' && 'Design & Style'}
         {selectedNode.type === 'codeStack' && 'Code stack'}
-        </h2>
-      )}
-      <div className={showTemplateSelection ? '' : 'mt-6'}>{renderNodeEditor()}</div>
+      </h2>
+      <div className="mt-6">{renderNodeEditor()}</div>
 
       {onCreateNextNode && nextNodeLabel && (
         <div className="mt-6">
@@ -447,22 +350,6 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
         </div>
       )}
       
-      {/* Figma Connection Modal */}
-      {selectedNode?.type === 'figmaSetup' && (
-        <FigmaConnectionModal
-          isOpen={showFigmaModal}
-          onClose={() => setShowFigmaModal(false)}
-          onSelectFile={(file) => {
-            updateField('figmaFile', {
-              key: file.key,
-              name: file.name,
-              projectName: file.projectName,
-            })
-            updateField('template', file.name)
-          }}
-          currentSelection={localData?.figmaFile?.key}
-        />
-      )}
 
       {/* Upload Source Modal */}
       {selectedNode?.type === 'projectDetails' && (
