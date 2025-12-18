@@ -119,9 +119,10 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(
         }
       case 'figmaSetup':
         return {
-          option: 'template',
-          template: '',
-          figmaFile: undefined,
+          option: 'website',
+          websiteUrl: '',
+          inspirationUrl: '',
+          inspirationImages: [],
           aiDescription: '',
         }
       case 'codeStack':

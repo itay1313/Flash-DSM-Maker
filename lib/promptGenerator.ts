@@ -17,8 +17,12 @@ interface ProjectDetails {
 }
 
 interface FigmaSetup {
-  option?: 'template' | 'ai'
-  template?: string
+  option?: 'website' | 'ai'
+  websiteUrl?: string
+  inspirationUrl?: string
+  inspirationImages?: File[]
+  isScanning?: boolean
+  scannedComponents?: any[]
   aiDescription?: string
 }
 
@@ -62,10 +66,21 @@ export function generateSystemPrompt(data: DesignSystemData): string {
 
   // Build design system style description
   let designSystemStyle = ''
-  if (figmaSetup?.option === 'ai' && figmaSetup.aiDescription) {
-    designSystemStyle = figmaSetup.aiDescription
-  } else if (figmaSetup?.option === 'template' && figmaSetup.template) {
-    designSystemStyle = `Based on template: ${figmaSetup.template}`
+  if (figmaSetup?.option === 'website' && figmaSetup.websiteUrl) {
+    designSystemStyle = `Scanned from website: ${figmaSetup.websiteUrl}`
+    if (figmaSetup.scannedComponents && figmaSetup.scannedComponents.length > 0) {
+      designSystemStyle += ` (${figmaSetup.scannedComponents.length} components found)`
+    }
+  } else if (figmaSetup?.option === 'ai') {
+    if (figmaSetup.inspirationUrl) {
+      designSystemStyle = `Inspired by website: ${figmaSetup.inspirationUrl}`
+    }
+    if (figmaSetup.inspirationImages && figmaSetup.inspirationImages.length > 0) {
+      designSystemStyle += designSystemStyle ? `. ${figmaSetup.inspirationImages.length} inspiration images uploaded` : `${figmaSetup.inspirationImages.length} inspiration images uploaded`
+    }
+    if (figmaSetup.aiDescription) {
+      designSystemStyle += designSystemStyle ? `. ${figmaSetup.aiDescription}` : figmaSetup.aiDescription
+    }
   }
 
   // Build project context

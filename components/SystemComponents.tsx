@@ -8,7 +8,7 @@ interface SystemComponentsProps {
   onSwitchSystem: (id: string) => void
 }
 
-type Theme = 'light' | 'dark' | 'blue' | 'purple' | 'green'
+type Theme = 'light' | 'dark' | 'blue' | 'purple' | 'green' | 'red' | 'orange' | 'yellow' | 'pink' | 'teal'
 
 const COMPONENT_CARDS = [
   { name: 'Button', description: 'Primary action buttons with multiple variants' },
@@ -53,6 +53,31 @@ const THEMES: { id: Theme; name: string; colors: { primary: string; bg: string; 
     id: 'green', 
     name: 'Green', 
     colors: { primary: '#10B981', bg: '#064E3B', text: '#D1FAE5', border: '#10B981' } 
+  },
+  { 
+    id: 'red', 
+    name: 'Red', 
+    colors: { primary: '#EF4444', bg: '#7F1D1D', text: '#FEE2E2', border: '#EF4444' } 
+  },
+  { 
+    id: 'orange', 
+    name: 'Orange', 
+    colors: { primary: '#F97316', bg: '#7C2D12', text: '#FFEDD5', border: '#F97316' } 
+  },
+  { 
+    id: 'yellow', 
+    name: 'Yellow', 
+    colors: { primary: '#EAB308', bg: '#713F12', text: '#FEF9C3', border: '#EAB308' } 
+  },
+  { 
+    id: 'pink', 
+    name: 'Pink', 
+    colors: { primary: '#EC4899', bg: '#831843', text: '#FCE7F3', border: '#EC4899' } 
+  },
+  { 
+    id: 'teal', 
+    name: 'Teal', 
+    colors: { primary: '#14B8A6', bg: '#134E4A', text: '#CCFBF1', border: '#14B8A6' } 
   },
 ]
 
