@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 
 interface SidebarItem {
   id: string
@@ -10,10 +11,17 @@ interface SidebarItem {
 
 interface LeftSidebarProps {
   activeView: string
-  onViewChange: (view: string) => void
+  onViewChange?: (view: string) => void
+  isCollapsed?: boolean
+  onToggleCollapse?: () => void
 }
 
-export default function LeftSidebar({ activeView, onViewChange }: LeftSidebarProps) {
+export default function LeftSidebar({ activeView, onViewChange, isCollapsed = false, onToggleCollapse }: LeftSidebarProps) {
+  const pathname = usePathname()
+  
+  // Extract system ID from pathname (e.g., /ds/[id]/[view])
+  const pathParts = pathname?.split('/') || []
+  const systemId = pathParts[2] || 'new'
 
   const sidebarItems: SidebarItem[] = [
     {
@@ -53,6 +61,24 @@ export default function LeftSidebar({ activeView, onViewChange }: LeftSidebarPro
       label: 'Templates',
     },
     {
+      id: 'versions',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      ),
+      label: 'Version History',
+    },
+    {
+      id: 'sync',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      ),
+      label: 'Sync & Integration',
+    },
+    {
       id: 'export',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,42 +100,69 @@ export default function LeftSidebar({ activeView, onViewChange }: LeftSidebarPro
   ]
 
   return (
-    <div className="w-16 bg-gray-950 border-r border-gray-800 flex flex-col items-center py-4 h-full">
+    <div className="relative">
+      {/* Collapse Toggle Button */}
+      <button
+        onClick={onToggleCollapse}
+        className={`absolute top-1/2 -translate-y-1/2 z-50 w-6 h-12 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-r-lg flex items-center justify-center transition-all duration-300 group shadow-lg ${
+          isCollapsed ? 'left-0' : 'left-full -translate-x-1/2'
+        }`}
+      >
+        <svg 
+          className={`w-4 h-4 text-gray-400 group-hover:text-white transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <div className={`bg-gray-950 border-r border-gray-800 flex flex-col items-center py-4 h-full transition-all duration-300 ${
+        isCollapsed ? 'w-0 overflow-hidden' : 'w-16'
+      }`}>
 
       {/* Sidebar Items */}
-      <div className="flex-1 flex flex-col space-y-1 w-full px-2">
-        {sidebarItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => onViewChange(item.id)}
-            className={`w-full p-3 rounded-lg transition-all relative group ${
-              activeView === item.id
-                ? 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-400 border border-indigo-500/30'
-                : 'text-gray-500 hover:text-gray-300 hover:bg-gray-900/50'
-            }`}
-          >
-            <div className="flex items-center justify-center">
-              {item.icon}
-            </div>
-            {activeView === item.id && (
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-indigo-400 to-purple-400 rounded-r-full" />
-            )}
-            {/* Tooltip */}
-            <div className="absolute left-full ml-3 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-lg border border-gray-700">
-              {item.label}
-              <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-800"></div>
-            </div>
-          </button>
-        ))}
+      <div className={`flex-1 flex flex-col space-y-1 w-full px-2 transition-opacity duration-300 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
+        {sidebarItems.map((item) => {
+          const href = `/ds/${systemId}/${item.id}`
+          const isActive = activeView === item.id
+          
+          return (
+            <Link
+              key={item.id}
+              href={href}
+              onClick={() => onViewChange?.(item.id)}
+              className={`w-full p-3 rounded-lg transition-all relative group ${
+                isActive
+                  ? 'bg-palette-slate/20 text-palette-cornflower border border-palette-slate/30'
+                  : 'text-gray-500 hover:text-gray-300 hover:bg-gray-900/50'
+              }`}
+            >
+              <div className="flex items-center justify-center">
+                {item.icon}
+              </div>
+              {isActive && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-palette-cornflower rounded-r-full" />
+              )}
+              {/* Tooltip */}
+              <div className="absolute left-full ml-3 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-lg border border-gray-700">
+                {item.label}
+                <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-800"></div>
+              </div>
+            </Link>
+          )
+        })}
       </div>
 
       {/* AI Badge */}
-      <div className="mt-auto pt-4 border-t border-gray-800 w-full px-2">
-        <div className="w-full p-2 rounded-lg bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 flex items-center justify-center">
-          <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={`mt-auto pt-4 border-t border-gray-800 w-full px-2 transition-opacity duration-300 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
+        <div className="w-full p-2 rounded-[8px] bg-palette-slate/10 border border-palette-slate/20 flex items-center justify-center">
+          <svg className="w-4 h-4 text-palette-cornflower" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </div>
+      </div>
       </div>
     </div>
   )

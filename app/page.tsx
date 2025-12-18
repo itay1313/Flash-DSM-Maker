@@ -32,13 +32,17 @@ export default function Home() {
       localStorage.removeItem('dsm-flow-nodes')
       localStorage.removeItem('dsm-flow-edges')
     }
-    setIsCreatingNew(true)
-    setCurrentDesignSystem(null)
+    // Navigate to new design system flow page
+    if (typeof window !== 'undefined') {
+      window.location.href = '/ds/new/flow'
+    }
   }
 
   const handleSelectDesignSystem = (system: SavedDesignSystem) => {
-    setCurrentDesignSystem(system)
-    setIsCreatingNew(false)
+    // Navigate to design system flow page
+    if (typeof window !== 'undefined') {
+      window.location.href = `/ds/${system.id}/flow`
+    }
   }
 
   const handleSaveDesignSystem = (system: SavedDesignSystem) => {
@@ -80,29 +84,8 @@ export default function Home() {
     setDashboardKey(prev => prev + 1)
   }
 
-  // Show homepage if not authenticated
-  if (!isAuthenticated) {
-    return <HomePage onLogin={handleLogin} />
-  }
-
-  // Show wizard if creating new or editing existing
-  if (isCreatingNew || currentDesignSystem) {
-    return (
-      <DesignSystemWizard
-        designSystem={currentDesignSystem || undefined}
-        onSave={handleSaveDesignSystem}
-        onClose={handleCloseWizard}
-      />
-    )
-  }
-
-  // Show dashboard
-  return (
-    <Dashboard
-      key={dashboardKey}
-      onSelectDesignSystem={handleSelectDesignSystem}
-      onCreateNew={handleCreateNew}
-    />
-  )
+  // Always show homepage at root route
+  // Dashboard is accessible via /ds routes after login
+  return <HomePage onLogin={handleLogin} />
 }
 

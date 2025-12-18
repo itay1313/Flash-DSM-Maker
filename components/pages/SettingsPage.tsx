@@ -27,7 +27,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setAutoSave(!autoSave)}
                   className={`w-12 h-6 rounded-full transition-colors ${
-                    autoSave ? 'bg-indigo-500' : 'bg-gray-700'
+                    autoSave ? 'bg-palette-slate' : 'bg-gray-700'
                   }`}
                 >
                   <div
@@ -45,7 +45,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setNotifications(!notifications)}
                   className={`w-12 h-6 rounded-full transition-colors ${
-                    notifications ? 'bg-indigo-500' : 'bg-gray-700'
+                    notifications ? 'bg-palette-slate' : 'bg-gray-700'
                   }`}
                 >
                   <div
@@ -98,7 +98,7 @@ export default function SettingsPage() {
 
           {/* Actions */}
           <div className="flex space-x-3">
-            <button className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors">
+            <button className="px-6 py-2 bg-palette-slate hover:bg-primary-600 text-white rounded-lg font-medium transition-colors">
               Save Changes
             </button>
             <button className="px-6 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg font-medium transition-colors">

@@ -30,7 +30,7 @@ export default function ExportPage() {
                   key={option.id}
                   className={`flex items-start p-4 border rounded-lg cursor-pointer transition-colors ${
                     exportFormat === option.id
-                      ? 'border-indigo-500 bg-indigo-500/10'
+                      ? 'border-palette-slate bg-palette-slate/10'
                       : 'border-gray-800 hover:border-gray-700'
                   }`}
                 >
@@ -69,7 +69,7 @@ export default function ExportPage() {
             </div>
           </div>
 
-          <button className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all shadow-lg shadow-indigo-500/20">
+          <button className="w-full px-6 py-3 bg-palette-slate hover:bg-primary-600 text-white rounded-lg font-semibold transition-all shadow-lg shadow-palette-slate/20">
             Export Design System
           </button>
         </div>

@@ -7,6 +7,27 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        primary: {
+          50: '#f0edff',
+          100: '#e0dbff',
+          200: '#c1b7ff',
+          300: '#a293ff',
+          400: '#836fff',
+          500: '#715AFF', // Primary color - Medium Slate Blue
+          600: '#5a47cc',
+          700: '#443599',
+          800: '#2d2466',
+          900: '#171233',
+        },
+        palette: {
+          periwinkle: '#A682FF', // Soft Periwinkle
+          slate: '#715AFF', // Medium Slate Blue (primary)
+          cornflower: '#5887FF', // Cornflower Blue
+          maya: '#55C1FF', // Maya Blue
+          space: '#102E4A', // Deep Space Blue
+        },
+      },
       fontFamily: {
         'jakarta': ['Plus Jakarta Sans', 'sans-serif'],
         'serif': ['Instrument Serif', 'serif'],

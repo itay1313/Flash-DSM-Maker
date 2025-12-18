@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
 import FlowCanvas, { FlowCanvasRef } from './FlowCanvas'
 import SidePanel from './SidePanel'
 import LeftSidebar from './LeftSidebar'
@@ -9,6 +11,8 @@ import TokensPage from './pages/TokensPage'
 import TemplatesPage from './pages/TemplatesPage'
 import ExportPage from './pages/ExportPage'
 import SettingsPage from './pages/SettingsPage'
+import VersionHistoryPage from './pages/VersionHistoryPage'
+import SyncPage from './pages/SyncPage'
 import ProjectAIModal from './ProjectAIModal'
 import { Node } from 'reactflow'
 import { SavedDesignSystem } from './Dashboard'
@@ -18,6 +22,7 @@ interface DesignSystemWizardProps {
   designSystem?: SavedDesignSystem
   onSave: (system: SavedDesignSystem) => void
   onClose: () => void
+  initialView?: string
 }
 
 const NODE_TYPES = [
@@ -26,9 +31,28 @@ const NODE_TYPES = [
   { id: 'codeStack', label: 'Code stack' },
 ]
 
-export default function DesignSystemWizard({ designSystem, onSave, onClose }: DesignSystemWizardProps) {
-  const [activeView, setActiveView] = useState('flow')
+export default function DesignSystemWizard({ designSystem, onSave, onClose, initialView }: DesignSystemWizardProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const [activeView, setActiveView] = useState(initialView || 'flow')
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [titleValue, setTitleValue] = useState('')
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  
+  // Sync activeView with URL
+  useEffect(() => {
+    if (initialView && initialView !== activeView) {
+      setActiveView(initialView)
+    }
+  }, [initialView])
+
+  // Update URL when view changes
+  const handleViewChange = useCallback((view: string) => {
+    setActiveView(view)
+    const systemId = designSystem?.id || 'new'
+    router.push(`/ds/${systemId}/${view}`)
+  }, [designSystem?.id, router])
   const [isCreating, setIsCreating] = useState(false)
   const [nextNodeType, setNextNodeType] = useState<string | null>(null)
   const [isFlowComplete, setIsFlowComplete] = useState(false)
@@ -252,7 +276,8 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
       console.log('Saving design system:', systemToSave)
       onSave(systemToSave)
       setCurrentSystemId(systemToSave.id)
-      setActiveView('components')
+      // Navigate to components view after saving
+      router.push(`/ds/${systemToSave.id}/components`)
       // refresh saved systems
       if (typeof window !== 'undefined') {
         const saved = localStorage.getItem('dsm-design-systems')
@@ -332,27 +357,100 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
     return projectDetailsNode?.data?.projectName || designSystem?.projectName || 'Untitled Design System'
   }
 
+  // Initialize title value
+  useEffect(() => {
+    if (!titleValue && designSystem) {
+      setTitleValue(designSystem.projectName || 'Untitled Design System')
+    } else if (!titleValue) {
+      setTitleValue('Untitled Design System')
+    }
+  }, [designSystem])
+
+  // Update title when project name changes from nodes
+  useEffect(() => {
+    if (!isEditingTitle && flowCanvasRef.current) {
+      const currentName = getProjectName()
+      if (currentName !== titleValue) {
+        setTitleValue(currentName)
+      }
+    }
+  }, [selectedNode, isEditingTitle])
+
+  const handleTitleClick = () => {
+    setIsEditingTitle(true)
+    setTitleValue(getProjectName())
+  }
+
+  const handleTitleChange = (value: string) => {
+    setTitleValue(value)
+  }
+
+  const handleTitleBlur = () => {
+    setIsEditingTitle(false)
+    const trimmedValue = titleValue.trim() || 'Untitled Design System'
+    setTitleValue(trimmedValue)
+    
+    // Update the project name in the node
+    if (flowCanvasRef.current) {
+      const nodes = flowCanvasRef.current.getNodes()
+      const projectDetailsNode = nodes.find(n => n.type === 'projectDetails')
+      if (projectDetailsNode) {
+        flowCanvasRef.current.updateNodeData(projectDetailsNode.id, {
+          ...projectDetailsNode.data,
+          projectName: trimmedValue
+        })
+      }
+    }
+  }
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleTitleBlur()
+    } else if (e.key === 'Escape') {
+      setIsEditingTitle(false)
+      setTitleValue(getProjectName())
+    }
+  }
+
   return (
     <div className="flex flex-col h-screen bg-gray-950">
       {/* Top Bar */}
       <div className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <button
-            onClick={onClose}
+          <Link
+            href="/"
             className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-          </button>
+          </Link>
           <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-lg">
+            <div className="flex items-center justify-center w-10 h-10 bg-palette-slate rounded-[8px] shadow-lg shadow-palette-slate/30">
               <span className="text-white font-bold text-sm tracking-tight">DSM</span>
             </div>
             <div>
-              <h1 className="text-white/90 text-[28px] font-normal italic font-serif">
-                {getProjectName()}
-              </h1>
+              {isEditingTitle ? (
+                <input
+                  type="text"
+                  value={titleValue}
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                  onBlur={handleTitleBlur}
+                  onKeyDown={handleTitleKeyDown}
+                  autoFocus
+                  className="text-white/90 text-[28px] font-normal italic font-serif bg-transparent border-b-2 border-palette-slate/50 focus:border-palette-slate focus:outline-none px-1 py-0 min-w-[200px]"
+                  style={{ fontFamily: 'Instrument Serif, serif' }}
+                />
+              ) : (
+                <h1 
+                  onClick={handleTitleClick}
+                  className="text-white/90 text-[28px] font-normal italic font-serif cursor-text hover:text-white transition-colors px-1 py-0 rounded hover:bg-white/5"
+                  style={{ fontFamily: 'Instrument Serif, serif' }}
+                >
+                  {titleValue || getProjectName()}
+                </h1>
+              )}
               <p className="text-xs text-gray-500">Design System Wizard</p>
             </div>
           </div>
@@ -401,7 +499,7 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-all flex items-center space-x-2"
+            className="px-4 py-2 bg-palette-slate hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-[8px] text-sm font-medium transition-all shadow-lg shadow-palette-slate/20 hover:shadow-xl hover:shadow-palette-slate/30 flex items-center space-x-2"
           >
             {isSaving ? (
               <>
@@ -423,7 +521,12 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
       {/* Main Content */}
       <div className={`flex flex-1 ${activeView === 'flow' ? 'overflow-hidden' : ''} overflow-y-auto`}>
         {/* Left Sidebar */}
-        <LeftSidebar activeView={activeView} onViewChange={setActiveView} />
+        <LeftSidebar 
+          activeView={activeView} 
+          onViewChange={handleViewChange}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
         
         {/* Main Content Area */}
         <div className={`flex-1 relative ${activeView === 'flow' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
@@ -458,12 +561,14 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose }: De
           )}
           {activeView === 'tokens' && <TokensPage />}
           {activeView === 'templates' && <TemplatesPage />}
+          {activeView === 'versions' && <VersionHistoryPage />}
+          {activeView === 'sync' && <SyncPage />}
           {activeView === 'export' && <ExportPage />}
           {activeView === 'settings' && <SettingsPage />}
         </div>
 
-        {/* Side Panel - only show on flow view */}
-        {activeView === 'flow' && (
+        {/* Side Panel - only show on flow view when a node is selected or prompt is shown */}
+        {activeView === 'flow' && (selectedNode || showPrompt) && (
           <div className="w-80 bg-gray-900 border-l border-gray-800 overflow-y-auto">
           {showPrompt && generatedPrompt ? (
             <div className="p-6 h-full flex flex-col">

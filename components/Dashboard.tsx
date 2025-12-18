@@ -63,7 +63,8 @@ export default function Dashboard({ onSelectDesignSystem, onCreateNew }: Dashboa
           </div>
           <button
             onClick={onCreateNew}
-            className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all shadow-lg shadow-indigo-500/20 flex items-center gap-2"
+            className="px-6 py-3 hover:bg-primary-600 text-white rounded-[8px] font-medium transition-all shadow-lg shadow-palette-slate/20 flex items-center gap-2 hover:shadow-xl hover:shadow-palette-slate/30"
+            style={{ backgroundColor: 'rgba(45, 30, 128, 1)' }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -75,8 +76,8 @@ export default function Dashboard({ onSelectDesignSystem, onCreateNew }: Dashboa
         {/* Design Systems Grid */}
         {designSystems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 bg-gray-900/50 rounded-2xl border border-gray-800">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center mb-6">
-              <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-20 h-20 rounded-full bg-palette-slate/20 flex items-center justify-center mb-6">
+              <svg className="w-10 h-10 text-palette-cornflower" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
               </svg>
             </div>
@@ -86,7 +87,8 @@ export default function Dashboard({ onSelectDesignSystem, onCreateNew }: Dashboa
             </p>
             <button
               onClick={onCreateNew}
-              className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all shadow-lg shadow-indigo-500/20"
+              className="px-6 py-3 hover:bg-primary-600 text-white rounded-[8px] font-medium transition-all shadow-lg shadow-palette-slate/20 hover:shadow-xl hover:shadow-palette-slate/30"
+              style={{ backgroundColor: 'rgba(45, 30, 128, 1)' }}
             >
               Create Design System
             </button>
@@ -97,7 +99,7 @@ export default function Dashboard({ onSelectDesignSystem, onCreateNew }: Dashboa
               <div
                 key={system.id}
                 onClick={() => onSelectDesignSystem(system)}
-                className="group relative bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-indigo-500/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-indigo-500/10"
+                className="group relative bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-palette-slate/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-palette-slate/10"
               >
                 {/* Preview */}
                 <div className="mb-4">
@@ -126,7 +128,7 @@ export default function Dashboard({ onSelectDesignSystem, onCreateNew }: Dashboa
                 </div>
 
                 {/* Hover Overlay */}
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/5 group-hover:to-purple-500/5 transition-all pointer-events-none" />
+                <div className="absolute inset-0 rounded-xl bg-palette-slate/0 group-hover:bg-palette-slate/5 transition-all pointer-events-none" />
               </div>
             ))}
           </div>

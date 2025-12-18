@@ -63,19 +63,44 @@ export default function FigmaConnectionModal({
 
   useEffect(() => {
     if (isOpen && isConnected) {
-      // Simulate fetching files from Figma API
-      setTimeout(() => {
-        setFiles(mockFigmaFiles)
-      }, 500)
+      fetchFigmaFiles()
     }
   }, [isOpen, isConnected])
+  
+  const fetchFigmaFiles = async () => {
+    try {
+      // PROTOTYPE: In production, pass access token from secure session
+      const response = await fetch('/api/figma/files')
+      const data = await response.json()
+      setFiles(data.files)
+    } catch (error) {
+      console.error('Failed to fetch Figma files:', error)
+      // Fallback to mock files for prototype
+      setFiles(mockFigmaFiles)
+    }
+  }
 
   const handleConnect = async () => {
     setIsConnecting(true)
-    // Simulate Figma OAuth connection
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsConnected(true)
-    setIsConnecting(false)
+    try {
+      // PROTOTYPE: In production, this would redirect to Figma OAuth
+      // For now, simulate connection
+      const response = await fetch('/api/figma/connect')
+      const data = await response.json()
+      
+      // In production, redirect to data.oauthUrl
+      // For prototype, simulate successful connection
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      setIsConnected(true)
+      
+      // Fetch files after connection
+      await fetchFigmaFiles()
+    } catch (error) {
+      console.error('Failed to connect to Figma:', error)
+      alert('Failed to connect to Figma. Please try again.')
+    } finally {
+      setIsConnecting(false)
+    }
   }
 
   const handleSelectFile = (file: FigmaFile) => {
@@ -101,7 +126,7 @@ export default function FigmaConnectionModal({
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-800">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-palette-periwinkle to-palette-slate rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M15.852 8.981h-4.588v-1.506c0-.944.653-1.506 1.6-1.506.876 0 1.575.441 1.575 1.506v1.506zm-4.589 0H6.148v-1.506c0-.944.653-1.506 1.6-1.506.876 0 1.575.441 1.575 1.506v1.506zm4.589 0v1.505c0 .944-.653 1.506-1.6 1.506-.876 0-1.575-.441-1.575-1.506V8.981zm-4.589 0v1.505c0 .944-.653 1.506-1.6 1.506-.876 0-1.575-.441-1.575-1.506V8.981zm8.486-2.459v9.836c0 .944-.743 1.506-1.6 1.506H3.6c-.857 0-1.6-.562-1.6-1.506V6.522c0-.944.743-1.506 1.6-1.506h1.6v-.877c0-1.506 1.2-2.459 2.4-2.459 1.2 0 2.4.953 2.4 2.459v.877h3.2v-.877c0-1.506 1.2-2.459 2.4-2.459 1.2 0 2.4.953 2.4 2.459v.877h1.6c.857 0 1.6.562 1.6 1.506z"/>
                 </svg>
@@ -125,8 +150,8 @@ export default function FigmaConnectionModal({
           <div className="flex-1 overflow-y-auto p-6">
             {!isConnected ? (
               <div className="flex flex-col items-center justify-center py-12">
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center mb-6">
-                  <svg className="w-10 h-10 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                <div className="w-20 h-20 bg-gradient-to-br from-palette-periwinkle/20 to-palette-slate/20 rounded-full flex items-center justify-center mb-6">
+                  <svg className="w-10 h-10 text-palette-periwinkle" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M15.852 8.981h-4.588v-1.506c0-.944.653-1.506 1.6-1.506.876 0 1.575.441 1.575 1.506v1.506zm-4.589 0H6.148v-1.506c0-.944.653-1.506 1.6-1.506.876 0 1.575.441 1.575 1.506v1.506zm4.589 0v1.505c0 .944-.653 1.506-1.6 1.506-.876 0-1.575-.441-1.575-1.506V8.981zm-4.589 0v1.505c0 .944-.653 1.506-1.6 1.506-.876 0-1.575-.441-1.575-1.506V8.981zm8.486-2.459v9.836c0 .944-.743 1.506-1.6 1.506H3.6c-.857 0-1.6-.562-1.6-1.506V6.522c0-.944.743-1.506 1.6-1.506h1.6v-.877c0-1.506 1.2-2.459 2.4-2.459 1.2 0 2.4.953 2.4 2.459v.877h3.2v-.877c0-1.506 1.2-2.459 2.4-2.459 1.2 0 2.4.953 2.4 2.459v.877h1.6c.857 0 1.6.562 1.6 1.506z"/>
                   </svg>
                 </div>
@@ -137,7 +162,7 @@ export default function FigmaConnectionModal({
                 <button
                   onClick={handleConnect}
                   disabled={isConnecting}
-                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-700 disabled:to-gray-700 text-white rounded-lg font-semibold transition-all flex items-center space-x-3 shadow-lg shadow-purple-500/20"
+                  className="px-6 py-3 bg-palette-slate hover:bg-primary-600 disabled:bg-gray-700 text-white rounded-lg font-semibold transition-all flex items-center space-x-3 shadow-lg shadow-palette-slate/20"
                 >
                   {isConnecting ? (
                     <>
@@ -170,14 +195,14 @@ export default function FigmaConnectionModal({
                       onClick={() => handleSelectFile(file)}
                       className={`w-full p-4 rounded-lg border transition-all text-left ${
                         selectedFile === file.key
-                          ? 'border-indigo-500 bg-indigo-500/10'
+                          ? 'border-palette-slate bg-palette-slate/10'
                           : 'border-gray-800 hover:border-gray-700 bg-gray-800/50 hover:bg-gray-800'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3 flex-1">
-                          <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg className="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                          <div className="w-12 h-12 bg-gradient-to-br from-palette-periwinkle/20 to-palette-slate/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg className="w-6 h-6 text-palette-periwinkle" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M15.852 8.981h-4.588v-1.506c0-.944.653-1.506 1.6-1.506.876 0 1.575.441 1.575 1.506v1.506zm-4.589 0H6.148v-1.506c0-.944.653-1.506 1.6-1.506.876 0 1.575.441 1.575 1.506v1.506zm4.589 0v1.505c0 .944-.653 1.506-1.6 1.506-.876 0-1.575-.441-1.575-1.506V8.981zm-4.589 0v1.505c0 .944-.653 1.506-1.6 1.506-.876 0-1.575-.441-1.575-1.506V8.981zm8.486-2.459v9.836c0 .944-.743 1.506-1.6 1.506H3.6c-.857 0-1.6-.562-1.6-1.506V6.522c0-.944.743-1.506 1.6-1.506h1.6v-.877c0-1.506 1.2-2.459 2.4-2.459 1.2 0 2.4.953 2.4 2.459v.877h3.2v-.877c0-1.506 1.2-2.459 2.4-2.459 1.2 0 2.4.953 2.4 2.459v.877h1.6c.857 0 1.6.562 1.6 1.506z"/>
                             </svg>
                           </div>
@@ -189,7 +214,7 @@ export default function FigmaConnectionModal({
                         </div>
                         {selectedFile === file.key && (
                           <div className="ml-3">
-                            <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 text-palette-cornflower" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                           </div>
@@ -228,6 +253,11 @@ export default function FigmaConnectionModal({
     </>
   )
 }
+
+
+
+
+
 
 
 

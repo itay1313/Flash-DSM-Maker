@@ -34,7 +34,11 @@ export function FlowNodeButton({
           ? 'hover:bg-white/15 hover:border-white/20 cursor-pointer'
           : 'cursor-default'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`
-    : `${sizeClasses} rounded-[8px] transition-colors flex items-center justify-center gap-2 ${typographyClass} ${className}`
+    : `${size === 'default' ? 'w-full md:w-[240px]' : ''} ${sizeClasses} rounded-[8px] bg-white/10 border border-white/0 transition-colors flex items-center justify-center gap-2 ${typographyClass} ${
+        selected && !disabled
+          ? 'hover:bg-white/15 hover:border-white/20 cursor-pointer'
+          : 'cursor-default'
+      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`
 
   return (
     <button

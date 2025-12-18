@@ -18,7 +18,7 @@ export function FlowNodeRadio({ label, checked, onChange, selected = false, clas
       <div
         className={`w-3 h-3 rounded-full border-2 flex-shrink-0 transition-colors ${
           checked
-            ? 'border-indigo-500 bg-indigo-500'
+            ? 'border-palette-slate bg-palette-slate'
             : 'border-gray-500'
         }`}
       />
