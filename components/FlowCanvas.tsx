@@ -127,8 +127,8 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(
         }
       case 'codeStack':
         return {
-          projectTypes: [],
-          designSystemBases: [],
+          projectTypes: ['Next.js'],
+          designSystemBases: ['shadcn/ui'],
         }
       default:
         return {}

@@ -45,9 +45,11 @@ const DEFAULT_TOKENS: TokenCategory[] = [
 
 export default function TokensPage() {
   const [tokenCategories, setTokenCategories] = useState<TokenCategory[]>(DEFAULT_TOKENS)
-
   const [editingToken, setEditingToken] = useState<{ categoryIndex: number; tokenIndex: number } | null>(null)
   const [colorPickerPosition, setColorPickerPosition] = useState<{ x: number; y: number } | null>(null)
+  const [showImportModal, setShowImportModal] = useState(false)
+  const [importText, setImportText] = useState('')
+  const [isImporting, setIsImporting] = useState(false)
 
   // Load tokens from localStorage on mount
   useEffect(() => {
@@ -116,12 +118,105 @@ export default function TokensPage() {
     setColorPickerPosition(null)
   }
 
+  const parseCSSVariables = (cssText: string): { name: string; value: string; type: 'color' | 'font' | 'size' }[] => {
+    const variables: { name: string; value: string; type: 'color' | 'font' | 'size' }[] = []
+    
+    // Match CSS custom properties: --variable-name: value;
+    const regex = /--([^:]+):\s*([^;]+);/g
+    let match
+    
+    while ((match = regex.exec(cssText)) !== null) {
+      const name = match[1].trim()
+      const value = match[2].trim()
+      
+      // Determine type based on value
+      let type: 'color' | 'font' | 'size' = 'size'
+      if (value.match(/^#|rgb|rgba|hsl|hsla/)) {
+        type = 'color'
+      } else if (value.match(/rem|em|px|pt|%/)) {
+        type = 'size'
+      } else if (value.match(/['"]/)) {
+        type = 'font'
+      }
+      
+      variables.push({ name, value, type })
+    }
+    
+    return variables
+  }
+
+  const handleImportCSSVariables = async () => {
+    if (!importText.trim()) {
+      alert('Please paste CSS variables')
+      return
+    }
+
+    setIsImporting(true)
+    try {
+      // Parse CSS variables
+      const parsedVariables = parseCSSVariables(importText)
+      
+      if (parsedVariables.length === 0) {
+        alert('No CSS variables found. Please check your input.')
+        setIsImporting(false)
+        return
+      }
+
+      // Send to API for AI validation and improvement
+      const response = await fetch('/api/import-css-variables', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cssVariables: parsedVariables,
+          existingTokens: tokenCategories,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to import and validate CSS variables')
+      }
+
+      const { validatedTokens, improvements } = await response.json()
+      
+      // Update tokens with validated and improved versions
+      setTokenCategories(validatedTokens)
+      
+      // Show success message with improvements
+      if (improvements && improvements.length > 0) {
+        alert(`Successfully imported ${parsedVariables.length} CSS variables!\n\nAI Improvements:\n${improvements.join('\n')}`)
+      } else {
+        alert(`Successfully imported ${parsedVariables.length} CSS variables!`)
+      }
+      
+      setShowImportModal(false)
+      setImportText('')
+    } catch (error) {
+      console.error('Error importing CSS variables:', error)
+      alert('Failed to import CSS variables. Please try again.')
+    } finally {
+      setIsImporting(false)
+    }
+  }
+
   return (
     <div className="min-h-full flex flex-col overflow-y-auto relative">
       <div className="p-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-white mb-2">Design Tokens</h1>
-          <p className="text-gray-400">Manage colors, typography, spacing, and other design tokens</p>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-white mb-2">Design Tokens</h1>
+            <p className="text-gray-400">Manage colors, typography, spacing, and other design tokens</p>
+          </div>
+          <button
+            onClick={() => setShowImportModal(true)}
+            className="px-4 py-2 bg-palette-slate hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            Import CSS Variables
+          </button>
         </div>
 
         <div className="space-y-6">
@@ -245,6 +340,103 @@ export default function TokensPage() {
                   className="flex-1 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
                 >
                   Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Import CSS Variables Modal */}
+      {showImportModal && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowImportModal(false)}
+          />
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-gray-900 border border-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-800">
+                <div>
+                  <h2 className="text-xl font-semibold text-white">Import CSS Variables</h2>
+                  <p className="text-sm text-gray-400 mt-1">Paste your CSS variables. AI will validate and improve them.</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowImportModal(false)
+                    setImportText('')
+                  }}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      CSS Variables
+                    </label>
+                    <textarea
+                      value={importText}
+                      onChange={(e) => setImportText(e.target.value)}
+                      placeholder=":root {&#10;  --primary-color: #6366f1;&#10;  --secondary-color: #8b5cf6;&#10;  --font-size-base: 1rem;&#10;  --spacing-unit: 0.25rem;&#10;}"
+                      className="w-full h-64 px-4 py-3 bg-gray-950 border border-gray-700 rounded-lg text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-palette-slate resize-none"
+                    />
+                    <p className="text-xs text-gray-500 mt-2">
+                      Paste CSS custom properties (--variable-name: value;). AI will automatically categorize and improve them.
+                    </p>
+                  </div>
+                  
+                  {/* Example */}
+                  <div className="bg-gray-950 border border-gray-800 rounded-lg p-4">
+                    <p className="text-xs font-medium text-gray-400 mb-2">Example:</p>
+                    <pre className="text-xs text-gray-500 font-mono whitespace-pre-wrap">
+{`:root {
+  --primary-color: #6366f1;
+  --secondary-color: #8b5cf6;
+  --font-size-base: 1rem;
+  --spacing-unit: 0.25rem;
+}`}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+              {/* Footer */}
+              <div className="p-6 border-t border-gray-800 flex space-x-2">
+                <button
+                  onClick={handleImportCSSVariables}
+                  disabled={isImporting || !importText.trim()}
+                  className="flex-1 px-4 py-2 bg-palette-slate hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                >
+                  {isImporting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Importing & Validating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Import & Validate</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowImportModal(false)
+                    setImportText('')
+                  }}
+                  className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Cancel
                 </button>
               </div>
             </div>

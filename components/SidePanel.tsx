@@ -212,11 +212,74 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
         )
 
       case 'codeStack':
-        const projectTypes = ['Next.js', 'React', 'Vue', 'Svelte', 'Remix']
-        const designSystemBases = ['From scratch', 'Tailwind CSS', 'MUI', 'Ant Design', 'shadcn']
+        const projectTypes = ['Next.js', 'React', 'Vue', 'Angular', 'Svelte', 'Remix']
+        const designSystemBases = ['From scratch', 'Tailwind CSS', 'MUI', 'Ant Design', 'shadcn/ui', 'Angular Material']
+        const selectedProjectType = localData.projectTypes?.[0] || 'Next.js'
+        const selectedDesignSystemBase = localData.designSystemBases?.[0] || 'shadcn/ui'
+        const isDefaultStack = selectedProjectType === 'Next.js' && selectedDesignSystemBase === 'shadcn/ui'
 
         return (
           <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-3">
+                Selected Technology
+              </label>
+              <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    {isDefaultStack && (
+                      <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                    )}
+                    <span className="text-sm font-medium text-white">{selectedProjectType}</span>
+                    <span className="text-xs text-gray-400">+</span>
+                    <span className="text-sm font-medium text-white">{selectedDesignSystemBase}</span>
+                  </div>
+                </div>
+                {isDefaultStack ? (
+                  <>
+                    <p className="text-xs text-gray-400 leading-relaxed mb-3">
+                      Next.js 14+ with App Router and shadcn/ui for the most modern, performant, and maintainable stack.
+                    </p>
+                    <div className="space-y-1.5">
+                      <div className="flex items-start gap-2">
+                        <svg className="w-3 h-3 text-indigo-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-xs text-gray-300">Server Components & RSC for optimal performance</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <svg className="w-3 h-3 text-indigo-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-xs text-gray-300">Built-in TypeScript support</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <svg className="w-3 h-3 text-indigo-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-xs text-gray-300">Excellent developer experience</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <svg className="w-3 h-3 text-indigo-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-xs text-gray-300">Production-ready component library</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <svg className="w-3 h-3 text-indigo-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-xs text-gray-300">Accessible by default</span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    Custom technology stack selected
+                  </p>
+                )}
+              </div>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-3">
                 Project type
@@ -225,16 +288,13 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                 {projectTypes.map((type) => (
                   <label key={type} className="flex items-center space-x-2 cursor-pointer">
                     <input
-                      type="checkbox"
-                      checked={(localData.projectTypes || []).includes(type)}
-                      onChange={(e) => {
-                        const current = localData.projectTypes || []
-                        const updated = e.target.checked
-                          ? [...current, type]
-                          : current.filter((t: string) => t !== type)
-                        updateField('projectTypes', updated)
+                      type="radio"
+                      name="projectType"
+                      checked={selectedProjectType === type}
+                      onChange={() => {
+                        updateField('projectTypes', [type])
                       }}
-                      className="w-4 h-4 text-indigo-500 rounded focus:ring-palette-slate"
+                      className="w-4 h-4 text-indigo-500 focus:ring-palette-slate"
                     />
                     <span className="text-sm text-gray-300">{type}</span>
                   </label>
@@ -249,16 +309,13 @@ export default function SidePanel({ selectedNode, onNodeUpdate, onShowAIModal, o
                 {designSystemBases.map((base) => (
                   <label key={base} className="flex items-center space-x-2 cursor-pointer">
                     <input
-                      type="checkbox"
-                      checked={(localData.designSystemBases || []).includes(base)}
-                      onChange={(e) => {
-                        const current = localData.designSystemBases || []
-                        const updated = e.target.checked
-                          ? [...current, base]
-                          : current.filter((b: string) => b !== base)
-                        updateField('designSystemBases', updated)
+                      type="radio"
+                      name="designSystemBase"
+                      checked={selectedDesignSystemBase === base}
+                      onChange={() => {
+                        updateField('designSystemBases', [base])
                       }}
-                      className="w-4 h-4 text-indigo-500 rounded focus:ring-palette-slate"
+                      className="w-4 h-4 text-indigo-500 focus:ring-palette-slate"
                     />
                     <span className="text-sm text-gray-300">{base}</span>
                   </label>

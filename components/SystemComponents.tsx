@@ -223,9 +223,27 @@ function ComponentPreview({ componentName, theme }: { componentName: string; the
   }
 }
 
+interface ComponentStyles {
+  radius: number
+  shadow: {
+    xOffset: number
+    yOffset: number
+    blur: number
+    spread: number
+    color: string
+  }
+}
+
 export default function SystemComponents({ designSystemName, availableSystems, onSwitchSystem }: SystemComponentsProps) {
   const [selectedTheme, setSelectedTheme] = useState<Theme>('dark')
   const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false)
+  const [editingComponent, setEditingComponent] = useState<string | null>(null)
+  const [componentStyles, setComponentStyles] = useState<Record<string, ComponentStyles>>({})
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    colors: false,
+    typography: false,
+    other: true,
+  })
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown when clicking outside
@@ -294,7 +312,27 @@ export default function SystemComponents({ designSystemName, availableSystems, o
                   <button className="px-3 py-1 text-xs bg-gray-800 hover:bg-gray-700 rounded transition-colors">
                     Preview
                   </button>
-                  <button className="px-3 py-1 text-xs bg-palette-slate hover:bg-primary-600 rounded transition-colors">
+                  <button 
+                    onClick={() => {
+                      setEditingComponent(component.name)
+                      if (!componentStyles[component.name]) {
+                        setComponentStyles({
+                          ...componentStyles,
+                          [component.name]: {
+                            radius: 1.25,
+                            shadow: {
+                              xOffset: 4,
+                              yOffset: 4,
+                              blur: 0,
+                              spread: 0,
+                              color: '#000000',
+                            },
+                          },
+                        })
+                      }
+                    }}
+                    className="px-3 py-1 text-xs bg-palette-slate hover:bg-primary-600 rounded transition-colors"
+                  >
                     Edit
                   </button>
                 </div>
@@ -390,6 +428,443 @@ export default function SystemComponents({ designSystemName, availableSystems, o
             </select>
           </div>
         </div>
+      )}
+
+      {/* Component Edit Modal - Right Sidebar */}
+      {editingComponent && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-50"
+            onClick={() => setEditingComponent(null)}
+          />
+          {/* Modal - Right Side */}
+          <div className="fixed inset-y-0 right-0 z-50 flex items-center">
+            <div className="bg-gray-900 border-l border-gray-800 shadow-2xl w-full max-w-md h-full flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-800 flex-shrink-0">
+                <h2 className="text-xl font-semibold text-white">Edit {editingComponent}</h2>
+                <button
+                  onClick={() => setEditingComponent(null)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="space-y-4">
+                  {/* Colors Section */}
+                  <div>
+                    <button
+                      onClick={() => setExpandedSections({ ...expandedSections, colors: !expandedSections.colors })}
+                      className="w-full flex items-center justify-between text-left"
+                    >
+                      <span className="text-sm font-medium text-gray-300">Colors</span>
+                      <svg 
+                        className={`w-4 h-4 text-gray-400 transition-transform ${expandedSections.colors ? 'rotate-180' : ''}`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {expandedSections.colors && (
+                      <div className="mt-2 space-y-2">
+                        <p className="text-xs text-gray-500">Color options coming soon...</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Typography Section */}
+                  <div>
+                    <button
+                      onClick={() => setExpandedSections({ ...expandedSections, typography: !expandedSections.typography })}
+                      className="w-full flex items-center justify-between text-left"
+                    >
+                      <span className="text-sm font-medium text-gray-300">Typography</span>
+                      <svg 
+                        className={`w-4 h-4 text-gray-400 transition-transform ${expandedSections.typography ? 'rotate-180' : ''}`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {expandedSections.typography && (
+                      <div className="mt-2 space-y-2">
+                        <p className="text-xs text-gray-500">Typography options coming soon...</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Other Section */}
+                  <div>
+                    <button
+                      onClick={() => setExpandedSections({ ...expandedSections, other: !expandedSections.other })}
+                      className="w-full flex items-center justify-between text-left"
+                    >
+                      <span className="text-sm font-medium text-gray-300">Other</span>
+                      <svg 
+                        className={`w-4 h-4 text-gray-400 transition-transform ${expandedSections.other ? 'rotate-180' : ''}`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {expandedSections.other && (
+                      <div className="mt-4 space-y-6">
+                        {/* Radius */}
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-2">Radius</label>
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 relative">
+                              <input
+                                type="range"
+                                min="0"
+                                max="3"
+                                step="0.05"
+                                value={componentStyles[editingComponent]?.radius || 1.25}
+                                onChange={(e) => {
+                                  const newStyles = {
+                                    ...componentStyles,
+                                    [editingComponent]: {
+                                      ...componentStyles[editingComponent],
+                                      radius: parseFloat(e.target.value),
+                                    },
+                                  }
+                                  setComponentStyles(newStyles)
+                                }}
+                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                style={{
+                                  background: `linear-gradient(to right, #715AFF 0%, #715AFF ${((componentStyles[editingComponent]?.radius || 1.25) / 3) * 100}%, #374151 ${((componentStyles[editingComponent]?.radius || 1.25) / 3) * 100}%, #374151 100%)`,
+                                }}
+                              />
+                            </div>
+                            <input
+                              type="number"
+                              min="0"
+                              max="3"
+                              step="0.05"
+                              value={componentStyles[editingComponent]?.radius || 1.25}
+                              onChange={(e) => {
+                                const newStyles = {
+                                  ...componentStyles,
+                                  [editingComponent]: {
+                                    ...componentStyles[editingComponent],
+                                    radius: parseFloat(e.target.value) || 0,
+                                  },
+                                }
+                                setComponentStyles(newStyles)
+                              }}
+                              className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-palette-slate"
+                            />
+                            <span className="text-xs text-gray-400">rem</span>
+                          </div>
+                        </div>
+
+                        {/* Shadow */}
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-300 mb-3">Shadow</h4>
+                          <div className="space-y-4">
+                            {/* X Offset */}
+                            <div>
+                              <label className="block text-xs text-gray-400 mb-2">X Offset</label>
+                              <div className="flex items-center gap-3">
+                                <div className="flex-1 relative">
+                                  <input
+                                    type="range"
+                                    min="-20"
+                                    max="20"
+                                    step="1"
+                                    value={componentStyles[editingComponent]?.shadow.xOffset || 4}
+                                    onChange={(e) => {
+                                      const newStyles = {
+                                        ...componentStyles,
+                                        [editingComponent]: {
+                                          ...componentStyles[editingComponent],
+                                          shadow: {
+                                            ...componentStyles[editingComponent]?.shadow,
+                                            xOffset: parseInt(e.target.value),
+                                          },
+                                        },
+                                      }
+                                      setComponentStyles(newStyles)
+                                    }}
+                                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                    style={{
+                                      background: `linear-gradient(to right, #715AFF 0%, #715AFF ${((componentStyles[editingComponent]?.shadow.xOffset || 4) + 20) / 40 * 100}%, #374151 ${((componentStyles[editingComponent]?.shadow.xOffset || 4) + 20) / 40 * 100}%, #374151 100%)`,
+                                    }}
+                                  />
+                                </div>
+                                <input
+                                  type="number"
+                                  min="-20"
+                                  max="20"
+                                  step="1"
+                                  value={componentStyles[editingComponent]?.shadow.xOffset || 4}
+                                  onChange={(e) => {
+                                    const newStyles = {
+                                      ...componentStyles,
+                                      [editingComponent]: {
+                                        ...componentStyles[editingComponent],
+                                        shadow: {
+                                          ...componentStyles[editingComponent]?.shadow,
+                                          xOffset: parseInt(e.target.value) || 0,
+                                        },
+                                      },
+                                    }
+                                    setComponentStyles(newStyles)
+                                  }}
+                                  className="w-16 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-palette-slate"
+                                />
+                                <span className="text-xs text-gray-400">px</span>
+                              </div>
+                            </div>
+
+                            {/* Y Offset */}
+                            <div>
+                              <label className="block text-xs text-gray-400 mb-2">Y Offset</label>
+                              <div className="flex items-center gap-3">
+                                <div className="flex-1 relative">
+                                  <input
+                                    type="range"
+                                    min="-20"
+                                    max="20"
+                                    step="1"
+                                    value={componentStyles[editingComponent]?.shadow.yOffset || 4}
+                                    onChange={(e) => {
+                                      const newStyles = {
+                                        ...componentStyles,
+                                        [editingComponent]: {
+                                          ...componentStyles[editingComponent],
+                                          shadow: {
+                                            ...componentStyles[editingComponent]?.shadow,
+                                            yOffset: parseInt(e.target.value),
+                                          },
+                                        },
+                                      }
+                                      setComponentStyles(newStyles)
+                                    }}
+                                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                    style={{
+                                      background: `linear-gradient(to right, #715AFF 0%, #715AFF ${((componentStyles[editingComponent]?.shadow.yOffset || 4) + 20) / 40 * 100}%, #374151 ${((componentStyles[editingComponent]?.shadow.yOffset || 4) + 20) / 40 * 100}%, #374151 100%)`,
+                                    }}
+                                  />
+                                </div>
+                                <input
+                                  type="number"
+                                  min="-20"
+                                  max="20"
+                                  step="1"
+                                  value={componentStyles[editingComponent]?.shadow.yOffset || 4}
+                                  onChange={(e) => {
+                                    const newStyles = {
+                                      ...componentStyles,
+                                      [editingComponent]: {
+                                        ...componentStyles[editingComponent],
+                                        shadow: {
+                                          ...componentStyles[editingComponent]?.shadow,
+                                          yOffset: parseInt(e.target.value) || 0,
+                                        },
+                                      },
+                                    }
+                                    setComponentStyles(newStyles)
+                                  }}
+                                  className="w-16 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-palette-slate"
+                                />
+                                <span className="text-xs text-gray-400">px</span>
+                              </div>
+                            </div>
+
+                            {/* Blur */}
+                            <div>
+                              <label className="block text-xs text-gray-400 mb-2">Blur</label>
+                              <div className="flex items-center gap-3">
+                                <div className="flex-1 relative">
+                                  <input
+                                    type="range"
+                                    min="0"
+                                    max="50"
+                                    step="1"
+                                    value={componentStyles[editingComponent]?.shadow.blur || 0}
+                                    onChange={(e) => {
+                                      const newStyles = {
+                                        ...componentStyles,
+                                        [editingComponent]: {
+                                          ...componentStyles[editingComponent],
+                                          shadow: {
+                                            ...componentStyles[editingComponent]?.shadow,
+                                            blur: parseInt(e.target.value),
+                                          },
+                                        },
+                                      }
+                                      setComponentStyles(newStyles)
+                                    }}
+                                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                    style={{
+                                      background: `linear-gradient(to right, #715AFF 0%, #715AFF ${((componentStyles[editingComponent]?.shadow.blur || 0) / 50) * 100}%, #374151 ${((componentStyles[editingComponent]?.shadow.blur || 0) / 50) * 100}%, #374151 100%)`,
+                                    }}
+                                  />
+                                </div>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="50"
+                                  step="1"
+                                  value={componentStyles[editingComponent]?.shadow.blur || 0}
+                                  onChange={(e) => {
+                                    const newStyles = {
+                                      ...componentStyles,
+                                      [editingComponent]: {
+                                        ...componentStyles[editingComponent],
+                                        shadow: {
+                                          ...componentStyles[editingComponent]?.shadow,
+                                          blur: parseInt(e.target.value) || 0,
+                                        },
+                                      },
+                                    }
+                                    setComponentStyles(newStyles)
+                                  }}
+                                  className="w-16 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-palette-slate"
+                                />
+                                <span className="text-xs text-gray-400">px</span>
+                              </div>
+                            </div>
+
+                            {/* Spread */}
+                            <div>
+                              <label className="block text-xs text-gray-400 mb-2">Spread</label>
+                              <div className="flex items-center gap-3">
+                                <div className="flex-1 relative">
+                                  <input
+                                    type="range"
+                                    min="0"
+                                    max="50"
+                                    step="1"
+                                    value={componentStyles[editingComponent]?.shadow.spread || 0}
+                                    onChange={(e) => {
+                                      const newStyles = {
+                                        ...componentStyles,
+                                        [editingComponent]: {
+                                          ...componentStyles[editingComponent],
+                                          shadow: {
+                                            ...componentStyles[editingComponent]?.shadow,
+                                            spread: parseInt(e.target.value),
+                                          },
+                                        },
+                                      }
+                                      setComponentStyles(newStyles)
+                                    }}
+                                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                    style={{
+                                      background: `linear-gradient(to right, #715AFF 0%, #715AFF ${((componentStyles[editingComponent]?.shadow.spread || 0) / 50) * 100}%, #374151 ${((componentStyles[editingComponent]?.shadow.spread || 0) / 50) * 100}%, #374151 100%)`,
+                                    }}
+                                  />
+                                </div>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="50"
+                                  step="1"
+                                  value={componentStyles[editingComponent]?.shadow.spread || 0}
+                                  onChange={(e) => {
+                                    const newStyles = {
+                                      ...componentStyles,
+                                      [editingComponent]: {
+                                        ...componentStyles[editingComponent],
+                                        shadow: {
+                                          ...componentStyles[editingComponent]?.shadow,
+                                          spread: parseInt(e.target.value) || 0,
+                                        },
+                                      },
+                                    }
+                                    setComponentStyles(newStyles)
+                                  }}
+                                  className="w-16 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-palette-slate"
+                                />
+                                <span className="text-xs text-gray-400">px</span>
+                              </div>
+                            </div>
+
+                            {/* Color */}
+                            <div>
+                              <label className="block text-xs text-gray-400 mb-2">Color</label>
+                              <div className="flex items-center gap-3">
+                                <input
+                                  type="color"
+                                  value={componentStyles[editingComponent]?.shadow.color || '#000000'}
+                                  onChange={(e) => {
+                                    const newStyles = {
+                                      ...componentStyles,
+                                      [editingComponent]: {
+                                        ...componentStyles[editingComponent],
+                                        shadow: {
+                                          ...componentStyles[editingComponent]?.shadow,
+                                          color: e.target.value,
+                                        },
+                                      },
+                                    }
+                                    setComponentStyles(newStyles)
+                                  }}
+                                  className="w-12 h-12 rounded border-2 border-gray-700 cursor-pointer"
+                                />
+                                <input
+                                  type="text"
+                                  value={componentStyles[editingComponent]?.shadow.color || '#000000'}
+                                  onChange={(e) => {
+                                    const value = e.target.value
+                                    if (value.match(/^#[0-9A-Fa-f]{0,6}$/) || value === '') {
+                                      const newStyles = {
+                                        ...componentStyles,
+                                        [editingComponent]: {
+                                          ...componentStyles[editingComponent],
+                                          shadow: {
+                                            ...componentStyles[editingComponent]?.shadow,
+                                            color: value || '#000000',
+                                          },
+                                        },
+                                      }
+                                      setComponentStyles(newStyles)
+                                    }
+                                  }}
+                                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-palette-slate"
+                                  placeholder="#000000"
+                                  maxLength={7}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {/* Footer */}
+              <div className="p-6 border-t border-gray-800 flex space-x-2 flex-shrink-0">
+                <button
+                  onClick={() => setEditingComponent(null)}
+                  className="flex-1 px-4 py-2 bg-palette-slate hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setEditingComponent(null)}
+                  className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   )

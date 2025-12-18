@@ -139,9 +139,9 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
     const figmaSetup = nodesByType.figmaSetup?.data || {}
     const codeStack = nodesByType.codeStack?.data || {}
 
-    // Determine tech stack
-    const projectTypes = codeStack.projectTypes || []
-    const designSystemBases = codeStack.designSystemBases || []
+    // Determine tech stack - use modern defaults
+    const projectTypes = codeStack.projectTypes || ['Next.js']
+    const designSystemBases = codeStack.designSystemBases || ['shadcn/ui']
     
     let techStack = 'Next.js'
     if (projectTypes.includes('Next.js')) {
@@ -156,15 +156,15 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
       techStack = 'Remix'
     }
 
-    let stylingApproach = 'Tailwind CSS'
-    if (designSystemBases.includes('From scratch')) {
+    let stylingApproach = 'shadcn/ui with Tailwind CSS'
+    if (designSystemBases.includes('shadcn') || designSystemBases.includes('shadcn/ui')) {
+      stylingApproach = 'shadcn/ui with Tailwind CSS'
+    } else if (designSystemBases.includes('From scratch')) {
       stylingApproach = 'from scratch using CSS modules'
     } else if (designSystemBases.includes('MUI')) {
       stylingApproach = 'Material-UI (MUI)'
     } else if (designSystemBases.includes('Ant Design')) {
       stylingApproach = 'Ant Design'
-    } else if (designSystemBases.includes('shadcn')) {
-      stylingApproach = 'shadcn/ui with Tailwind CSS'
     } else if (designSystemBases.includes('Tailwind CSS')) {
       stylingApproach = 'Tailwind CSS'
     }
