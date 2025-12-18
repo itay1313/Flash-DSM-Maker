@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
         // Merge tokens, avoiding duplicates
         const existingTokens = mergedTokens[existingCategoryIndex].tokens
         newCategory.tokens.forEach(newToken => {
-          if (!existingTokens.find(t => t.name === newToken.name)) {
+          if (!existingTokens.find((t: { name: string; value: string; type: 'color' | 'font' | 'size' }) => t.name === newToken.name)) {
             existingTokens.push(newToken)
           }
         })
@@ -176,4 +176,5 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
 
