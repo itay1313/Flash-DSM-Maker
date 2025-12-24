@@ -1,0 +1,117 @@
+import { Meta } from '@storybook/blocks'
+
+<Meta title="Documentation/Design Tokens" />
+
+# Design Tokens
+
+Design tokens are the foundation of our design system. They ensure consistency across all components and make theming easy.
+
+## Color Tokens
+
+### Primary Colors
+- `--color-primary-50` through `--color-primary-900`
+- Default: `--color-primary` (maps to `--color-primary-600`)
+
+### Semantic Colors
+- **Success**: `--color-success-*`
+- **Warning**: `--color-warning-*`
+- **Error**: `--color-error-*`
+- **Info**: `--color-info-*`
+
+### UI Colors
+- **Background**: `--color-background`, `--color-background-secondary`, `--color-background-tertiary`
+- **Border**: `--color-border`, `--color-border-hover`, `--color-border-focus`
+- **Text**: `--color-text`, `--color-text-secondary`, `--color-text-tertiary`, `--color-text-inverse`
+
+## Typography Tokens
+
+### Font Families
+- `--font-sans`: System font stack
+- `--font-mono`: Monospace font stack
+
+### Font Sizes
+- `--font-size-xs` through `--font-size-4xl`
+- Each includes corresponding `--line-height-*`
+
+## Spacing Tokens
+
+Spacing scale from `--spacing-0` (0) to `--spacing-64` (16rem).
+
+Common spacing values:
+- `--spacing-1`: 0.25rem (4px)
+- `--spacing-2`: 0.5rem (8px)
+- `--spacing-4`: 1rem (16px)
+- `--spacing-8`: 2rem (32px)
+
+## Radius Tokens
+
+- `--radius-none`: 0
+- `--radius-sm`: 0.125rem
+- `--radius-base`: 0.25rem
+- `--radius-md`: 0.375rem
+- `--radius-lg`: 0.5rem
+- `--radius-xl`: 0.75rem
+- `--radius-full`: 9999px
+
+## Shadow Tokens
+
+- `--shadow-sm`: Subtle shadow
+- `--shadow-base`: Default shadow
+- `--shadow-md`: Medium shadow
+- `--shadow-lg`: Large shadow
+- `--shadow-xl`: Extra large shadow
+- `--shadow-2xl`: Largest shadow
+- `--shadow-inner`: Inner shadow
+
+## Using Tokens in Tailwind
+
+Tokens are automatically available in Tailwind:
+
+```tsx
+// Colors
+<div className="ds-bg-primary ds-text-text-inverse">Content</div>
+
+// Spacing
+<div className="ds-p-4 ds-mt-8">Content</div>
+
+// Radius
+<button className="ds-rounded-lg">Button</button>
+
+// Shadows
+<div className="ds-shadow-md">Card</div>
+```
+
+## Theming
+
+Tokens support theming. To add dark mode:
+
+1. Add dark mode tokens in `app/globals.css`:
+
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #171717;
+    --color-text: #fafafa;
+    /* ... other dark tokens */
+  }
+}
+```
+
+2. Use Tailwind's dark mode:
+
+```tsx
+<div className="ds-bg-background dark:ds-bg-neutral-900">Content</div>
+```
+
+## Legacy Token Migration
+
+If migrating from legacy tokens, map them to new semantic tokens:
+
+```css
+/* Legacy */
+--old-primary: #0ea5e9;
+
+/* New */
+--color-primary-600: var(--old-primary);
+```
+

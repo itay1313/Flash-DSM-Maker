@@ -1,0 +1,222 @@
+import { Meta } from '@storybook/blocks'
+
+<Meta title="Documentation/Migration Guide" />
+
+# Migration Guide
+
+Guide for migrating from legacy components to the new design system.
+
+## Migration Strategy
+
+### Progressive Migration
+
+Migrate components incrementally, not all at once:
+
+1. **Identify** legacy components
+2. **Map** to design system equivalents
+3. **Migrate** one component at a time
+4. **Test** thoroughly
+5. **Deprecate** legacy component
+
+### Component Mapping
+
+| Legacy Component | Design System Component | Notes |
+|----------------|------------------------|-------|
+| `OldButton` | `Button` | Direct replacement |
+| `CustomInput` | `TextField` | Includes label/error |
+| `Spinner` | `Spinner` | Same API |
+
+## Step-by-Step Migration
+
+### 1. Update Imports
+
+```tsx
+// Before
+import { OldButton } from '@/components/legacy/Button'
+
+// After
+import { Button } from '@/design-system'
+```
+
+### 2. Update Props
+
+Map legacy props to new component props:
+
+```tsx
+// Before
+<OldButton type="primary" size="large" />
+
+// After
+<Button variant="primary" size="lg" />
+```
+
+### 3. Update Styling
+
+Replace legacy classes with design system classes:
+
+```tsx
+// Before
+<button className="btn btn-primary btn-large">
+
+// After
+<Button variant="primary" size="lg">
+```
+
+### 4. Handle Breaking Changes
+
+Some components have breaking changes:
+
+```tsx
+// Before - CustomInput had separate label prop
+<CustomInput label="Email" />
+
+// After - TextField integrates label
+<TextField label="Email" />
+```
+
+## Token Migration
+
+### Color Tokens
+
+Map legacy colors to semantic tokens:
+
+```css
+/* Legacy */
+--old-primary: #0ea5e9;
+--old-secondary: #9333ea;
+
+/* New */
+--color-primary-600: var(--old-primary);
+--color-secondary-600: var(--old-secondary);
+```
+
+### Spacing Tokens
+
+Map legacy spacing:
+
+```css
+/* Legacy */
+--spacing-small: 8px;
+--spacing-medium: 16px;
+--spacing-large: 32px;
+
+/* New */
+--spacing-2: var(--spacing-small);
+--spacing-4: var(--spacing-medium);
+--spacing-8: var(--spacing-large);
+```
+
+## Common Migration Patterns
+
+### Form Fields
+
+Legacy forms often had separate label/input/error:
+
+```tsx
+// Before
+<div>
+  <label>Email</label>
+  <input type="email" />
+  {error && <span>{error}</span>}
+</div>
+
+// After
+<TextField label="Email" type="email" error={error} />
+```
+
+### Buttons
+
+Legacy buttons often used classes:
+
+```tsx
+// Before
+<button className="btn btn-primary btn-large">
+  Click me
+</button>
+
+// After
+<Button variant="primary" size="lg">
+  Click me
+</Button>
+```
+
+### Icons
+
+Legacy icon usage:
+
+```tsx
+// Before
+<Icon name="user" size={16} />
+
+// After
+<Icon name="User" size="sm" />
+```
+
+## Deprecation Strategy
+
+### Mark as Deprecated
+
+Add deprecation warnings:
+
+```tsx
+// Legacy component
+export function OldButton(props) {
+  console.warn('OldButton is deprecated. Use Button from @/design-system')
+  // ... implementation
+}
+```
+
+### Provide Migration Path
+
+Document migration in component:
+
+```tsx
+/**
+ * @deprecated Use Button from @/design-system instead
+ * 
+ * Migration:
+ * <OldButton type="primary" /> → <Button variant="primary" />
+ */
+export function OldButton() { ... }
+```
+
+### Gradual Removal
+
+1. Mark deprecated (keep working)
+2. Add warnings
+3. Update documentation
+4. Remove in next major version
+
+## Testing Migration
+
+### Visual Regression
+
+Use visual regression testing:
+
+```tsx
+test('migrated component matches design', () => {
+  const { container } = render(<Button>Click</Button>)
+  expect(container).toMatchSnapshot()
+})
+```
+
+### Behavior Testing
+
+Test component behavior:
+
+```tsx
+test('button click works', () => {
+  const handleClick = jest.fn()
+  render(<Button onClick={handleClick}>Click</Button>)
+  fireEvent.click(screen.getByRole('button'))
+  expect(handleClick).toHaveBeenCalled()
+})
+```
+
+## Getting Help
+
+- Check component stories in Storybook
+- Review component documentation
+- Ask in team chat
+- Create an issue for migration blockers
+
