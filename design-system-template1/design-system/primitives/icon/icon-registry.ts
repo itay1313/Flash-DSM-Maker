@@ -6,14 +6,16 @@
  */
 
 import * as React from 'react'
-import * as Icons from 'lucide-react'
+import * as LucideIcons from 'lucide-react'
 
-export type IconName = keyof typeof Icons
+// Filter to only React components (functions that can be rendered)
+const iconEntries = Object.entries(LucideIcons).filter(
+  ([_, value]) => typeof value === 'function' || (typeof value === 'object' && value !== null && '$$typeof' in value)
+) as [string, React.ComponentType<any>][]
 
-export const iconRegistry: Record<string, React.ComponentType<any>> = {
-  // Common icons from lucide-react
-  ...Icons,
-}
+export type IconName = typeof iconEntries[number][0]
+
+export const iconRegistry: Record<string, React.ComponentType<any>> = Object.fromEntries(iconEntries)
 
 /**
  * Get an icon component by name

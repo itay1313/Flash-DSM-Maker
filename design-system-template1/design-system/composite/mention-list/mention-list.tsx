@@ -10,7 +10,7 @@ export interface MentionItem {
   status?: 'online' | 'offline' | 'away' | 'busy'
 }
 
-export interface MentionListProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface MentionListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onSelect'> {
   items: MentionItem[]
   onSelect?: (item: MentionItem) => void
   highlightedIndex?: number

@@ -11,4 +11,7 @@ export * from './dialog'
 export * from './badge'
 export * from './tag'
 export * from './icon'
+export * from './alert'
+export * from './separator'
+export * from './accordion'
 

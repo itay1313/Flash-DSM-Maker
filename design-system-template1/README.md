@@ -5,9 +5,9 @@ Production-ready Design System for modern SaaS startups built with Next.js 14, R
 ## Features
 
 - 🎨 **Token-driven design** - CSS variables for all design tokens
-- ♿ **Accessible by default** - WCAG 2.1 AA compliant components
-- 📚 **Storybook documentation** - Comprehensive component library
-- 🎯 **Type-safe** - Full TypeScript support
+- ♿ **Accessible by default** - WCAG 2.1 AA compliant components built on Radix UI
+- 📚 **Comprehensive documentation** - Live component showcase and examples
+- 🎯 **Type-safe** - Full TypeScript support with IntelliSense
 - 🧩 **Composable** - Build complex UIs from simple primitives
 - 🚀 **Production-ready** - Battle-tested patterns and best practices
 
@@ -20,8 +20,8 @@ npm install
 # Run development server
 npm run dev
 
-# Run Storybook
-npm run storybook
+# Build for production
+npm run build
 ```
 
 ## Project Structure
@@ -36,8 +36,8 @@ design-system-template/
 │   ├── composite/         # Complex components
 │   └── layout/            # Layout components
 ├── app/                   # Next.js app directory
-├── docs/                  # MDX documentation
-└── .storybook/            # Storybook configuration
+│   └── design-system/     # Component showcase pages
+└── docs/                  # MDX documentation
 ```
 
 ## Usage
@@ -108,17 +108,19 @@ Use tokens via Tailwind classes:
 - Grid, Card
 - DashboardWidget
 
-## Storybook
+## Component Showcase
 
-View all components and documentation:
+View all components and examples:
 
 ```bash
-npm run storybook
+npm run dev
 ```
 
-Stories are located in:
-- `/design-system/**/*.stories.tsx`
-- `/components/**/*.stories.tsx`
+Then navigate to:
+- `/design-system` - Main design system hub
+- `/design-system/primitives` - All primitive components
+- `/design-system/tokens` - Design tokens reference
+- `/design-system/[category]` - Component category pages
 
 ## Documentation
 
