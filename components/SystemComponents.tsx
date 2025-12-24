@@ -82,8 +82,27 @@ const THEMES: { id: Theme; name: string; colors: { primary: string; bg: string; 
 ]
 
 // Component Preview Renderer
-function ComponentPreview({ componentName, theme }: { componentName: string; theme: Theme }) {
+function ComponentPreview({ 
+  componentName, 
+  theme, 
+  styles 
+}: { 
+  componentName: string
+  theme: Theme
+  styles?: ComponentStyles
+}) {
   const themeColors = THEMES.find(t => t.id === theme)?.colors || THEMES[0].colors
+  
+  // Calculate border radius and shadow from styles
+  const borderRadius = styles?.radius ? `${styles.radius}rem` : '0.375rem'
+  const boxShadow = styles?.shadow 
+    ? `${styles.shadow.xOffset}px ${styles.shadow.yOffset}px ${styles.shadow.blur}px ${styles.shadow.spread}px ${styles.shadow.color}`
+    : undefined
+  
+  const componentStyle = {
+    borderRadius,
+    boxShadow,
+  }
   
   const previewStyles = {
     backgroundColor: themeColors.bg,
@@ -96,14 +115,22 @@ function ComponentPreview({ componentName, theme }: { componentName: string; the
       return (
         <div className="space-y-2">
           <button 
-            className="px-4 py-2 rounded-lg font-medium text-sm transition-all"
-            style={{ backgroundColor: themeColors.primary, color: '#FFFFFF' }}
+            className="px-4 py-2 font-medium text-sm transition-all"
+            style={{ 
+              backgroundColor: themeColors.primary, 
+              color: '#FFFFFF',
+              ...componentStyle
+            }}
           >
             Primary Button
           </button>
           <button 
-            className="px-4 py-2 rounded-lg font-medium text-sm border transition-all"
-            style={{ borderColor: themeColors.border, color: themeColors.text }}
+            className="px-4 py-2 font-medium text-sm border transition-all"
+            style={{ 
+              borderColor: themeColors.border, 
+              color: themeColors.text,
+              ...componentStyle
+            }}
           >
             Secondary Button
           </button>
@@ -115,21 +142,23 @@ function ComponentPreview({ componentName, theme }: { componentName: string; the
           <input
             type="text"
             placeholder="Enter text..."
-            className="w-full px-3 py-2 rounded-lg text-sm border transition-all"
+            className="w-full px-3 py-2 text-sm border transition-all"
             style={{ 
               backgroundColor: themeColors.bg,
               borderColor: themeColors.border,
-              color: themeColors.text
+              color: themeColors.text,
+              ...componentStyle
             }}
           />
           <input
             type="text"
             placeholder="Focused state"
-            className="w-full px-3 py-2 rounded-lg text-sm border-2 transition-all"
+            className="w-full px-3 py-2 text-sm border-2 transition-all"
             style={{ 
               backgroundColor: themeColors.bg,
               borderColor: themeColors.primary,
-              color: themeColors.text
+              color: themeColors.text,
+              ...componentStyle
             }}
           />
         </div>
@@ -137,11 +166,12 @@ function ComponentPreview({ componentName, theme }: { componentName: string; the
     case 'Card':
       return (
         <div 
-          className="p-4 rounded-lg border"
+          className="p-4 border"
           style={{ 
             backgroundColor: themeColors.bg,
             borderColor: themeColors.border,
-            color: themeColors.text
+            color: themeColors.text,
+            ...componentStyle
           }}
         >
           <h4 className="font-semibold mb-2">Card Title</h4>
@@ -152,14 +182,22 @@ function ComponentPreview({ componentName, theme }: { componentName: string; the
       return (
         <div className="flex gap-2 flex-wrap">
           <span 
-            className="px-2 py-1 rounded-full text-xs font-medium"
-            style={{ backgroundColor: themeColors.primary, color: '#FFFFFF' }}
+            className="px-2 py-1 text-xs font-medium"
+            style={{ 
+              backgroundColor: themeColors.primary, 
+              color: '#FFFFFF',
+              ...componentStyle
+            }}
           >
             New
           </span>
           <span 
-            className="px-2 py-1 rounded-full text-xs font-medium border"
-            style={{ borderColor: themeColors.border, color: themeColors.text }}
+            className="px-2 py-1 text-xs font-medium border"
+            style={{ 
+              borderColor: themeColors.border, 
+              color: themeColors.text,
+              ...componentStyle
+            }}
           >
             Default
           </span>
@@ -169,11 +207,26 @@ function ComponentPreview({ componentName, theme }: { componentName: string; the
       return (
         <div className="space-y-2">
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" className="w-4 h-4 rounded" style={{ accentColor: themeColors.primary }} />
+            <input 
+              type="checkbox" 
+              className="w-4 h-4" 
+              style={{ 
+                accentColor: themeColors.primary,
+                borderRadius: styles?.radius ? `${styles.radius * 0.25}rem` : undefined
+              }} 
+            />
             <span className="text-sm">Option 1</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked className="w-4 h-4 rounded" style={{ accentColor: themeColors.primary }} />
+            <input 
+              type="checkbox" 
+              checked 
+              className="w-4 h-4" 
+              style={{ 
+                accentColor: themeColors.primary,
+                borderRadius: styles?.radius ? `${styles.radius * 0.25}rem` : undefined
+              }} 
+            />
             <span className="text-sm">Option 2</span>
           </label>
         </div>
@@ -185,8 +238,12 @@ function ComponentPreview({ componentName, theme }: { componentName: string; the
             <div className="relative">
               <input type="checkbox" className="sr-only" />
               <div 
-                className="w-10 h-6 rounded-full transition-all"
-                style={{ backgroundColor: themeColors.border }}
+                className="w-10 h-6 transition-all"
+                style={{ 
+                  backgroundColor: themeColors.border,
+                  borderRadius: styles?.radius ? `${styles.radius * 0.5}rem` : '9999px',
+                  ...(styles?.shadow ? { boxShadow: boxShadow } : {})
+                }}
               >
                 <div className="w-5 h-5 bg-white rounded-full shadow transform transition-all translate-x-0.5 translate-y-0.5"></div>
               </div>
@@ -197,8 +254,12 @@ function ComponentPreview({ componentName, theme }: { componentName: string; the
             <div className="relative">
               <input type="checkbox" checked className="sr-only" />
               <div 
-                className="w-10 h-6 rounded-full transition-all"
-                style={{ backgroundColor: themeColors.primary }}
+                className="w-10 h-6 transition-all"
+                style={{ 
+                  backgroundColor: themeColors.primary,
+                  borderRadius: styles?.radius ? `${styles.radius * 0.5}rem` : '9999px',
+                  ...(styles?.shadow ? { boxShadow: boxShadow } : {})
+                }}
               >
                 <div className="w-5 h-5 bg-white rounded-full shadow transform transition-all translate-x-5 translate-y-0.5"></div>
               </div>
@@ -210,11 +271,12 @@ function ComponentPreview({ componentName, theme }: { componentName: string; the
     default:
       return (
         <div 
-          className="p-4 rounded-lg border text-center"
+          className="p-4 border text-center"
           style={{ 
             backgroundColor: themeColors.bg,
             borderColor: themeColors.border,
-            color: themeColors.text
+            color: themeColors.text,
+            ...componentStyle
           }}
         >
           <p className="text-sm opacity-60">{componentName} Preview</p>
@@ -294,17 +356,19 @@ export default function SystemComponents({ designSystemName, availableSystems, o
                 
                 {/* Preview Area */}
                 <div 
-                  className="mb-4 p-4 rounded-lg border border-gray-800 transition-all"
+                  className="mb-4 p-4 rounded-lg border border-gray-800 bg-gray-950 transition-all"
                   style={{ 
-                    backgroundColor: THEMES.find(t => t.id === selectedTheme)?.colors.bg || '#111827',
-                    borderColor: THEMES.find(t => t.id === selectedTheme)?.colors.border || '#374151',
                     minHeight: '120px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
                 >
-                  <ComponentPreview componentName={component.name} theme={selectedTheme} />
+                  <ComponentPreview 
+                    componentName={component.name} 
+                    theme={selectedTheme}
+                    styles={componentStyles[component.name]}
+                  />
                 </div>
                 
                 {/* Actions */}
@@ -409,26 +473,6 @@ export default function SystemComponents({ designSystemName, availableSystems, o
           )}
         </div>
       </div>
-
-      {/* System Switcher */}
-      {availableSystems.length > 0 && (
-        <div className="fixed bottom-6 right-6 z-40" style={{ transform: 'translateY(-60px)' }}>
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-3 shadow-xl">
-            <label className="block text-xs text-gray-400 mb-1">Switch design system</label>
-            <select
-              className="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-palette-slate"
-              onChange={(e) => onSwitchSystem(e.target.value)}
-              value={availableSystems.find((s) => s.projectName === designSystemName)?.id || ''}
-            >
-              {availableSystems.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.projectName}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      )}
 
       {/* Component Edit Modal - Right Sidebar */}
       {editingComponent && (
