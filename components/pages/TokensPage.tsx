@@ -27,53 +27,55 @@ const DEFAULT_TOKENS: Record<TokenLayer, TokenGroup[]> = {
       layer: 'core',
       category: 'colors',
       tokens: [
-        { name: 'text-primary', value: '#ffffff', type: 'color', layer: 'core', category: 'colors', state: 'default' },
-        { name: 'bg-surface', value: '#1a1a1a', type: 'color', layer: 'core', category: 'colors', state: 'default' },
-        { name: 'border-default', value: '#333333', type: 'color', layer: 'core', category: 'colors', state: 'default' },
+        { name: 'color-white', value: '#ffffff', type: 'color', layer: 'core', category: 'colors' },
+        { name: 'color-black', value: '#000000', type: 'color', layer: 'core', category: 'colors' },
+        { name: 'color-gray-50', value: '#f5f5f5', type: 'color', layer: 'core', category: 'colors' },
+        { name: 'color-gray-100', value: '#e5e5e5', type: 'color', layer: 'core', category: 'colors' },
+        { name: 'color-gray-300', value: '#b3b3b3', type: 'color', layer: 'core', category: 'colors' },
+        { name: 'color-gray-600', value: '#666666', type: 'color', layer: 'core', category: 'colors' },
+        { name: 'color-gray-900', value: '#1a1a1a', type: 'color', layer: 'core', category: 'colors' },
+        { name: 'color-blue-500', value: '#3b82f6', type: 'color', layer: 'core', category: 'colors' },
+        { name: 'color-red-500', value: '#ef4444', type: 'color', layer: 'core', category: 'colors' },
+        { name: 'color-green-500', value: '#22c55e', type: 'color', layer: 'core', category: 'colors' },
       ],
     },
     {
       layer: 'core',
       category: 'typography',
       tokens: [
-        { name: 'font-family-base', value: 'Inter, sans-serif', type: 'font', layer: 'core', category: 'typography' },
-        { name: 'font-size-md', value: '1rem', type: 'size', layer: 'core', category: 'typography' },
-        { name: 'font-weight-regular', value: '400', type: 'size', layer: 'core', category: 'typography' },
-        { name: 'line-height-normal', value: '1.5', type: 'size', layer: 'core', category: 'typography' },
+        { name: 'font-sans', value: 'Inter, system-ui, Arial', type: 'font', layer: 'core', category: 'typography' },
+        { name: 'font-mono', value: 'Menlo, monospace', type: 'font', layer: 'core', category: 'typography' },
+        { name: 'font-size-xs', value: '12px', type: 'size', layer: 'core', category: 'typography' },
+        { name: 'font-size-sm', value: '14px', type: 'size', layer: 'core', category: 'typography' },
+        { name: 'font-size-md', value: '16px', type: 'size', layer: 'core', category: 'typography' },
+        { name: 'font-size-lg', value: '18px', type: 'size', layer: 'core', category: 'typography' },
       ],
     },
     {
       layer: 'core',
       category: 'spacing',
       tokens: [
-        { name: 'space-4', value: '0.25rem', type: 'size', layer: 'core', category: 'spacing' },
-        { name: 'space-8', value: '0.5rem', type: 'size', layer: 'core', category: 'spacing' },
-        { name: 'space-16', value: '1rem', type: 'size', layer: 'core', category: 'spacing' },
+        { name: 'space-2', value: '4px', type: 'size', layer: 'core', category: 'spacing' },
+        { name: 'space-4', value: '8px', type: 'size', layer: 'core', category: 'spacing' },
+        { name: 'space-6', value: '12px', type: 'size', layer: 'core', category: 'spacing' },
+        { name: 'space-8', value: '16px', type: 'size', layer: 'core', category: 'spacing' },
       ],
     },
     {
       layer: 'core',
       category: 'radius',
       tokens: [
-        { name: 'radius-md', value: '0.375rem', type: 'radius', layer: 'core', category: 'radius' },
-        { name: 'radius-sm', value: '0.25rem', type: 'radius', layer: 'core', category: 'radius' },
-        { name: 'radius-lg', value: '0.5rem', type: 'radius', layer: 'core', category: 'radius' },
+        { name: 'radius-sm', value: '4px', type: 'radius', layer: 'core', category: 'radius' },
+        { name: 'radius-md', value: '8px', type: 'radius', layer: 'core', category: 'radius' },
+        { name: 'radius-lg', value: '12px', type: 'radius', layer: 'core', category: 'radius' },
       ],
     },
     {
       layer: 'core',
       category: 'shadows',
       tokens: [
-        { name: 'shadow-sm', value: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', type: 'shadow', layer: 'core', category: 'shadows' },
-        { name: 'shadow-md', value: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', type: 'shadow', layer: 'core', category: 'shadows' },
-      ],
-    },
-    {
-      layer: 'core',
-      category: 'theme',
-      tokens: [
-        { name: 'light', value: 'light', type: 'theme', layer: 'core', category: 'theme' },
-        { name: 'dark', value: 'dark', type: 'theme', layer: 'core', category: 'theme' },
+        { name: 'shadow-sm', value: '0 2px 4px rgba(0,0,0,.08)', type: 'shadow', layer: 'core', category: 'shadows' },
+        { name: 'shadow-md', value: '0 6px 16px rgba(0,0,0,.12)', type: 'shadow', layer: 'core', category: 'shadows' },
       ],
     },
   ],
@@ -82,12 +84,16 @@ const DEFAULT_TOKENS: Record<TokenLayer, TokenGroup[]> = {
       layer: 'semantic',
       category: 'colors',
       tokens: [
-        { name: 'text-primary', value: '#ffffff', type: 'color', layer: 'semantic', category: 'colors', state: 'default' },
-        { name: 'text-primary', value: '#e0e0e0', type: 'color', layer: 'semantic', category: 'colors', state: 'hover' },
-        { name: 'bg-surface', value: '#1a1a1a', type: 'color', layer: 'semantic', category: 'colors', state: 'default' },
-        { name: 'bg-surface', value: '#242424', type: 'color', layer: 'semantic', category: 'colors', state: 'hover' },
-        { name: 'border-default', value: '#333333', type: 'color', layer: 'semantic', category: 'colors', state: 'default' },
-        { name: 'border-default', value: '#404040', type: 'color', layer: 'semantic', category: 'colors', state: 'focus' },
+        { name: 'text-primary', value: 'var(--color-gray-900)', type: 'color', layer: 'semantic', category: 'colors' },
+        { name: 'text-secondary', value: 'var(--color-gray-600)', type: 'color', layer: 'semantic', category: 'colors' },
+        { name: 'text-inverse', value: 'var(--color-white)', type: 'color', layer: 'semantic', category: 'colors' },
+        { name: 'bg-app', value: 'var(--color-gray-50)', type: 'color', layer: 'semantic', category: 'colors' },
+        { name: 'bg-surface', value: 'var(--color-white)', type: 'color', layer: 'semantic', category: 'colors' },
+        { name: 'bg-subtle', value: 'var(--color-gray-100)', type: 'color', layer: 'semantic', category: 'colors' },
+        { name: 'border-default', value: 'var(--color-gray-300)', type: 'color', layer: 'semantic', category: 'colors' },
+        { name: 'accent-primary', value: 'var(--color-blue-500)', type: 'color', layer: 'semantic', category: 'colors' },
+        { name: 'accent-success', value: 'var(--color-green-500)', type: 'color', layer: 'semantic', category: 'colors' },
+        { name: 'accent-danger', value: 'var(--color-red-500)', type: 'color', layer: 'semantic', category: 'colors' },
       ],
     },
   ],
@@ -96,10 +102,47 @@ const DEFAULT_TOKENS: Record<TokenLayer, TokenGroup[]> = {
       layer: 'component',
       category: 'colors',
       tokens: [
-        { name: 'button-bg', value: '#6366f1', type: 'color', layer: 'component', category: 'colors', state: 'default' },
-        { name: 'button-bg', value: '#4f46e5', type: 'color', layer: 'component', category: 'colors', state: 'hover' },
-        { name: 'button-bg', value: '#4338ca', type: 'color', layer: 'component', category: 'colors', state: 'focus' },
-        { name: 'button-bg', value: '#6b7280', type: 'color', layer: 'component', category: 'colors', state: 'disabled' },
+        { name: 'btn-primary-bg', value: 'var(--accent-primary)', type: 'color', layer: 'component', category: 'colors' },
+        { name: 'btn-primary-text', value: 'var(--text-inverse)', type: 'color', layer: 'component', category: 'colors' },
+        { name: 'btn-outline-bg', value: 'transparent', type: 'color', layer: 'component', category: 'colors' },
+        { name: 'btn-outline-text', value: 'var(--text-primary)', type: 'color', layer: 'component', category: 'colors' },
+        { name: 'btn-outline-border', value: 'var(--border-default)', type: 'color', layer: 'component', category: 'colors' },
+        { name: 'card-bg', value: 'var(--bg-surface)', type: 'color', layer: 'component', category: 'colors' },
+        { name: 'card-text', value: 'var(--text-primary)', type: 'color', layer: 'component', category: 'colors' },
+        { name: 'input-bg', value: 'var(--bg-surface)', type: 'color', layer: 'component', category: 'colors' },
+        { name: 'input-text', value: 'var(--text-primary)', type: 'color', layer: 'component', category: 'colors' },
+        { name: 'input-border', value: 'var(--border-default)', type: 'color', layer: 'component', category: 'colors' },
+      ],
+    },
+    {
+      layer: 'component',
+      category: 'typography',
+      tokens: [
+        { name: 'btn-font', value: 'var(--font-sans)', type: 'font', layer: 'component', category: 'typography' },
+      ],
+    },
+    {
+      layer: 'component',
+      category: 'spacing',
+      tokens: [
+        { name: 'btn-padding-y', value: 'var(--space-4)', type: 'size', layer: 'component', category: 'spacing' },
+        { name: 'btn-padding-x', value: 'var(--space-8)', type: 'size', layer: 'component', category: 'spacing' },
+      ],
+    },
+    {
+      layer: 'component',
+      category: 'radius',
+      tokens: [
+        { name: 'btn-radius', value: 'var(--radius-md)', type: 'radius', layer: 'component', category: 'radius' },
+        { name: 'card-radius', value: 'var(--radius-lg)', type: 'radius', layer: 'component', category: 'radius' },
+        { name: 'input-radius', value: 'var(--radius-sm)', type: 'radius', layer: 'component', category: 'radius' },
+      ],
+    },
+    {
+      layer: 'component',
+      category: 'shadows',
+      tokens: [
+        { name: 'card-shadow', value: 'var(--shadow-md)', type: 'shadow', layer: 'component', category: 'shadows' },
       ],
     },
   ],
@@ -118,10 +161,19 @@ export default function TokensPage() {
   const [activeTab, setActiveTab] = useState<TokenLayer>('core')
   const [tokens, setTokens] = useState<Record<TokenLayer, TokenGroup[]>>(DEFAULT_TOKENS)
   const [editingToken, setEditingToken] = useState<{ layer: TokenLayer; groupIndex: number; tokenIndex: number } | null>(null)
-  const [colorPickerPosition, setColorPickerPosition] = useState<{ x: number; y: number } | null>(null)
+  const [editValue, setEditValue] = useState('')
+  const [editModalPosition, setEditModalPosition] = useState<{ x: number; y: number } | null>(null)
   const [showImportModal, setShowImportModal] = useState(false)
   const [importText, setImportText] = useState('')
   const [isImporting, setIsImporting] = useState(false)
+  const [addingToken, setAddingToken] = useState<{ layer: TokenLayer; category: TokenCategory } | null>(null)
+  const [newToken, setNewToken] = useState<{ name: string; value: string; type: Token['type']; state?: TokenState }>({
+    name: '',
+    value: '',
+    type: 'size',
+    state: undefined,
+  })
+  const [addModalPosition, setAddModalPosition] = useState<{ x: number; y: number } | null>(null)
 
   // Load tokens from localStorage on mount
   useEffect(() => {
@@ -147,42 +199,156 @@ export default function TokensPage() {
     }
   }, [tokens])
 
+  // Apply tokens to CSS variables in :root
+  useEffect(() => {
+    if (typeof window !== 'undefined' && document.documentElement) {
+      const root = document.documentElement
+      
+      // Apply Core tokens first (primitives)
+      tokens.core.forEach((group) => {
+        group.tokens.forEach((token) => {
+          const cssVarName = `--${token.name}`
+          // Only set if value doesn't start with var() (to avoid circular references)
+          if (!token.value.startsWith('var(')) {
+            root.style.setProperty(cssVarName, token.value)
+          }
+        })
+      })
+
+      // Apply Semantic tokens (depend on Core)
+      tokens.semantic.forEach((group) => {
+        group.tokens.forEach((token) => {
+          const cssVarName = `--${token.name}`
+          root.style.setProperty(cssVarName, token.value)
+        })
+      })
+
+      // Apply Component tokens (depend on Semantic/Core)
+      tokens.component.forEach((group) => {
+        group.tokens.forEach((token) => {
+          const cssVarName = `--${token.name}`
+          root.style.setProperty(cssVarName, token.value)
+        })
+      })
+    }
+  }, [tokens])
+
+  // Helper function to get computed CSS variable value
+  const getComputedValue = (token: Token): string => {
+    if (typeof window === 'undefined') return token.value
+    
+    if (token.value.startsWith('var(')) {
+      // For var() references, try to get the computed value
+      const cssVarName = `--${token.name}`
+      const computed = getComputedStyle(document.documentElement).getPropertyValue(cssVarName).trim()
+      return computed || token.value
+    }
+    
+    return token.value
+  }
+
   const handleEditClick = (layer: TokenLayer, groupIndex: number, tokenIndex: number, e: React.MouseEvent) => {
     const token = tokens[layer][groupIndex].tokens[tokenIndex]
-    if (token.type === 'color') {
-      const buttonRect = e.currentTarget.getBoundingClientRect()
-      
-      let x = buttonRect.right + 10
-      let y = buttonRect.top
-      
-      if (x + 300 > window.innerWidth) {
-        x = buttonRect.left - 320
-      }
-      
-      if (y + 250 > window.innerHeight) {
-        y = window.innerHeight - 260
-      }
-      
-      if (y < 10) {
-        y = 10
-      }
-      
-      setColorPickerPosition({ x, y })
-      setEditingToken({ layer, groupIndex, tokenIndex })
+    const buttonRect = e.currentTarget.getBoundingClientRect()
+    
+    let x = buttonRect.right + 10
+    let y = buttonRect.top
+    
+    if (x + 320 > window.innerWidth) {
+      x = buttonRect.left - 340
     }
+    
+    if (y + 300 > window.innerHeight) {
+      y = window.innerHeight - 310
+    }
+    
+    if (y < 10) {
+      y = 10
+    }
+    
+    setEditModalPosition({ x, y })
+    setEditValue(token.value)
+    setEditingToken({ layer, groupIndex, tokenIndex })
   }
 
-  const handleColorChange = (color: string) => {
+  const handleValueChange = (newValue: string) => {
     if (editingToken) {
       const updated = { ...tokens }
-      updated[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].value = color
+      updated[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].value = newValue
       setTokens(updated)
+      setEditValue(newValue)
     }
   }
 
-  const handleCloseColorPicker = () => {
+  const handleCloseEditModal = () => {
     setEditingToken(null)
-    setColorPickerPosition(null)
+    setEditModalPosition(null)
+    setEditValue('')
+  }
+
+  const handleSaveEdit = () => {
+    if (editingToken && editValue.trim()) {
+      handleValueChange(editValue.trim())
+      handleCloseEditModal()
+    }
+  }
+
+  const handleAddTokenClick = (layer: TokenLayer, category: TokenCategory, e: React.MouseEvent) => {
+    const buttonRect = e.currentTarget.getBoundingClientRect()
+    
+    let x = buttonRect.right + 10
+    let y = buttonRect.top
+    
+    if (x + 320 > window.innerWidth) {
+      x = buttonRect.left - 340
+    }
+    
+    if (y + 350 > window.innerHeight) {
+      y = window.innerHeight - 360
+    }
+    
+    if (y < 10) {
+      y = 10
+    }
+    
+    setAddModalPosition({ x, y })
+    setAddingToken({ layer, category })
+    setNewToken({
+      name: '',
+      value: '',
+      type: category === 'colors' ? 'color' : category === 'typography' ? 'font' : category === 'shadows' ? 'shadow' : category === 'theme' ? 'theme' : category === 'radius' ? 'radius' : 'size',
+      state: category === 'colors' ? 'default' : undefined,
+    })
+  }
+
+  const handleCloseAddModal = () => {
+    setAddingToken(null)
+    setAddModalPosition(null)
+    setNewToken({ name: '', value: '', type: 'size', state: undefined })
+  }
+
+  const handleSaveNewToken = () => {
+    if (!addingToken || !newToken.name.trim() || !newToken.value.trim()) {
+      return
+    }
+
+    const updated = { ...tokens }
+    const groupIndex = updated[addingToken.layer].findIndex(g => g.category === addingToken.category)
+    
+    if (groupIndex >= 0) {
+      const newTokenObj: Token = {
+        name: newToken.name.trim(),
+        value: newToken.value.trim(),
+        type: newToken.type,
+        layer: addingToken.layer,
+        category: addingToken.category,
+        state: newToken.state,
+      }
+      
+      updated[addingToken.layer][groupIndex].tokens.push(newTokenObj)
+      setTokens(updated)
+      handleCloseAddModal()
+    }
   }
 
   const parseCSSVariables = (cssText: string): { name: string; value: string; type: 'color' | 'font' | 'size' }[] => {
@@ -263,6 +429,146 @@ export default function TokensPage() {
   }
 
   const currentTokens = tokens[activeTab] || []
+  const currentEditingToken = editingToken ? tokens[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex] : null
+
+  const renderEditInput = () => {
+    if (!currentEditingToken) return null
+
+    switch (currentEditingToken.type) {
+      case 'color':
+        return (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-start gap-3">
+              <div className="relative flex-shrink-0">
+                <input
+                  type="color"
+                  value={editValue}
+                  onChange={(e) => {
+                    setEditValue(e.target.value)
+                    handleValueChange(e.target.value)
+                  }}
+                  className="w-20 h-20 rounded-lg border-2 border-gray-700 cursor-pointer hover:border-indigo-500 transition-colors"
+                  style={{ backgroundColor: editValue }}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <label className="block text-xs text-gray-400 mb-1.5">Value</label>
+                <input
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (value.match(/^#|rgb|rgba|hsl|hsla|^[a-zA-Z]/) || value === '') {
+                      setEditValue(value)
+                      handleValueChange(value)
+                    }
+                  }}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="#000000 or rgb(...)"
+                />
+              </div>
+            </div>
+            <div className="pt-2 border-t border-gray-800">
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-gray-400 font-medium">Preview</span>
+                <div
+                  className="flex-1 h-10 rounded-lg border-2 border-gray-700 shadow-lg"
+                  style={{ backgroundColor: editValue }}
+                />
+              </div>
+            </div>
+          </div>
+        )
+      
+      case 'font':
+        return (
+          <div>
+            <label className="block text-xs text-gray-400 mb-1.5">Font Family</label>
+            <input
+              type="text"
+              value={editValue}
+              onChange={(e) => {
+                setEditValue(e.target.value)
+                handleValueChange(e.target.value)
+              }}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="Inter, sans-serif"
+            />
+          </div>
+        )
+      
+      case 'size':
+      case 'radius':
+        return (
+          <div>
+            <label className="block text-xs text-gray-400 mb-1.5">Value</label>
+            <input
+              type="text"
+              value={editValue}
+              onChange={(e) => {
+                setEditValue(e.target.value)
+                handleValueChange(e.target.value)
+              }}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="0.25rem, 1rem, etc."
+            />
+            <p className="text-xs text-gray-500 mt-1">Use rem, em, px, or %</p>
+          </div>
+        )
+      
+      case 'shadow':
+        return (
+          <div>
+            <label className="block text-xs text-gray-400 mb-1.5">Shadow Value</label>
+            <textarea
+              value={editValue}
+              onChange={(e) => {
+                setEditValue(e.target.value)
+                handleValueChange(e.target.value)
+              }}
+              rows={3}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+              placeholder="0 1px 2px 0 rgba(0, 0, 0, 0.05)"
+            />
+            <p className="text-xs text-gray-500 mt-1">CSS box-shadow syntax</p>
+          </div>
+        )
+      
+      case 'theme':
+        return (
+          <div>
+            <label className="block text-xs text-gray-400 mb-1.5">Theme Value</label>
+            <select
+              value={editValue}
+              onChange={(e) => {
+                setEditValue(e.target.value)
+                handleValueChange(e.target.value)
+              }}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            >
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        )
+      
+      default:
+        return (
+          <div>
+            <label className="block text-xs text-gray-400 mb-1.5">Value</label>
+            <input
+              type="text"
+              value={editValue}
+              onChange={(e) => {
+                setEditValue(e.target.value)
+                handleValueChange(e.target.value)
+              }}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+        )
+    }
+  }
 
   return (
     <div className="min-h-full flex flex-col overflow-y-auto relative">
@@ -308,8 +614,8 @@ export default function TokensPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {group.tokens.map((token, tokenIndex) => (
                   <div
-                    key={token.name}
-                    className="flex items-center justify-between p-4 bg-gray-950 border border-gray-800 rounded-lg hover:border-indigo-500/50 transition-colors"
+                    key={`${token.name}-${token.state || ''}`}
+                    className="flex items-center justify-between p-4 bg-gray-950 border border-gray-800 rounded-lg hover:border-indigo-500/50 transition-colors group"
                   >
                     <div className="flex items-center space-x-3 flex-1 min-w-0">
                       {token.type === 'color' && (
@@ -320,52 +626,70 @@ export default function TokensPage() {
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium text-white truncate">
-                          {token.name}
+                          --{token.name}
                           {token.state && (
                             <span className="ml-2 text-xs text-gray-500">({token.state})</span>
                           )}
                         </div>
-                        <div className="text-xs text-gray-500 font-mono truncate">{token.value}</div>
+                        <div className="text-xs text-gray-500 font-mono truncate" title={getComputedValue(token)}>
+                          {getComputedValue(token)}
+                        </div>
                       </div>
                     </div>
-                    {token.type === 'color' && (
-                      <button
-                        onClick={(e) => handleEditClick(activeTab, groupIndex, tokenIndex, e)}
-                        className="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded text-xs transition-colors flex-shrink-0 ml-2"
-                      >
-                        Edit
-                      </button>
-                    )}
+                    <button
+                      onClick={(e) => handleEditClick(activeTab, groupIndex, tokenIndex, e)}
+                      className="p-2 text-gray-400 hover:text-palette-cornflower hover:bg-gray-800 rounded transition-colors flex-shrink-0 ml-2 opacity-0 group-hover:opacity-100"
+                      title="Edit token"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
                   </div>
                 ))}
+                {/* Add Token Button */}
+                <button
+                  onClick={(e) => handleAddTokenClick(activeTab, group.category, e)}
+                  className="flex items-center justify-center p-4 bg-gray-950 border-2 border-dashed border-gray-700 rounded-lg hover:border-indigo-500/50 hover:bg-gray-900 transition-colors group"
+                >
+                  <svg className="w-5 h-5 text-gray-400 group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Color Picker Modal */}
-      {editingToken && colorPickerPosition && (
+      {/* Edit Modal */}
+      {editingToken && editModalPosition && currentEditingToken && (
         <>
           <div
             className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm"
-            onClick={handleCloseColorPicker}
+            onClick={handleCloseEditModal}
           />
           <div
-            className="fixed z-50 bg-gray-900 border border-gray-800 rounded-xl shadow-2xl p-5 min-w-[280px] transition-all duration-200"
+            className="fixed z-50 bg-gray-900 border border-gray-800 rounded-xl shadow-2xl p-5 min-w-[320px] max-w-[400px] transition-all duration-200"
             style={{
-              left: `${colorPickerPosition.x}px`,
-              top: `${colorPickerPosition.y}px`,
+              left: `${editModalPosition.x}px`,
+              top: `${editModalPosition.y}px`,
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-white">
-                  {tokens[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].name}
-                </h3>
+                <div>
+                  <h3 className="text-sm font-semibold text-white">
+                    {currentEditingToken.name}
+                    {currentEditingToken.state && (
+                      <span className="ml-2 text-xs text-gray-400">({currentEditingToken.state})</span>
+                    )}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5">{currentEditingToken.type}</p>
+                </div>
                 <button
-                  onClick={handleCloseColorPicker}
+                  onClick={handleCloseEditModal}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -374,54 +698,190 @@ export default function TokensPage() {
                 </button>
               </div>
               
-              <div className="flex items-start gap-3">
-                <div className="relative flex-shrink-0">
-                  <input
-                    type="color"
-                    value={tokens[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].value}
-                    onChange={(e) => handleColorChange(e.target.value)}
-                    className="w-20 h-20 rounded-lg border-2 border-gray-700 cursor-pointer hover:border-indigo-500 transition-colors"
-                    style={{
-                      backgroundColor: tokens[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].value,
-                    }}
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <label className="block text-xs text-gray-400 mb-1.5">Hex Color</label>
-                  <input
-                    type="text"
-                    value={tokens[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].value}
-                    onChange={(e) => {
-                      const value = e.target.value
-                      if (value.match(/^#[0-9A-Fa-f]{0,6}$/) || value === '') {
-                        handleColorChange(value)
-                      }
-                    }}
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="#000000"
-                    maxLength={7}
-                  />
-                </div>
+              {renderEditInput()}
+              
+              <div className="flex gap-2 pt-2 border-t border-gray-800">
+                <button
+                  onClick={handleSaveEdit}
+                  className="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={handleCloseEditModal}
+                  className="px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Cancel
+                </button>
               </div>
+            </div>
+          </div>
+        </>
+      )}
 
-              <div className="pt-3 border-t border-gray-800">
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-gray-400 font-medium">Preview</span>
-                  <div
-                    className="flex-1 h-10 rounded-lg border-2 border-gray-700 shadow-lg"
-                    style={{
-                      backgroundColor: tokens[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].value,
-                    }}
-                  />
+      {/* Add Token Modal */}
+      {addingToken && addModalPosition && (
+        <>
+          <div
+            className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm"
+            onClick={handleCloseAddModal}
+          />
+          <div
+            className="fixed z-50 bg-gray-900 border border-gray-800 rounded-xl shadow-2xl p-5 min-w-[320px] max-w-[400px] transition-all duration-200"
+            style={{
+              left: `${addModalPosition.x}px`,
+              top: `${addModalPosition.y}px`,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold text-white">Add New Token</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">{CATEGORY_LABELS[addingToken.category]}</p>
                 </div>
+                <button
+                  onClick={handleCloseAddModal}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
               
-              <div className="flex gap-2 pt-2">
+              {/* Token Name */}
+              <div>
+                <label className="block text-xs text-gray-400 mb-1.5">Token Name</label>
+                <input
+                  type="text"
+                  value={newToken.name}
+                  onChange={(e) => setNewToken({ ...newToken, name: e.target.value })}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="token-name"
+                />
+              </div>
+
+              {/* Token Type (if not auto-determined) */}
+              {addingToken.category === 'colors' && (
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1.5">State (optional)</label>
+                  <select
+                    value={newToken.state || 'default'}
+                    onChange={(e) => setNewToken({ ...newToken, state: e.target.value as TokenState })}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  >
+                    <option value="default">Default</option>
+                    <option value="hover">Hover</option>
+                    <option value="focus">Focus</option>
+                    <option value="disabled">Disabled</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Token Value Input */}
+              {newToken.type === 'color' ? (
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="relative flex-shrink-0">
+                      <input
+                        type="color"
+                        value={newToken.value || '#000000'}
+                        onChange={(e) => setNewToken({ ...newToken, value: e.target.value })}
+                        className="w-20 h-20 rounded-lg border-2 border-gray-700 cursor-pointer hover:border-indigo-500 transition-colors"
+                        style={{ backgroundColor: newToken.value || '#000000' }}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-xs text-gray-400 mb-1.5">Value</label>
+                      <input
+                        type="text"
+                        value={newToken.value}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (value.match(/^#|rgb|rgba|hsl|hsla|^[a-zA-Z]/) || value === '') {
+                            setNewToken({ ...newToken, value })
+                          }
+                        }}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        placeholder="#000000 or rgb(...)"
+                      />
+                    </div>
+                  </div>
+                  {newToken.value && (
+                    <div className="pt-2 border-t border-gray-800">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-gray-400 font-medium">Preview</span>
+                        <div
+                          className="flex-1 h-10 rounded-lg border-2 border-gray-700 shadow-lg"
+                          style={{ backgroundColor: newToken.value }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : newToken.type === 'font' ? (
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1.5">Font Family</label>
+                  <input
+                    type="text"
+                    value={newToken.value}
+                    onChange={(e) => setNewToken({ ...newToken, value: e.target.value })}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Inter, sans-serif"
+                  />
+                </div>
+              ) : newToken.type === 'shadow' ? (
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1.5">Shadow Value</label>
+                  <textarea
+                    value={newToken.value}
+                    onChange={(e) => setNewToken({ ...newToken, value: e.target.value })}
+                    rows={3}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                    placeholder="0 1px 2px 0 rgba(0, 0, 0, 0.05)"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">CSS box-shadow syntax</p>
+                </div>
+              ) : newToken.type === 'theme' ? (
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1.5">Theme Value</label>
+                  <select
+                    value={newToken.value}
+                    onChange={(e) => setNewToken({ ...newToken, value: e.target.value })}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  >
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                  </select>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1.5">Value</label>
+                  <input
+                    type="text"
+                    value={newToken.value}
+                    onChange={(e) => setNewToken({ ...newToken, value: e.target.value })}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="0.25rem, 1rem, etc."
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Use rem, em, px, or %</p>
+                </div>
+              )}
+              
+              <div className="flex gap-2 pt-2 border-t border-gray-800">
                 <button
-                  onClick={handleCloseColorPicker}
-                  className="flex-1 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+                  onClick={handleSaveNewToken}
+                  disabled={!newToken.name.trim() || !newToken.value.trim()}
+                  className="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
                 >
-                  Done
+                  Add Token
+                </button>
+                <button
+                  onClick={handleCloseAddModal}
+                  className="px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Cancel
                 </button>
               </div>
             </div>

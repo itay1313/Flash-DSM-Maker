@@ -426,7 +426,7 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
   return (
     <div className="flex flex-col h-screen bg-gray-950">
       {/* Top Bar */}
-      <div className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
+      <div className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center space-x-4">
           <Link
             href="/"
@@ -465,7 +465,7 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {nextNodeType ? (
             <button
               onClick={() => handleCreateNode(nextNodeType)}
