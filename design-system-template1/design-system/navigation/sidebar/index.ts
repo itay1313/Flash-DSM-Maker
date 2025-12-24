@@ -1,2 +1,3 @@
-export { Sidebar, type SidebarProps, type SidebarItem } from './sidebar'
+export { Sidebar } from './sidebar'
+export type { SidebarProps } from './sidebar'
 

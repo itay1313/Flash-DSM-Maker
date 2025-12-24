@@ -1,15 +1,17 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/design-system'
+import { ArrowRight, Palette } from 'lucide-react'
+import Link from 'next/link'
 
 const colorTokens = [
   {
     category: 'Primary',
     colors: [
-      { name: 'primary-50', value: 'var(--color-primary-50)', hex: '#f0f9ff' },
-      { name: 'primary-100', value: 'var(--color-primary-100)', hex: '#e0f2fe' },
-      { name: 'primary-500', value: 'var(--color-primary-500)', hex: '#0ea5e9' },
-      { name: 'primary-600', value: 'var(--color-primary-600)', hex: '#0284c7' },
-      { name: 'primary-700', value: 'var(--color-primary-700)', hex: '#0369a1' },
-      { name: 'primary-900', value: 'var(--color-primary-900)', hex: '#0c4a6e' },
+      { name: 'primary-50', value: 'var(--color-primary-50)', hex: '#eff6ff' },
+      { name: 'primary-100', value: 'var(--color-primary-100)', hex: '#dbeafe' },
+      { name: 'primary-500', value: 'var(--color-primary-500)', hex: '#3b82f6' },
+      { name: 'primary-600', value: 'var(--color-primary-600)', hex: '#2563eb' },
+      { name: 'primary-700', value: 'var(--color-primary-700)', hex: '#1d4ed8' },
+      { name: 'primary-900', value: 'var(--color-primary-900)', hex: '#1e3a8a' },
     ]
   },
   {
@@ -31,26 +33,6 @@ const colorTokens = [
   }
 ]
 
-const spacingTokens = [
-  { name: 'spacing-1', value: 'var(--spacing-1)', rem: '0.25rem', px: '4px' },
-  { name: 'spacing-2', value: 'var(--spacing-2)', rem: '0.5rem', px: '8px' },
-  { name: 'spacing-4', value: 'var(--spacing-4)', rem: '1rem', px: '16px' },
-  { name: 'spacing-6', value: 'var(--spacing-6)', rem: '1.5rem', px: '24px' },
-  { name: 'spacing-8', value: 'var(--spacing-8)', rem: '2rem', px: '32px' },
-  { name: 'spacing-12', value: 'var(--spacing-12)', rem: '3rem', px: '48px' },
-  { name: 'spacing-16', value: 'var(--spacing-16)', rem: '4rem', px: '64px' },
-]
-
-const radiusTokens = [
-  { name: 'radius-2', value: 'var(--radius-2)', rem: '0.125rem', px: '2px' },
-  { name: 'radius-6', value: 'var(--radius-6)', rem: '0.375rem', px: '6px' },
-  { name: 'radius-8', value: 'var(--radius-8)', rem: '0.5rem', px: '8px' },
-  { name: 'radius-12', value: 'var(--radius-12)', rem: '0.75rem', px: '12px' },
-  { name: 'radius-16', value: 'var(--radius-16)', rem: '1rem', px: '16px' },
-  { name: 'radius-24', value: 'var(--radius-24)', rem: '1.5rem', px: '24px' },
-  { name: 'radius-full', value: 'var(--radius-full)', rem: '9999px', px: '9999px' },
-]
-
 const shadowTokens = [
   { name: 'shadow-sm', value: 'var(--shadow-sm)', description: 'Subtle elevation' },
   { name: 'shadow-base', value: 'var(--shadow-base)', description: 'Default elevation' },
@@ -61,9 +43,16 @@ const shadowTokens = [
 
 export default function TokensPage() {
   return (
-    <main className="min-h-screen ds-bg-background">
-      <div className="ds-max-w-7xl ds-mx-auto ds-px-4 ds-py-12">
+    <div className="ds-min-h-screen ds-bg-background">
+      <div className="ds-max-w-7xl ds-mx-auto ds-px-6 ds-py-12">
         <div className="ds-mb-12">
+          <Link 
+            href="/design-system/foundation"
+            className="ds-inline-flex ds-items-center ds-gap-2 ds-text-text-secondary hover:ds-text-text ds-mb-6 ds-transition-colors"
+          >
+            <ArrowRight className="ds-w-4 ds-h-4 ds-rotate-180" />
+            Back to Foundation
+          </Link>
           <h1 className="ds-text-4xl ds-font-bold ds-mb-4 ds-text-text">Design Tokens</h1>
           <p className="ds-text-lg ds-text-text-secondary ds-max-w-3xl">
             All design tokens are defined as CSS variables, enabling easy theming, 
@@ -86,7 +75,7 @@ export default function TokensPage() {
                       {group.colors.map((color) => (
                         <div key={color.name} className="ds-flex ds-items-center ds-gap-4">
                           <div
-                            className="ds-w-16 ds-h-16 ds-rounded-lg ds-border ds-border-border"
+                            className="ds-w-16 ds-h-16 ds-rounded-lg ds-border ds-border-border ds-shadow-sm"
                             style={{ backgroundColor: color.hex }}
                           />
                           <div className="ds-flex-1">
@@ -107,75 +96,6 @@ export default function TokensPage() {
                 </Card>
               ))}
             </div>
-          </div>
-
-          {/* Spacing */}
-          <div>
-            <h2 className="ds-text-2xl ds-font-bold ds-mb-6 ds-text-text">Spacing</h2>
-            <Card>
-              <CardHeader>
-                <CardTitle>Spacing Scale</CardTitle>
-                <CardDescription>
-                  Consistent spacing values for margins, padding, and gaps
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="ds-space-y-4">
-                  {spacingTokens.map((spacing) => (
-                    <div key={spacing.name} className="ds-flex ds-items-center ds-gap-4">
-                      <div className="ds-w-32 ds-font-mono ds-text-sm ds-font-medium ds-text-text">
-                        {spacing.name}
-                      </div>
-                      <div className="ds-flex-1 ds-h-8 ds-bg-primary-100 ds-rounded" style={{ width: spacing.rem }} />
-                      <div className="ds-w-24 ds-text-right ds-text-sm ds-text-text-secondary ds-font-mono">
-                        {spacing.rem}
-                      </div>
-                      <div className="ds-w-16 ds-text-right ds-text-xs ds-text-text-tertiary">
-                        {spacing.px}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Border Radius */}
-          <div>
-            <h2 className="ds-text-2xl ds-font-bold ds-mb-6 ds-text-text">Border Radius</h2>
-            <Card>
-              <CardHeader>
-                <CardTitle>Radius Scale</CardTitle>
-                <CardDescription>
-                  Consistent border radius values for rounded corners
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="ds-grid ds-grid-cols-2 md:ds-grid-cols-3 ds-gap-4">
-                  {radiusTokens.map((radius) => (
-                    <div key={radius.name} className="ds-flex ds-flex-col ds-items-center ds-gap-2">
-                      <div
-                        className="ds-w-20 ds-h-20 ds-bg-primary-100 ds-border-2 ds-border-primary"
-                        style={{ borderRadius: radius.rem }}
-                      />
-                      <div className="ds-text-center">
-                        <div className="ds-font-mono ds-text-sm ds-font-medium ds-text-text">
-                          {radius.name}
-                        </div>
-                        <div className="ds-text-xs ds-text-text-secondary ds-font-mono">
-                          {radius.rem}
-                        </div>
-                        {radius.px && radius.px !== '9999px' && (
-                          <div className="ds-text-xs ds-text-text-tertiary">
-                            {radius.px}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Shadows */}
@@ -221,20 +141,10 @@ export default function TokensPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <pre className="ds-p-4 ds-rounded-lg ds-bg-background-secondary ds-border ds-border-border ds-text-sm ds-font-mono ds-overflow-x-auto">
+            <pre className="ds-p-4 ds-rounded-lg ds-bg-neutral-900 ds-text-neutral-100 ds-text-sm ds-font-mono ds-overflow-x-auto ds-border ds-border-neutral-800">
               <code>{`// Colors
 <div className="ds-bg-primary ds-text-text-inverse">
   Primary background
-</div>
-
-// Spacing
-<div className="ds-p-4 ds-m-6">
-  Padding and margin
-</div>
-
-// Radius
-<div className="ds-rounded-lg">
-  Rounded corners
 </div>
 
 // Shadows
@@ -245,7 +155,7 @@ export default function TokensPage() {
           </CardContent>
         </Card>
       </div>
-    </main>
+    </div>
   )
 }
 

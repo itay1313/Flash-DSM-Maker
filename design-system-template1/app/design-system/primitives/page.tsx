@@ -16,7 +16,7 @@ const components = [
   {
     name: 'Button',
     description: 'Primary action component with multiple variants and sizes',
-    href: '/design-system/primitives/button',
+      href: '/design-system/components/button',
     icon: MousePointer,
     variants: ['primary', 'secondary', 'tertiary', 'ghost', 'danger'],
     sizes: ['sm', 'md', 'lg']
@@ -24,51 +24,51 @@ const components = [
   {
     name: 'Input',
     description: 'Text input field with focus states and validation',
-    href: '/design-system/primitives/input',
+      href: '/design-system/components/input',
     icon: Type,
     variants: ['text', 'email', 'password', 'number'],
   },
   {
     name: 'Textarea',
     description: 'Multi-line text input with auto-resize support',
-    href: '/design-system/primitives/textarea',
+      href: '/design-system/components/textarea',
     icon: MessageSquare,
   },
   {
     name: 'Select',
     description: 'Dropdown select with search and multi-select support',
-    href: '/design-system/primitives/select',
+      href: '/design-system/components/select',
     icon: Circle,
   },
   {
     name: 'Checkbox',
     description: 'Checkbox input with indeterminate state support',
-    href: '/design-system/primitives/checkbox',
+      href: '/design-system/components/checkbox',
     icon: CheckSquare,
   },
   {
     name: 'Radio',
     description: 'Radio button group for single selection',
-    href: '/design-system/primitives/radio',
+      href: '/design-system/components/radio',
     icon: Circle,
   },
   {
     name: 'Switch',
     description: 'Toggle switch for boolean values',
-    href: '/design-system/primitives/switch',
+      href: '/design-system/components/switch',
     icon: ToggleLeft,
   },
   {
     name: 'Badge',
     description: 'Status indicator with multiple variants',
-    href: '/design-system/primitives/badge',
+      href: '/design-system/components/badge',
     icon: BadgeIcon,
     variants: ['default', 'secondary', 'outline', 'success', 'warning', 'error']
   },
   {
     name: 'Tag',
     description: 'Removable tag component for labels and filters',
-    href: '/design-system/primitives/tag',
+      href: '/design-system/components/tag',
     icon: Tag,
     variants: ['default', 'primary', 'secondary', 'success', 'warning', 'error']
   },

@@ -2,50 +2,122 @@
 
 import { useState, useEffect } from 'react'
 
+type TokenLayer = 'core' | 'semantic' | 'component'
+type TokenCategory = 'colors' | 'typography' | 'spacing' | 'radius' | 'shadows' | 'theme'
+type TokenState = 'default' | 'hover' | 'focus' | 'disabled'
+
 interface Token {
   name: string
   value: string
-  type: 'color' | 'font' | 'size'
+  type: 'color' | 'font' | 'size' | 'radius' | 'shadow' | 'theme'
+  state?: TokenState
+  layer: TokenLayer
+  category: TokenCategory
 }
 
-interface TokenCategory {
-  name: string
+interface TokenGroup {
+  category: TokenCategory
+  layer: TokenLayer
   tokens: Token[]
 }
 
-const DEFAULT_TOKENS: TokenCategory[] = [
+const DEFAULT_TOKENS: Record<TokenLayer, TokenGroup[]> = {
+  core: [
     {
-      name: 'Colors',
+      layer: 'core',
+      category: 'colors',
       tokens: [
-        { name: 'primary', value: '#6366f1', type: 'color' },
-        { name: 'secondary', value: '#8b5cf6', type: 'color' },
-        { name: 'success', value: '#10b981', type: 'color' },
-        { name: 'error', value: '#ef4444', type: 'color' },
+        { name: 'text-primary', value: '#ffffff', type: 'color', layer: 'core', category: 'colors', state: 'default' },
+        { name: 'bg-surface', value: '#1a1a1a', type: 'color', layer: 'core', category: 'colors', state: 'default' },
+        { name: 'border-default', value: '#333333', type: 'color', layer: 'core', category: 'colors', state: 'default' },
       ],
     },
     {
-      name: 'Typography',
+      layer: 'core',
+      category: 'typography',
       tokens: [
-        { name: 'font-family', value: 'Inter, sans-serif', type: 'font' },
-        { name: 'font-size-14', value: '0.875rem', type: 'size' },
-        { name: 'font-size-16', value: '1rem', type: 'size' },
-        { name: 'font-size-18', value: '1.125rem', type: 'size' },
+        { name: 'font-family-base', value: 'Inter, sans-serif', type: 'font', layer: 'core', category: 'typography' },
+        { name: 'font-size-md', value: '1rem', type: 'size', layer: 'core', category: 'typography' },
+        { name: 'font-weight-regular', value: '400', type: 'size', layer: 'core', category: 'typography' },
+        { name: 'line-height-normal', value: '1.5', type: 'size', layer: 'core', category: 'typography' },
       ],
     },
     {
-      name: 'Spacing',
+      layer: 'core',
+      category: 'spacing',
       tokens: [
-        { name: 'spacing-4', value: '0.25rem', type: 'size' },
-        { name: 'spacing-8', value: '0.5rem', type: 'size' },
-        { name: 'spacing-16', value: '1rem', type: 'size' },
-        { name: 'spacing-24', value: '1.5rem', type: 'size' },
+        { name: 'space-4', value: '0.25rem', type: 'size', layer: 'core', category: 'spacing' },
+        { name: 'space-8', value: '0.5rem', type: 'size', layer: 'core', category: 'spacing' },
+        { name: 'space-16', value: '1rem', type: 'size', layer: 'core', category: 'spacing' },
       ],
     },
-]
+    {
+      layer: 'core',
+      category: 'radius',
+      tokens: [
+        { name: 'radius-md', value: '0.375rem', type: 'radius', layer: 'core', category: 'radius' },
+        { name: 'radius-sm', value: '0.25rem', type: 'radius', layer: 'core', category: 'radius' },
+        { name: 'radius-lg', value: '0.5rem', type: 'radius', layer: 'core', category: 'radius' },
+      ],
+    },
+    {
+      layer: 'core',
+      category: 'shadows',
+      tokens: [
+        { name: 'shadow-sm', value: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', type: 'shadow', layer: 'core', category: 'shadows' },
+        { name: 'shadow-md', value: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', type: 'shadow', layer: 'core', category: 'shadows' },
+      ],
+    },
+    {
+      layer: 'core',
+      category: 'theme',
+      tokens: [
+        { name: 'light', value: 'light', type: 'theme', layer: 'core', category: 'theme' },
+        { name: 'dark', value: 'dark', type: 'theme', layer: 'core', category: 'theme' },
+      ],
+    },
+  ],
+  semantic: [
+    {
+      layer: 'semantic',
+      category: 'colors',
+      tokens: [
+        { name: 'text-primary', value: '#ffffff', type: 'color', layer: 'semantic', category: 'colors', state: 'default' },
+        { name: 'text-primary', value: '#e0e0e0', type: 'color', layer: 'semantic', category: 'colors', state: 'hover' },
+        { name: 'bg-surface', value: '#1a1a1a', type: 'color', layer: 'semantic', category: 'colors', state: 'default' },
+        { name: 'bg-surface', value: '#242424', type: 'color', layer: 'semantic', category: 'colors', state: 'hover' },
+        { name: 'border-default', value: '#333333', type: 'color', layer: 'semantic', category: 'colors', state: 'default' },
+        { name: 'border-default', value: '#404040', type: 'color', layer: 'semantic', category: 'colors', state: 'focus' },
+      ],
+    },
+  ],
+  component: [
+    {
+      layer: 'component',
+      category: 'colors',
+      tokens: [
+        { name: 'button-bg', value: '#6366f1', type: 'color', layer: 'component', category: 'colors', state: 'default' },
+        { name: 'button-bg', value: '#4f46e5', type: 'color', layer: 'component', category: 'colors', state: 'hover' },
+        { name: 'button-bg', value: '#4338ca', type: 'color', layer: 'component', category: 'colors', state: 'focus' },
+        { name: 'button-bg', value: '#6b7280', type: 'color', layer: 'component', category: 'colors', state: 'disabled' },
+      ],
+    },
+  ],
+}
+
+const CATEGORY_LABELS: Record<TokenCategory, string> = {
+  colors: 'Colors',
+  typography: 'Typography',
+  spacing: 'Spacing',
+  radius: 'Radius',
+  shadows: 'Shadows',
+  theme: 'Theme',
+}
 
 export default function TokensPage() {
-  const [tokenCategories, setTokenCategories] = useState<TokenCategory[]>(DEFAULT_TOKENS)
-  const [editingToken, setEditingToken] = useState<{ categoryIndex: number; tokenIndex: number } | null>(null)
+  const [activeTab, setActiveTab] = useState<TokenLayer>('core')
+  const [tokens, setTokens] = useState<Record<TokenLayer, TokenGroup[]>>(DEFAULT_TOKENS)
+  const [editingToken, setEditingToken] = useState<{ layer: TokenLayer; groupIndex: number; tokenIndex: number } | null>(null)
   const [colorPickerPosition, setColorPickerPosition] = useState<{ x: number; y: number } | null>(null)
   const [showImportModal, setShowImportModal] = useState(false)
   const [importText, setImportText] = useState('')
@@ -54,12 +126,12 @@ export default function TokensPage() {
   // Load tokens from localStorage on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('dsm-tokens')
+      const saved = localStorage.getItem('dsm-tokens-v2')
       if (saved) {
         try {
           const parsed = JSON.parse(saved)
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setTokenCategories(parsed)
+          if (parsed && typeof parsed === 'object') {
+            setTokens(parsed)
           }
         } catch (e) {
           console.error('Failed to load tokens:', e)
@@ -70,46 +142,41 @@ export default function TokensPage() {
 
   // Save tokens to localStorage whenever they change
   useEffect(() => {
-    if (typeof window !== 'undefined' && tokenCategories.length > 0) {
-      localStorage.setItem('dsm-tokens', JSON.stringify(tokenCategories))
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dsm-tokens-v2', JSON.stringify(tokens))
     }
-  }, [tokenCategories])
+  }, [tokens])
 
-  const handleEditClick = (categoryIndex: number, tokenIndex: number, e: React.MouseEvent) => {
-    const token = tokenCategories[categoryIndex].tokens[tokenIndex]
+  const handleEditClick = (layer: TokenLayer, groupIndex: number, tokenIndex: number, e: React.MouseEvent) => {
+    const token = tokens[layer][groupIndex].tokens[tokenIndex]
     if (token.type === 'color') {
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
       const buttonRect = e.currentTarget.getBoundingClientRect()
       
-      // Calculate position - try to place it to the right, but adjust if it would go off-screen
       let x = buttonRect.right + 10
       let y = buttonRect.top
       
-      // If it would go off the right edge, place it to the left
       if (x + 300 > window.innerWidth) {
         x = buttonRect.left - 320
       }
       
-      // If it would go off the bottom, adjust upward
       if (y + 250 > window.innerHeight) {
         y = window.innerHeight - 260
       }
       
-      // Ensure it doesn't go off the top
       if (y < 10) {
         y = 10
       }
       
       setColorPickerPosition({ x, y })
-      setEditingToken({ categoryIndex, tokenIndex })
+      setEditingToken({ layer, groupIndex, tokenIndex })
     }
   }
 
   const handleColorChange = (color: string) => {
     if (editingToken) {
-      const updated = [...tokenCategories]
-      updated[editingToken.categoryIndex].tokens[editingToken.tokenIndex].value = color
-      setTokenCategories(updated)
+      const updated = { ...tokens }
+      updated[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].value = color
+      setTokens(updated)
     }
   }
 
@@ -120,8 +187,6 @@ export default function TokensPage() {
 
   const parseCSSVariables = (cssText: string): { name: string; value: string; type: 'color' | 'font' | 'size' }[] => {
     const variables: { name: string; value: string; type: 'color' | 'font' | 'size' }[] = []
-    
-    // Match CSS custom properties: --variable-name: value;
     const regex = /--([^:]+):\s*([^;]+);/g
     let match
     
@@ -129,7 +194,6 @@ export default function TokensPage() {
       const name = match[1].trim()
       const value = match[2].trim()
       
-      // Determine type based on value
       let type: 'color' | 'font' | 'size' = 'size'
       if (value.match(/^#|rgb|rgba|hsl|hsla/)) {
         type = 'color'
@@ -153,7 +217,6 @@ export default function TokensPage() {
 
     setIsImporting(true)
     try {
-      // Parse CSS variables
       const parsedVariables = parseCSSVariables(importText)
       
       if (parsedVariables.length === 0) {
@@ -162,7 +225,6 @@ export default function TokensPage() {
         return
       }
 
-      // Send to API for AI validation and improvement
       const response = await fetch('/api/import-css-variables', {
         method: 'POST',
         headers: {
@@ -170,7 +232,7 @@ export default function TokensPage() {
         },
         body: JSON.stringify({
           cssVariables: parsedVariables,
-          existingTokens: tokenCategories,
+          existingTokens: tokens,
         }),
       })
 
@@ -180,10 +242,10 @@ export default function TokensPage() {
 
       const { validatedTokens, improvements } = await response.json()
       
-      // Update tokens with validated and improved versions
-      setTokenCategories(validatedTokens)
+      if (validatedTokens) {
+        setTokens(validatedTokens)
+      }
       
-      // Show success message with improvements
       if (improvements && improvements.length > 0) {
         alert(`Successfully imported ${parsedVariables.length} CSS variables!\n\nAI Improvements:\n${improvements.join('\n')}`)
       } else {
@@ -199,6 +261,8 @@ export default function TokensPage() {
       setIsImporting(false)
     }
   }
+
+  const currentTokens = tokens[activeTab] || []
 
   return (
     <div className="min-h-full flex flex-col overflow-y-auto relative">
@@ -219,34 +283,59 @@ export default function TokensPage() {
           </button>
         </div>
 
+        {/* Tabs */}
+        <div className="mb-6 flex space-x-2 border-b border-gray-800">
+          {(['core', 'semantic', 'component'] as TokenLayer[]).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
+                activeTab === tab
+                  ? 'border-palette-cornflower text-palette-cornflower'
+                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-700'
+              }`}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {/* Token Groups */}
         <div className="space-y-6">
-          {tokenCategories.map((category, categoryIndex) => (
-            <div key={category.name} className="bg-gray-900 border border-gray-800 rounded-lg p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">{category.name}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {category.tokens.map((token, tokenIndex) => (
+          {currentTokens.map((group, groupIndex) => (
+            <div key={`${group.layer}-${group.category}`} className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+              <h2 className="text-lg font-semibold text-white mb-4">{CATEGORY_LABELS[group.category]}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {group.tokens.map((token, tokenIndex) => (
                   <div
                     key={token.name}
                     className="flex items-center justify-between p-4 bg-gray-950 border border-gray-800 rounded-lg hover:border-indigo-500/50 transition-colors"
                   >
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3 flex-1 min-w-0">
                       {token.type === 'color' && (
                         <div
-                          className="w-8 h-8 rounded border border-gray-700"
+                          className="w-8 h-8 rounded border border-gray-700 flex-shrink-0"
                           style={{ backgroundColor: token.value }}
                         />
                       )}
-                      <div>
-                        <div className="text-sm font-medium text-white">{token.name}</div>
-                        <div className="text-xs text-gray-500 font-mono">{token.value}</div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium text-white truncate">
+                          {token.name}
+                          {token.state && (
+                            <span className="ml-2 text-xs text-gray-500">({token.state})</span>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-500 font-mono truncate">{token.value}</div>
                       </div>
                     </div>
-                    <button
-                      onClick={(e) => handleEditClick(categoryIndex, tokenIndex, e)}
-                      className="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded text-xs transition-colors"
-                    >
-                      Edit
-                    </button>
+                    {token.type === 'color' && (
+                      <button
+                        onClick={(e) => handleEditClick(activeTab, groupIndex, tokenIndex, e)}
+                        className="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded text-xs transition-colors flex-shrink-0 ml-2"
+                      >
+                        Edit
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -258,25 +347,22 @@ export default function TokensPage() {
       {/* Color Picker Modal */}
       {editingToken && colorPickerPosition && (
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm"
             onClick={handleCloseColorPicker}
           />
-          {/* Color Picker */}
           <div
             className="fixed z-50 bg-gray-900 border border-gray-800 rounded-xl shadow-2xl p-5 min-w-[280px] transition-all duration-200"
             style={{
               left: `${colorPickerPosition.x}px`,
               top: `${colorPickerPosition.y}px`,
-              animation: 'fadeIn 0.2s ease-out',
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-white">
-                  {tokenCategories[editingToken.categoryIndex].tokens[editingToken.tokenIndex].name}
+                  {tokens[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].name}
                 </h3>
                 <button
                   onClick={handleCloseColorPicker}
@@ -288,16 +374,15 @@ export default function TokensPage() {
                 </button>
               </div>
               
-              {/* Color Input */}
               <div className="flex items-start gap-3">
                 <div className="relative flex-shrink-0">
                   <input
                     type="color"
-                    value={tokenCategories[editingToken.categoryIndex].tokens[editingToken.tokenIndex].value}
+                    value={tokens[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].value}
                     onChange={(e) => handleColorChange(e.target.value)}
                     className="w-20 h-20 rounded-lg border-2 border-gray-700 cursor-pointer hover:border-indigo-500 transition-colors"
                     style={{
-                      backgroundColor: tokenCategories[editingToken.categoryIndex].tokens[editingToken.tokenIndex].value,
+                      backgroundColor: tokens[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].value,
                     }}
                   />
                 </div>
@@ -305,10 +390,9 @@ export default function TokensPage() {
                   <label className="block text-xs text-gray-400 mb-1.5">Hex Color</label>
                   <input
                     type="text"
-                    value={tokenCategories[editingToken.categoryIndex].tokens[editingToken.tokenIndex].value}
+                    value={tokens[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].value}
                     onChange={(e) => {
                       const value = e.target.value
-                      // Allow typing hex codes
                       if (value.match(/^#[0-9A-Fa-f]{0,6}$/) || value === '') {
                         handleColorChange(value)
                       }
@@ -320,20 +404,18 @@ export default function TokensPage() {
                 </div>
               </div>
 
-              {/* Preview */}
               <div className="pt-3 border-t border-gray-800">
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-gray-400 font-medium">Preview</span>
                   <div
                     className="flex-1 h-10 rounded-lg border-2 border-gray-700 shadow-lg"
                     style={{
-                      backgroundColor: tokenCategories[editingToken.categoryIndex].tokens[editingToken.tokenIndex].value,
+                      backgroundColor: tokens[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex].value,
                     }}
                   />
                 </div>
               </div>
               
-              {/* Action Buttons */}
               <div className="flex gap-2 pt-2">
                 <button
                   onClick={handleCloseColorPicker}
@@ -350,15 +432,12 @@ export default function TokensPage() {
       {/* Import CSS Variables Modal */}
       {showImportModal && (
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowImportModal(false)}
           />
-          {/* Modal */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="bg-gray-900 border border-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-              {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-gray-800">
                 <div>
                   <h2 className="text-xl font-semibold text-white">Import CSS Variables</h2>
@@ -376,7 +455,6 @@ export default function TokensPage() {
                   </svg>
                 </button>
               </div>
-              {/* Content */}
               <div className="flex-1 overflow-y-auto p-6">
                 <div className="space-y-4">
                   <div>
@@ -394,7 +472,6 @@ export default function TokensPage() {
                     </p>
                   </div>
                   
-                  {/* Example */}
                   <div className="bg-gray-950 border border-gray-800 rounded-lg p-4">
                     <p className="text-xs font-medium text-gray-400 mb-2">Example:</p>
                     <pre className="text-xs text-gray-500 font-mono whitespace-pre-wrap">
@@ -408,7 +485,6 @@ export default function TokensPage() {
                   </div>
                 </div>
               </div>
-              {/* Footer */}
               <div className="p-6 border-t border-gray-800 flex space-x-2">
                 <button
                   onClick={handleImportCSSVariables}
@@ -446,4 +522,3 @@ export default function TokensPage() {
     </div>
   )
 }
-

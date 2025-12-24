@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
+  prefix: 'ds-',
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -105,14 +106,16 @@ const config: Config = {
         mono: ['var(--font-mono)', 'monospace'],
       },
       fontSize: {
-        xs: ['var(--font-size-xs)', { lineHeight: 'var(--line-height-xs)' }],
-        sm: ['var(--font-size-sm)', { lineHeight: 'var(--line-height-sm)' }],
-        base: ['var(--font-size-base)', { lineHeight: 'var(--line-height-base)' }],
-        lg: ['var(--font-size-lg)', { lineHeight: 'var(--line-height-lg)' }],
-        xl: ['var(--font-size-xl)', { lineHeight: 'var(--line-height-xl)' }],
-        '2xl': ['var(--font-size-2xl)', { lineHeight: 'var(--line-height-2xl)' }],
-        '3xl': ['var(--font-size-3xl)', { lineHeight: 'var(--line-height-3xl)' }],
-        '4xl': ['var(--font-size-4xl)', { lineHeight: 'var(--line-height-4xl)' }],
+        xs: ['var(--font-size-12)', { lineHeight: 'var(--line-height-16)' }],
+        sm: ['var(--font-size-14)', { lineHeight: 'var(--line-height-20)' }],
+        base: ['var(--font-size-16)', { lineHeight: 'var(--line-height-24)' }],
+        lg: ['var(--font-size-18)', { lineHeight: 'var(--line-height-28)' }],
+        xl: ['var(--font-size-20)', { lineHeight: 'var(--line-height-30)' }],
+        '2xl': ['var(--font-size-24)', { lineHeight: 'var(--line-height-32)' }],
+        '3xl': ['var(--font-size-30)', { lineHeight: 'var(--line-height-36)' }],
+        '4xl': ['var(--font-size-36)', { lineHeight: 'var(--line-height-40)' }],
+        '5xl': ['var(--font-size-48)', { lineHeight: 'var(--line-height-48)' }],
+        '6xl': ['var(--font-size-60)', { lineHeight: 'var(--line-height-60)' }],
       },
       spacing: {
         '0': 'var(--spacing-0)',
@@ -134,12 +137,13 @@ const config: Config = {
         '64': 'var(--spacing-64)',
       },
       borderRadius: {
-        none: 'var(--radius-none)',
-        sm: 'var(--radius-sm)',
-        DEFAULT: 'var(--radius-base)',
-        md: 'var(--radius-md)',
-        lg: 'var(--radius-lg)',
-        xl: 'var(--radius-xl)',
+        none: 'var(--radius-0)',
+        sm: 'var(--radius-2)',
+        DEFAULT: 'var(--radius-6)',
+        md: 'var(--radius-8)',
+        lg: 'var(--radius-12)',
+        xl: 'var(--radius-16)',
+        '2xl': 'var(--radius-24)',
         full: 'var(--radius-full)',
       },
       boxShadow: {
