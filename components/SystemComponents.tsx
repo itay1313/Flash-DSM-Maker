@@ -8,7 +8,7 @@ interface SystemComponentsProps {
   onSwitchSystem: (id: string) => void
 }
 
-type Theme = 'light' | 'dark' | 'blue' | 'purple' | 'green' | 'red' | 'orange' | 'yellow' | 'pink' | 'teal'
+type Theme = 'material' | 'ant' | 'chakra' | 'tailwind' | 'bootstrap' | 'custom'
 
 type ComponentCategory = 'components' | 'controls' | 'modules' | 'video'
 
@@ -111,56 +111,139 @@ const COMPONENT_CATEGORIES: Record<ComponentCategory, { title: string; descripti
   },
 }
 
-const THEMES: { id: Theme; name: string; colors: { primary: string; bg: string; text: string; border: string } }[] = [
-  { 
-    id: 'dark', 
-    name: 'Dark', 
-    colors: { primary: '#715AFF', bg: '#111827', text: '#F9FAFB', border: '#374151' } 
+interface ThemeStyle {
+  padding: {
+    sm: string
+    md: string
+    lg: string
+  }
+  border: {
+    width: string
+    style: 'solid' | 'dashed' | 'none'
+    radius: string
+  }
+  shadow: {
+    sm: string
+    md: string
+    lg: string
+    none: string
+  }
+  spacing: {
+    gap: string
+    margin: string
+  }
+  position: {
+    toast: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center' | 'top-center' | 'bottom-center'
+  }
+  variant: 'minimal' | 'outlined' | 'filled' | 'elevated' | 'bordered'
+}
+
+// Get primary color from tokens or use default
+const getPrimaryColor = (tokens: any): string => {
+  if (!tokens) return '#715AFF'
+  
+  const allTokens = Object.values(tokens).flatMap((layer: any) => 
+    layer.flatMap((group: any) => group.tokens)
+  )
+  
+  const accentPrimary = allTokens.find((token: any) => 
+    token.name === 'accent-primary' || token.name === 'primary'
+  )
+  
+  if (accentPrimary) {
+    return accentPrimary.value.startsWith('#') 
+      ? accentPrimary.value 
+      : accentPrimary.value.startsWith('var(') 
+        ? `var(--${accentPrimary.name})` 
+        : accentPrimary.value
+  }
+  
+  return '#715AFF'
+}
+
+const THEMES: { 
+  id: Theme
+  name: string
+  primaryColor: string // Will be set dynamically from tokens
+  styles: ThemeStyle
+}[] = [
+  {
+    id: 'material',
+    name: 'Material Design',
+    primaryColor: '#715AFF', // Will be overridden by getPrimaryColor
+    styles: {
+      padding: { sm: '8px', md: '12px', lg: '16px' },
+      border: { width: '0px', style: 'none', radius: '4px' },
+      shadow: { sm: '0 1px 3px rgba(0,0,0,0.12)', md: '0 4px 6px rgba(0,0,0,0.1)', lg: '0 10px 20px rgba(0,0,0,0.15)', none: 'none' },
+      spacing: { gap: '8px', margin: '16px' },
+      position: { toast: 'bottom-right' },
+      variant: 'elevated'
+    }
   },
-  { 
-    id: 'light', 
-    name: 'Light', 
-    colors: { primary: '#715AFF', bg: '#FFFFFF', text: '#111827', border: '#E5E7EB' } 
+  {
+    id: 'ant',
+    name: 'Ant Design',
+    primaryColor: '#715AFF',
+    styles: {
+      padding: { sm: '6px', md: '10px', lg: '14px' },
+      border: { width: '1px', style: 'solid', radius: '6px' },
+      shadow: { sm: '0 2px 8px rgba(0,0,0,0.15)', md: '0 4px 12px rgba(0,0,0,0.15)', lg: '0 8px 24px rgba(0,0,0,0.12)', none: 'none' },
+      spacing: { gap: '12px', margin: '12px' },
+      position: { toast: 'top-right' },
+      variant: 'bordered'
+    }
   },
-  { 
-    id: 'blue', 
-    name: 'Blue', 
-    colors: { primary: '#3B82F6', bg: '#1E3A8A', text: '#EFF6FF', border: '#3B82F6' } 
+  {
+    id: 'chakra',
+    name: 'Chakra UI',
+    primaryColor: '#715AFF',
+    styles: {
+      padding: { sm: '10px', md: '14px', lg: '18px' },
+      border: { width: '1px', style: 'solid', radius: '8px' },
+      shadow: { sm: '0 1px 2px rgba(0,0,0,0.05)', md: '0 4px 6px rgba(0,0,0,0.07)', lg: '0 10px 15px rgba(0,0,0,0.1)', none: 'none' },
+      spacing: { gap: '16px', margin: '20px' },
+      position: { toast: 'center' },
+      variant: 'minimal'
+    }
   },
-  { 
-    id: 'purple', 
-    name: 'Purple', 
-    colors: { primary: '#A855F7', bg: '#581C87', text: '#F3E8FF', border: '#A855F7' } 
+  {
+    id: 'tailwind',
+    name: 'Tailwind / Headless',
+    primaryColor: '#715AFF',
+    styles: {
+      padding: { sm: '8px', md: '12px', lg: '16px' },
+      border: { width: '0px', style: 'none', radius: '8px' },
+      shadow: { sm: '0 1px 2px rgba(0,0,0,0.05)', md: '0 4px 6px rgba(0,0,0,0.1)', lg: '0 10px 15px rgba(0,0,0,0.1)', none: 'none' },
+      spacing: { gap: '8px', margin: '12px' },
+      position: { toast: 'top-center' },
+      variant: 'minimal'
+    }
   },
-  { 
-    id: 'green', 
-    name: 'Green', 
-    colors: { primary: '#10B981', bg: '#064E3B', text: '#D1FAE5', border: '#10B981' } 
+  {
+    id: 'bootstrap',
+    name: 'Bootstrap',
+    primaryColor: '#715AFF',
+    styles: {
+      padding: { sm: '4px', md: '8px', lg: '12px' },
+      border: { width: '2px', style: 'solid', radius: '0px' },
+      shadow: { sm: '0 1px 3px rgba(0,0,0,0.12)', md: '0 4px 6px rgba(0,0,0,0.1)', lg: '0 10px 20px rgba(0,0,0,0.15)', none: 'none' },
+      spacing: { gap: '8px', margin: '16px' },
+      position: { toast: 'bottom-left' },
+      variant: 'bordered'
+    }
   },
-  { 
-    id: 'red', 
-    name: 'Red', 
-    colors: { primary: '#EF4444', bg: '#7F1D1D', text: '#FEE2E2', border: '#EF4444' } 
-  },
-  { 
-    id: 'orange', 
-    name: 'Orange', 
-    colors: { primary: '#F97316', bg: '#7C2D12', text: '#FFEDD5', border: '#F97316' } 
-  },
-  { 
-    id: 'yellow', 
-    name: 'Yellow', 
-    colors: { primary: '#EAB308', bg: '#713F12', text: '#FEF9C3', border: '#EAB308' } 
-  },
-  { 
-    id: 'pink', 
-    name: 'Pink', 
-    colors: { primary: '#EC4899', bg: '#831843', text: '#FCE7F3', border: '#EC4899' } 
-  },
-  { 
-    id: 'teal', 
-    name: 'Teal', 
-    colors: { primary: '#14B8A6', bg: '#134E4A', text: '#CCFBF1', border: '#14B8A6' } 
+  {
+    id: 'custom',
+    name: 'Custom',
+    primaryColor: '#715AFF',
+    styles: {
+      padding: { sm: '10px', md: '14px', lg: '18px' },
+      border: { width: '1px', style: 'dashed', radius: '12px' },
+      shadow: { sm: '0 2px 4px rgba(0,0,0,0.1)', md: '0 4px 8px rgba(0,0,0,0.12)', lg: '0 8px 16px rgba(0,0,0,0.15)', none: 'none' },
+      spacing: { gap: '10px', margin: '14px' },
+      position: { toast: 'top-left' },
+      variant: 'outlined'
+    }
   },
 ]
 
@@ -176,7 +259,22 @@ function ComponentPreview({
   styles?: ComponentStyles
   tokens?: any
 }) {
-  const themeColors = THEMES.find(t => t.id === theme)?.colors || THEMES[0].colors
+  // Get current theme styles
+  const currentTheme = THEMES.find(t => t.id === theme) || THEMES[0]
+  const themeStyles = currentTheme.styles
+  
+  // Get primary color from tokens or use default
+  const primaryColor = getPrimaryColor(tokens)
+  
+  // Base colors (consistent across all themes - dark mode)
+  const baseColors = {
+    bg: '#111827',
+    text: '#F9FAFB',
+    border: '#374151',
+    bgLight: '#FFFFFF',
+    textLight: '#111827',
+    borderLight: '#E5E7EB'
+  }
   
   // Resolve style from token bindings
   const resolveTokenStyle = (propertyPath: string, defaultValue: string): string => {
@@ -196,57 +294,87 @@ function ComponentPreview({
     )
     
     if (tokenWithBinding) {
-      // Support light/dark mode overrides
-      if (theme === 'dark' && tokenWithBinding.darkValue) {
-        return tokenWithBinding.darkValue
-      }
-      if (theme === 'light' && tokenWithBinding.lightValue) {
-        return tokenWithBinding.lightValue
-      }
-      
       return tokenWithBinding.value.startsWith('var(') ? `var(--${tokenWithBinding.name})` : tokenWithBinding.value
     }
     
     return defaultValue
   }
 
-  // Calculate border radius and shadow from styles
-  const borderRadius = resolveTokenStyle('radius', styles?.radius ? `${styles.radius}rem` : '0.375rem')
-  
-  const boxShadow = styles?.shadow 
-    ? `${styles.shadow.xOffset}px ${styles.shadow.yOffset}px ${styles.shadow.blur}px ${styles.shadow.spread}px ${styles.shadow.color}`
-    : undefined
-  
-  const componentStyle = {
-    borderRadius,
-    boxShadow,
+  // Apply theme-specific styles
+  const getThemeStyle = () => {
+    const borderWidth = themeStyles.border.width
+    const borderStyle = themeStyles.border.style
+    const borderRadius = resolveTokenStyle('radius', themeStyles.border.radius)
+    
+    // Choose shadow based on variant
+    let shadow = themeStyles.shadow.none
+    if (themeStyles.variant === 'elevated') {
+      shadow = themeStyles.shadow.md
+    } else if (themeStyles.variant === 'filled') {
+      shadow = themeStyles.shadow.sm
+    } else if (themeStyles.variant === 'bordered' && borderWidth === '0px') {
+      shadow = themeStyles.shadow.sm
+    }
+    
+    return {
+      padding: themeStyles.padding.md,
+      borderWidth,
+      borderStyle,
+      borderRadius,
+      boxShadow: shadow,
+      gap: themeStyles.spacing.gap
+    }
   }
   
-  const previewStyles = {
-    backgroundColor: resolveTokenStyle('bg', themeColors.bg),
-    color: resolveTokenStyle('text', themeColors.text),
-    borderColor: resolveTokenStyle('border', themeColors.border),
+  const themeStyle = getThemeStyle()
+  
+  // Component-specific style (from editor)
+  const componentStyle = {
+    borderRadius: styles?.radius ? `${styles.radius}rem` : themeStyle.borderRadius,
+    boxShadow: styles?.shadow 
+      ? `${styles.shadow.xOffset}px ${styles.shadow.yOffset}px ${styles.shadow.blur}px ${styles.shadow.spread}px ${styles.shadow.color}`
+      : themeStyle.boxShadow,
+  }
+  
+  // Base styles for components
+  const baseStyle = {
+    backgroundColor: baseColors.bg,
+    color: baseColors.text,
+    borderColor: baseColors.border,
   }
 
   switch (componentName) {
     case 'Button':
+      const buttonPadding = themeStyles.padding.md
+      const buttonBorder = themeStyles.variant === 'outlined' || themeStyles.variant === 'bordered'
+        ? `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`
+        : 'none'
+      
       return (
-        <div className="space-y-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: themeStyle.gap }}>
           <button 
-            className="px-4 py-2 font-medium text-sm transition-all"
+            className="font-medium text-sm transition-all"
             style={{ 
-              backgroundColor: resolveTokenStyle('bg', themeColors.primary), 
-              color: resolveTokenStyle('text', '#FFFFFF'),
+              padding: buttonPadding,
+              backgroundColor: themeStyles.variant === 'filled' || themeStyles.variant === 'elevated' 
+                ? primaryColor 
+                : 'transparent',
+              color: themeStyles.variant === 'filled' || themeStyles.variant === 'elevated'
+                ? '#FFFFFF'
+                : primaryColor,
+              border: buttonBorder,
               ...componentStyle
             }}
           >
             Primary Button
           </button>
           <button 
-            className="px-4 py-2 font-medium text-sm border transition-all"
+            className="font-medium text-sm transition-all"
             style={{ 
-              borderColor: resolveTokenStyle('border', themeColors.border), 
-              color: resolveTokenStyle('text', themeColors.text),
+              padding: buttonPadding,
+              backgroundColor: 'transparent',
+              border: `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`,
+              color: baseColors.text,
               ...componentStyle
             }}
           >
@@ -256,26 +384,28 @@ function ComponentPreview({
       )
     case 'Input':
       return (
-        <div className="space-y-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: themeStyle.gap }}>
           <input
             type="text"
             placeholder="Enter text..."
-            className="w-full px-3 py-2 text-sm border transition-all"
+            className="w-full text-sm transition-all"
             style={{ 
-              backgroundColor: themeColors.bg,
-              borderColor: themeColors.border,
-              color: themeColors.text,
+              padding: themeStyles.padding.md,
+              backgroundColor: baseColors.bg,
+              border: `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`,
+              color: baseColors.text,
               ...componentStyle
             }}
           />
           <input
             type="text"
             placeholder="Focused state"
-            className="w-full px-3 py-2 text-sm border-2 transition-all"
+            className="w-full text-sm transition-all"
             style={{ 
-              backgroundColor: themeColors.bg,
-              borderColor: themeColors.primary,
-              color: themeColors.text,
+              padding: themeStyles.padding.md,
+              backgroundColor: baseColors.bg,
+              border: `2px solid ${primaryColor}`,
+              color: baseColors.text,
               ...componentStyle
             }}
           />
@@ -284,11 +414,13 @@ function ComponentPreview({
     case 'Card':
       return (
         <div 
-          className="p-4 border"
           style={{ 
-            backgroundColor: themeColors.bg,
-            borderColor: themeColors.border,
-            color: themeColors.text,
+            padding: themeStyles.padding.lg,
+            backgroundColor: baseColors.bg,
+            border: themeStyles.variant === 'bordered' || themeStyles.variant === 'outlined'
+              ? `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`
+              : 'none',
+            color: baseColors.text,
             ...componentStyle
           }}
         >
@@ -298,22 +430,28 @@ function ComponentPreview({
       )
     case 'Badge':
       return (
-        <div className="flex gap-2 flex-wrap">
+        <div style={{ display: 'flex', gap: themeStyle.gap, flexWrap: 'wrap' }}>
           <span 
-            className="px-2 py-1 text-xs font-medium"
+            className="text-xs font-medium"
             style={{ 
-              backgroundColor: themeColors.primary, 
-              color: '#FFFFFF',
+              padding: themeStyles.padding.sm,
+              backgroundColor: themeStyles.variant === 'filled' ? primaryColor : 'transparent',
+              color: themeStyles.variant === 'filled' ? '#FFFFFF' : primaryColor,
+              border: themeStyles.variant === 'outlined' || themeStyles.variant === 'bordered'
+                ? `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${primaryColor}`
+                : 'none',
               ...componentStyle
             }}
           >
             New
           </span>
           <span 
-            className="px-2 py-1 text-xs font-medium border"
+            className="text-xs font-medium"
             style={{ 
-              borderColor: themeColors.border, 
-              color: themeColors.text,
+              padding: themeStyles.padding.sm,
+              backgroundColor: 'transparent',
+              border: `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`,
+              color: baseColors.text,
               ...componentStyle
             }}
           >
@@ -323,17 +461,17 @@ function ComponentPreview({
       )
     case 'Checkbox':
       return (
-        <div className="space-y-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: themeStyle.gap }}>
           <label className="flex items-center gap-2 cursor-pointer">
             <input 
               type="checkbox" 
               className="w-4 h-4" 
               style={{ 
-                accentColor: themeColors.primary,
-                borderRadius: styles?.radius ? `${styles.radius * 0.25}rem` : undefined
+                accentColor: primaryColor,
+                borderRadius: themeStyle.borderRadius
               }} 
             />
-            <span className="text-sm">Option 1</span>
+            <span className="text-sm" style={{ color: baseColors.text }}>Option 1</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input 
@@ -341,33 +479,33 @@ function ComponentPreview({
               checked 
               className="w-4 h-4" 
               style={{ 
-                accentColor: themeColors.primary,
-                borderRadius: styles?.radius ? `${styles.radius * 0.25}rem` : undefined
+                accentColor: primaryColor,
+                borderRadius: themeStyle.borderRadius
               }} 
             />
-            <span className="text-sm">Option 2</span>
+            <span className="text-sm" style={{ color: baseColors.text }}>Option 2</span>
           </label>
         </div>
       )
     case 'Switch':
     case 'Toggle':
       return (
-        <div className="space-y-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: themeStyle.gap }}>
           <label className="flex items-center gap-2 cursor-pointer">
             <div className="relative">
               <input type="checkbox" className="sr-only" />
               <div 
                 className="w-10 h-6 transition-all"
                 style={{ 
-                  backgroundColor: themeColors.border,
-                  borderRadius: styles?.radius ? `${styles.radius * 0.5}rem` : '9999px',
-                  ...(styles?.shadow ? { boxShadow: boxShadow } : {})
+                  backgroundColor: baseColors.border,
+                  borderRadius: themeStyle.borderRadius,
+                  ...(styles?.shadow ? { boxShadow: componentStyle.boxShadow } : {})
                 }}
               >
                 <div className="w-5 h-5 bg-white rounded-full shadow transform transition-all translate-x-0.5 translate-y-0.5"></div>
               </div>
             </div>
-            <span className="text-sm">Toggle Off</span>
+            <span className="text-sm" style={{ color: baseColors.text }}>Toggle Off</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <div className="relative">
@@ -375,452 +513,241 @@ function ComponentPreview({
               <div 
                 className="w-10 h-6 transition-all"
                 style={{ 
-                  backgroundColor: themeColors.primary,
-                  borderRadius: styles?.radius ? `${styles.radius * 0.5}rem` : '9999px',
-                  ...(styles?.shadow ? { boxShadow: boxShadow } : {})
+                  backgroundColor: primaryColor,
+                  borderRadius: themeStyle.borderRadius,
+                  ...(styles?.shadow ? { boxShadow: componentStyle.boxShadow } : {})
                 }}
               >
                 <div className="w-5 h-5 bg-white rounded-full shadow transform transition-all translate-x-5 translate-y-0.5"></div>
               </div>
             </div>
-            <span className="text-sm">Toggle On</span>
+            <span className="text-sm" style={{ color: baseColors.text }}>Toggle On</span>
           </label>
         </div>
       )
     case 'Toast':
-      // Theme-specific Toast styling inspired by component.gallery
-      const getToastStyles = () => {
-        switch (theme) {
-          case 'light':
-            return {
-              bg: resolveTokenStyle('bg', '#FFFFFF'),
-              text: resolveTokenStyle('text', '#111827'),
-              border: resolveTokenStyle('border', '#E5E7EB'),
-              shadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-              successBg: '#F0FDF4',
-              successBorder: '#86EFAC',
-              errorBg: '#FEF2F2',
-              errorBorder: '#FCA5A5',
-              warningBg: '#FFFBEB',
-              warningBorder: '#FDE047',
-              infoBg: '#EFF6FF',
-              infoBorder: '#93C5FD'
-            }
-          case 'blue':
-            return {
-              bg: resolveTokenStyle('bg', '#1E3A8A'),
-              text: resolveTokenStyle('text', '#EFF6FF'),
-              border: resolveTokenStyle('border', '#3B82F6'),
-              shadow: '0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2)',
-              successBg: '#065F46',
-              successBorder: '#10B981',
-              errorBg: '#7F1D1D',
-              errorBorder: '#EF4444',
-              warningBg: '#78350F',
-              warningBorder: '#F59E0B',
-              infoBg: '#1E3A8A',
-              infoBorder: '#3B82F6'
-            }
-          case 'purple':
-            return {
-              bg: resolveTokenStyle('bg', '#581C87'),
-              text: resolveTokenStyle('text', '#F3E8FF'),
-              border: resolveTokenStyle('border', '#A855F7'),
-              shadow: '0 10px 15px -3px rgba(168, 85, 247, 0.3), 0 4px 6px -2px rgba(168, 85, 247, 0.2)',
-              successBg: '#065F46',
-              successBorder: '#10B981',
-              errorBg: '#7F1D1D',
-              errorBorder: '#EF4444',
-              warningBg: '#78350F',
-              warningBorder: '#F59E0B',
-              infoBg: '#581C87',
-              infoBorder: '#A855F7'
-            }
-          case 'green':
-            return {
-              bg: resolveTokenStyle('bg', '#064E3B'),
-              text: resolveTokenStyle('text', '#D1FAE5'),
-              border: resolveTokenStyle('border', '#10B981'),
-              shadow: '0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.2)',
-              successBg: '#064E3B',
-              successBorder: '#10B981',
-              errorBg: '#7F1D1D',
-              errorBorder: '#EF4444',
-              warningBg: '#78350F',
-              warningBorder: '#F59E0B',
-              infoBg: '#1E3A8A',
-              infoBorder: '#3B82F6'
-            }
-          case 'red':
-            return {
-              bg: resolveTokenStyle('bg', '#7F1D1D'),
-              text: resolveTokenStyle('text', '#FEE2E2'),
-              border: resolveTokenStyle('border', '#EF4444'),
-              shadow: '0 10px 15px -3px rgba(239, 68, 68, 0.3), 0 4px 6px -2px rgba(239, 68, 68, 0.2)',
-              successBg: '#065F46',
-              successBorder: '#10B981',
-              errorBg: '#7F1D1D',
-              errorBorder: '#EF4444',
-              warningBg: '#78350F',
-              warningBorder: '#F59E0B',
-              infoBg: '#1E3A8A',
-              infoBorder: '#3B82F6'
-            }
-          case 'orange':
-            return {
-              bg: resolveTokenStyle('bg', '#7C2D12'),
-              text: resolveTokenStyle('text', '#FFEDD5'),
-              border: resolveTokenStyle('border', '#F97316'),
-              shadow: '0 10px 15px -3px rgba(249, 115, 22, 0.3), 0 4px 6px -2px rgba(249, 115, 22, 0.2)',
-              successBg: '#065F46',
-              successBorder: '#10B981',
-              errorBg: '#7F1D1D',
-              errorBorder: '#EF4444',
-              warningBg: '#78350F',
-              warningBorder: '#F59E0B',
-              infoBg: '#1E3A8A',
-              infoBorder: '#3B82F6'
-            }
-          case 'yellow':
-            return {
-              bg: resolveTokenStyle('bg', '#713F12'),
-              text: resolveTokenStyle('text', '#FEF9C3'),
-              border: resolveTokenStyle('border', '#EAB308'),
-              shadow: '0 10px 15px -3px rgba(234, 179, 8, 0.3), 0 4px 6px -2px rgba(234, 179, 8, 0.2)',
-              successBg: '#065F46',
-              successBorder: '#10B981',
-              errorBg: '#7F1D1D',
-              errorBorder: '#EF4444',
-              warningBg: '#713F12',
-              warningBorder: '#EAB308',
-              infoBg: '#1E3A8A',
-              infoBorder: '#3B82F6'
-            }
-          case 'pink':
-            return {
-              bg: resolveTokenStyle('bg', '#831843'),
-              text: resolveTokenStyle('text', '#FCE7F3'),
-              border: resolveTokenStyle('border', '#EC4899'),
-              shadow: '0 10px 15px -3px rgba(236, 72, 153, 0.3), 0 4px 6px -2px rgba(236, 72, 153, 0.2)',
-              successBg: '#065F46',
-              successBorder: '#10B981',
-              errorBg: '#7F1D1D',
-              errorBorder: '#EF4444',
-              warningBg: '#78350F',
-              warningBorder: '#F59E0B',
-              infoBg: '#1E3A8A',
-              infoBorder: '#3B82F6'
-            }
-          case 'teal':
-            return {
-              bg: resolveTokenStyle('bg', '#134E4A'),
-              text: resolveTokenStyle('text', '#CCFBF1'),
-              border: resolveTokenStyle('border', '#14B8A6'),
-              shadow: '0 10px 15px -3px rgba(20, 184, 166, 0.3), 0 4px 6px -2px rgba(20, 184, 166, 0.2)',
-              successBg: '#064E3B',
-              successBorder: '#10B981',
-              errorBg: '#7F1D1D',
-              errorBorder: '#EF4444',
-              warningBg: '#78350F',
-              warningBorder: '#F59E0B',
-              infoBg: '#134E4A',
-              infoBorder: '#14B8A6'
-            }
-          default: // dark
-            return {
-              bg: resolveTokenStyle('bg', '#1F2937'),
-              text: resolveTokenStyle('text', '#F9FAFB'),
-              border: resolveTokenStyle('border', '#374151'),
-              shadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2)',
-              successBg: '#064E3B',
-              successBorder: '#10B981',
-              errorBg: '#7F1D1D',
-              errorBorder: '#EF4444',
-              warningBg: '#78350F',
-              warningBorder: '#F59E0B',
-              infoBg: '#1E3A8A',
-              infoBorder: '#3B82F6'
-            }
+      // Get toast position from theme
+      const toastPosition = themeStyles.position.toast
+      
+      // Get position styles for container
+      const getPositionStyles = (): React.CSSProperties => {
+        const base: React.CSSProperties = { position: 'relative', width: '100%' }
+        switch (toastPosition) {
+          case 'top-left':
+            return { ...base, display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }
+          case 'top-right':
+            return { ...base, display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start' }
+          case 'top-center':
+            return { ...base, display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }
+          case 'bottom-left':
+            return { ...base, display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-end' }
+          case 'bottom-right':
+            return { ...base, display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }
+          case 'bottom-center':
+            return { ...base, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }
+          case 'center':
+            return { ...base, display: 'flex', justifyContent: 'center', alignItems: 'center' }
+          default:
+            return { ...base, display: 'flex', flexDirection: 'column', gap: themeStyle.gap }
         }
       }
       
-      const toastStyles = getToastStyles()
-      // Remove boxShadow from componentStyle to avoid duplication (we use toastStyles.shadow instead)
+      // Get toast variant based on theme variant
+      const getToastVariant = () => {
+        switch (themeStyles.variant) {
+          case 'elevated':
+            return 'elevated' // Material Design style
+          case 'bordered':
+            return 'bordered' // Ant Design style
+          case 'outlined':
+            return 'outlined' // Custom style
+          case 'minimal':
+            return 'minimal' // Chakra/Tailwind style
+          case 'filled':
+            return 'filled' // Filled style
+          default:
+            return 'minimal'
+        }
+      }
+      
+      const toastVariant = getToastVariant()
+      
+      // Base toast styles using theme
+      const toastBaseStyle = {
+        padding: themeStyles.padding.md,
+        borderRadius: themeStyle.borderRadius,
+        border: themeStyles.variant === 'bordered' || themeStyles.variant === 'outlined'
+          ? `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`
+          : 'none',
+        boxShadow: themeStyles.variant === 'elevated' ? themeStyle.boxShadow : themeStyles.shadow.sm,
+        backgroundColor: baseColors.bg,
+        color: baseColors.text,
+        maxWidth: '400px',
+        width: '100%'
+      }
+      
+      // Remove boxShadow from componentStyle to avoid duplication
       const { boxShadow: _, ...toastComponentStyle } = componentStyle
       
-      // Theme-specific toast variants inspired by component.gallery
-      const getToastVariant = () => {
-        // Different styles for different themes, inspired by component.gallery examples
-        if (theme === 'dark') {
-          // Gestalt style - dark with avatar
-          return 'avatar'
-        } else if (theme === 'light') {
-          // Helios style - light with actions
-          return 'actions'
-        } else if (theme === 'blue' || theme === 'purple') {
-          // HeroUI style - simple with icon
-          return 'simple'
+      // Render toast based on variant
+      const renderToast = (type: 'success' | 'error', message: string, description?: string) => {
+        const iconColor = type === 'success' ? '#10B981' : '#EF4444'
+        const borderLeftColor = type === 'success' ? '#10B981' : '#EF4444'
+        
+        if (toastVariant === 'elevated') {
+          // Material Design - Elevated with shadow
+          return (
+            <div 
+              className="flex items-center gap-3"
+              style={{ 
+                ...toastBaseStyle,
+                ...toastComponentStyle
+              }}
+            >
+              <div 
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: iconColor }}
+              >
+                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  {type === 'success' ? (
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  ) : (
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  )}
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold">{message}</p>
+                {description && <p className="text-xs opacity-90 mt-0.5">{description}</p>}
+              </div>
+              <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: baseColors.text }}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )
+        } else if (toastVariant === 'bordered') {
+          // Ant Design - Bordered style
+          return (
+            <div 
+              className="flex items-center gap-3"
+              style={{ 
+                ...toastBaseStyle,
+                ...toastComponentStyle
+              }}
+            >
+              <div 
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: iconColor }}
+              >
+                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  {type === 'success' ? (
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  ) : (
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  )}
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold">{message}</p>
+                {description && <p className="text-xs opacity-90 mt-0.5">{description}</p>}
+              </div>
+              <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: baseColors.text }}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )
+        } else if (toastVariant === 'outlined') {
+          // Outlined style with border-left
+          return (
+            <div 
+              className="flex items-center gap-3 border-l-4"
+              style={{ 
+                ...toastBaseStyle,
+                borderLeftColor: borderLeftColor,
+                ...toastComponentStyle
+              }}
+            >
+              <div 
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: iconColor }}
+              >
+                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  {type === 'success' ? (
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  ) : (
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  )}
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold">{message}</p>
+                {description && <p className="text-xs opacity-90 mt-0.5">{description}</p>}
+              </div>
+              <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: baseColors.text }}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )
         } else {
-          // Default - border left style
-          return 'border'
+          // Minimal style (default)
+          return (
+            <div 
+              className="flex items-center gap-3"
+              style={{ 
+                ...toastBaseStyle,
+                ...toastComponentStyle
+              }}
+            >
+              <div 
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: iconColor }}
+              >
+                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  {type === 'success' ? (
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  ) : (
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  )}
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold">{message}</p>
+                {description && <p className="text-xs opacity-90 mt-0.5">{description}</p>}
+              </div>
+              <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: baseColors.text }}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )
         }
       }
       
-      const variant = getToastVariant()
-      
       return (
-        <div className="space-y-3 w-full">
-          {/* Success Toast - varies by theme */}
-          {variant === 'avatar' ? (
-            // Gestalt style - dark toast with avatar (inspired by "Saved to Sushi time")
-            <div 
-              className="px-4 py-3 rounded-lg flex items-center gap-3"
-              style={{ 
-                backgroundColor: theme === 'dark' ? '#000000' : toastStyles.successBg,
-                color: '#FFFFFF',
-                boxShadow: toastStyles.shadow,
-                ...toastComponentStyle
-              }}
-            >
-              <div 
-                className="w-8 h-8 rounded-full bg-cover bg-center flex-shrink-0"
-                style={{ 
-                  backgroundImage: 'url(https://i.pravatar.cc/150?img=12)'
-                }}
-              />
-              <div className="flex-1">
-                <p className="text-sm font-semibold">Saved to <strong>Design System</strong></p>
-              </div>
-              <button className="opacity-60 hover:opacity-100 transition-opacity text-white">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          ) : variant === 'actions' ? (
-            // Helios style - light toast with title, description, and actions
-            <div 
-              className="px-4 py-4 rounded-lg"
-              style={{ 
-                backgroundColor: toastStyles.successBg,
-                color: toastStyles.text,
-                boxShadow: toastStyles.shadow,
-                ...toastComponentStyle
-              }}
-            >
-              <div className="flex items-start gap-3 mb-3">
-                <div 
-                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                  style={{ backgroundColor: '#10B981' }}
-                >
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-bold mb-1">Success toast</p>
-                  <p className="text-xs opacity-80 leading-relaxed">Your changes have been saved successfully. You can continue working.</p>
-                </div>
-                <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <div className="flex items-center gap-2 pt-2 border-t" style={{ borderColor: theme === 'light' ? '#E5E7EB' : '#374151' }}>
-                <button 
-                  className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
-                  style={{ 
-                    backgroundColor: theme === 'light' ? '#111827' : '#FFFFFF',
-                    color: theme === 'light' ? '#FFFFFF' : '#111827'
-                  }}
-                >
-                  Button
-                </button>
-                <button 
-                  className="px-3 py-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
-                  style={{ color: theme === 'light' ? '#4F46E5' : '#818CF8' }}
-                >
-                  + Link text
-                </button>
-              </div>
-            </div>
-          ) : variant === 'simple' ? (
-            // HeroUI style - simple with icon
-            <div 
-              className="px-4 py-3 rounded-lg flex items-center gap-3"
-              style={{ 
-                backgroundColor: toastStyles.successBg,
-                color: toastStyles.text,
-                boxShadow: toastStyles.shadow,
-                ...toastComponentStyle
-              }}
-            >
-              <div 
-                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: '#10B981' }}
-              >
-                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold">Toast Title</p>
-              </div>
-              <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          ) : (
-            // Default - border left style
-            <div 
-              className="px-4 py-3 rounded-lg flex items-center gap-3 border-l-4"
-              style={{ 
-                backgroundColor: toastStyles.successBg,
-                color: toastStyles.text,
-                borderLeftColor: toastStyles.successBorder,
-                boxShadow: toastStyles.shadow,
-                ...toastComponentStyle
-              }}
-            >
-              <div 
-                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: '#10B981' }}
-              >
-                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold">Success</p>
-                <p className="text-xs opacity-90 mt-0.5">Your changes have been saved</p>
-              </div>
-              <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          )}
-          
-          {/* Error Toast - varies by theme */}
-          {variant === 'avatar' ? (
-            <div 
-              className="px-4 py-3 rounded-lg flex items-center gap-3"
-              style={{ 
-                backgroundColor: theme === 'dark' ? '#1F2937' : toastStyles.errorBg,
-                color: theme === 'dark' ? '#FFFFFF' : toastStyles.text,
-                boxShadow: toastStyles.shadow,
-                ...toastComponentStyle
-              }}
-            >
-              <div 
-                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: '#EF4444' }}
-              >
-                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold">Error occurred</p>
-              </div>
-              <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: theme === 'dark' ? '#FFFFFF' : toastStyles.text }}>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          ) : variant === 'actions' ? (
-            <div 
-              className="px-4 py-4 rounded-lg"
-              style={{ 
-                backgroundColor: toastStyles.errorBg,
-                color: toastStyles.text,
-                boxShadow: toastStyles.shadow,
-                ...toastComponentStyle
-              }}
-            >
-              <div className="flex items-start gap-3 mb-3">
-                <div 
-                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                  style={{ backgroundColor: '#EF4444' }}
-                >
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-bold mb-1">Error toast</p>
-                  <p className="text-xs opacity-80 leading-relaxed">Something went wrong. Please try again or contact support.</p>
-                </div>
-                <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <div className="flex items-center gap-2 pt-2 border-t" style={{ borderColor: theme === 'light' ? '#E5E7EB' : '#374151' }}>
-                <button 
-                  className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
-                  style={{ 
-                    backgroundColor: theme === 'light' ? '#111827' : '#FFFFFF',
-                    color: theme === 'light' ? '#FFFFFF' : '#111827'
-                  }}
-                >
-                  Retry
-                </button>
-                <button 
-                  className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 transition-colors"
-                  style={{ color: theme === 'light' ? '#DC2626' : '#FCA5A5' }}
-                >
-                  + Report issue
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div 
-              className="px-4 py-3 rounded-lg flex items-center gap-3 border-l-4"
-              style={{ 
-                backgroundColor: toastStyles.errorBg,
-                color: toastStyles.text,
-                borderLeftColor: toastStyles.errorBorder,
-                boxShadow: toastStyles.shadow,
-                ...toastComponentStyle
-              }}
-            >
-              <div 
-                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: '#EF4444' }}
-              >
-                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold">Error</p>
-                <p className="text-xs opacity-90 mt-0.5">Something went wrong</p>
-              </div>
-              <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          )}
+        <div style={getPositionStyles()}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: themeStyle.gap }}>
+            {renderToast('success', 'Success', 'Your changes have been saved')}
+            {renderToast('error', 'Error', 'Something went wrong')}
+          </div>
         </div>
       )
     case 'Alert':
       return (
-        <div className="space-y-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: themeStyle.gap }}>
           <div 
-            className="px-4 py-3 rounded-lg border-l-4"
+            className="rounded-lg border-l-4"
             style={{ 
-              backgroundColor: theme === 'dark' ? '#1E3A8A' : '#DBEAFE',
-              borderLeftColor: themeColors.primary,
-              color: theme === 'dark' ? '#DBEAFE' : '#1E40AF',
+              padding: themeStyles.padding.md,
+              backgroundColor: baseColors.bg,
+              borderLeftColor: primaryColor,
+              color: baseColors.text,
               ...componentStyle
             }}
           >
@@ -828,11 +755,12 @@ function ComponentPreview({
             <p className="text-xs mt-1 opacity-90">This is an informational alert message</p>
           </div>
           <div 
-            className="px-4 py-3 rounded-lg border-l-4"
+            className="rounded-lg border-l-4"
             style={{ 
-              backgroundColor: theme === 'dark' ? '#7F1D1D' : '#FEE2E2',
+              padding: themeStyles.padding.md,
+              backgroundColor: baseColors.bg,
               borderLeftColor: '#EF4444',
-              color: theme === 'dark' ? '#FEE2E2' : '#991B1B',
+              color: baseColors.text,
               ...componentStyle
             }}
           >
@@ -843,11 +771,11 @@ function ComponentPreview({
       )
     case 'Avatar':
       return (
-        <div className="flex items-center gap-3">
+        <div style={{ display: 'flex', alignItems: 'center', gap: themeStyle.gap }}>
           <div 
             className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold"
             style={{ 
-              backgroundColor: themeColors.primary,
+              backgroundColor: primaryColor,
               color: '#FFFFFF'
             }}
           >
@@ -856,8 +784,8 @@ function ComponentPreview({
           <div 
             className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold border-2"
             style={{ 
-              borderColor: themeColors.border,
-              color: themeColors.text
+              borderColor: baseColors.border,
+              color: baseColors.text
             }}
           >
             AB
@@ -872,25 +800,29 @@ function ComponentPreview({
       )
     case 'Accordion':
       return (
-        <div className="space-y-2 w-full">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: themeStyle.gap, width: '100%' }}>
           <div 
-            className="border rounded-lg overflow-hidden"
+            className="rounded-lg overflow-hidden"
             style={{ 
-              borderColor: themeColors.border,
-              backgroundColor: themeColors.bg
+              border: `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`,
+              backgroundColor: baseColors.bg,
+              borderRadius: themeStyle.borderRadius
             }}
           >
             <button 
-              className="w-full px-4 py-3 flex items-center justify-between text-left"
-              style={{ color: themeColors.text }}
+              className="w-full flex items-center justify-between text-left"
+              style={{ 
+                padding: themeStyles.padding.md,
+                color: baseColors.text 
+              }}
             >
               <span className="text-sm font-medium">Section 1</span>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            <div className="px-4 pb-3">
-              <p className="text-xs opacity-70" style={{ color: themeColors.text }}>
+            <div style={{ padding: `0 ${themeStyles.padding.md} ${themeStyles.padding.md}` }}>
+              <p className="text-xs opacity-70" style={{ color: baseColors.text }}>
                 Accordion content goes here
               </p>
             </div>
@@ -900,13 +832,13 @@ function ComponentPreview({
     case 'Progress bar':
     case 'Progress indicator':
       return (
-        <div className="space-y-3 w-full">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: themeStyle.gap, width: '100%' }}>
           <div className="w-full bg-gray-700 rounded-full h-2">
             <div 
               className="h-2 rounded-full transition-all"
               style={{ 
                 width: '60%',
-                backgroundColor: themeColors.primary
+                backgroundColor: primaryColor
               }}
             />
           </div>
@@ -915,7 +847,7 @@ function ComponentPreview({
               className="h-2 rounded-full transition-all"
               style={{ 
                 width: '100%',
-                backgroundColor: themeColors.primary
+                backgroundColor: primaryColor
               }}
             />
           </div>
@@ -927,55 +859,56 @@ function ComponentPreview({
         <div className="flex items-center justify-center">
           <div 
             className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin"
-            style={{ borderColor: themeColors.primary }}
+            style={{ borderColor: primaryColor }}
           />
         </div>
       )
     case 'Skeleton':
     case 'Skeleton Loader':
       return (
-        <div className="space-y-2 w-full">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: themeStyle.gap, width: '100%' }}>
           <div 
             className="h-4 rounded animate-pulse"
-            style={{ backgroundColor: themeColors.border }}
+            style={{ backgroundColor: baseColors.border }}
           />
           <div 
             className="h-4 rounded w-5/6 animate-pulse"
-            style={{ backgroundColor: themeColors.border }}
+            style={{ backgroundColor: baseColors.border }}
           />
           <div 
             className="h-20 rounded animate-pulse"
-            style={{ backgroundColor: themeColors.border }}
+            style={{ backgroundColor: baseColors.border }}
           />
         </div>
       )
     case 'Separator':
     case 'Divider':
       return (
-        <div className="w-full flex items-center gap-2">
+        <div style={{ display: 'flex', alignItems: 'center', gap: themeStyle.gap, width: '100%' }}>
           <div 
             className="flex-1 h-px"
-            style={{ backgroundColor: themeColors.border }}
+            style={{ backgroundColor: baseColors.border }}
           />
-          <span className="text-xs opacity-60" style={{ color: themeColors.text }}>OR</span>
+          <span className="text-xs opacity-60" style={{ color: baseColors.text }}>OR</span>
           <div 
             className="flex-1 h-px"
-            style={{ backgroundColor: themeColors.border }}
+            style={{ backgroundColor: baseColors.border }}
           />
         </div>
       )
     case 'Text input':
     case 'Search input':
       return (
-        <div className="space-y-2 w-full">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: themeStyle.gap, width: '100%' }}>
           <input
             type="text"
             placeholder="Enter text..."
-            className="w-full px-3 py-2 text-sm border transition-all"
+            className="w-full text-sm transition-all"
             style={{ 
-              backgroundColor: themeColors.bg,
-              borderColor: themeColors.border,
-              color: themeColors.text,
+              padding: themeStyles.padding.md,
+              backgroundColor: baseColors.bg,
+              border: `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`,
+              color: baseColors.text,
               ...componentStyle
             }}
           />
@@ -985,12 +918,13 @@ function ComponentPreview({
       return (
         <textarea
           placeholder="Enter multi-line text..."
-          className="w-full px-3 py-2 text-sm border transition-all resize-none"
+          className="w-full text-sm transition-all resize-none"
           rows={3}
           style={{ 
-            backgroundColor: themeColors.bg,
-            borderColor: themeColors.border,
-            color: themeColors.text,
+            padding: themeStyles.padding.md,
+            backgroundColor: baseColors.bg,
+            border: `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`,
+            color: baseColors.text,
             ...componentStyle
           }}
         />
@@ -998,11 +932,12 @@ function ComponentPreview({
     case 'Select':
       return (
         <select
-          className="w-full px-3 py-2 text-sm border transition-all"
+          className="w-full text-sm transition-all"
           style={{ 
-            backgroundColor: themeColors.bg,
-            borderColor: themeColors.border,
-            color: themeColors.text,
+            padding: themeStyles.padding.md,
+            backgroundColor: baseColors.bg,
+            border: `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`,
+            color: baseColors.text,
             ...componentStyle
           }}
         >
@@ -1013,17 +948,17 @@ function ComponentPreview({
       )
     case 'Radio button':
       return (
-        <div className="space-y-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: themeStyle.gap }}>
           <label className="flex items-center gap-2 cursor-pointer">
             <input 
               type="radio" 
               name="radio-demo"
               className="w-4 h-4" 
               style={{ 
-                accentColor: themeColors.primary
+                accentColor: primaryColor
               }} 
             />
-            <span className="text-sm">Option 1</span>
+            <span className="text-sm" style={{ color: baseColors.text }}>Option 1</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input 
@@ -1032,10 +967,10 @@ function ComponentPreview({
               checked
               className="w-4 h-4" 
               style={{ 
-                accentColor: themeColors.primary
+                accentColor: primaryColor
               }} 
             />
-            <span className="text-sm">Option 2</span>
+            <span className="text-sm" style={{ color: baseColors.text }}>Option 2</span>
           </label>
         </div>
       )
@@ -1049,43 +984,50 @@ function ComponentPreview({
             defaultValue="50"
             className="w-full h-2 rounded-lg appearance-none cursor-pointer"
             style={{
-              background: `linear-gradient(to right, ${themeColors.primary} 50%, ${themeColors.border} 50%)`
+              background: `linear-gradient(to right, ${primaryColor} 50%, ${baseColors.border} 50%)`
             }}
           />
         </div>
       )
     case 'Breadcrumbs':
       return (
-        <nav className="flex items-center gap-2 text-sm">
-          <a href="#" className="opacity-60 hover:opacity-100" style={{ color: themeColors.text }}>Home</a>
-          <span className="opacity-40" style={{ color: themeColors.text }}>/</span>
-          <a href="#" className="opacity-60 hover:opacity-100" style={{ color: themeColors.text }}>Category</a>
-          <span className="opacity-40" style={{ color: themeColors.text }}>/</span>
-          <span style={{ color: themeColors.text }}>Current</span>
+        <nav style={{ display: 'flex', alignItems: 'center', gap: themeStyle.gap }} className="text-sm">
+          <a href="#" className="opacity-60 hover:opacity-100" style={{ color: baseColors.text }}>Home</a>
+          <span className="opacity-40" style={{ color: baseColors.text }}>/</span>
+          <a href="#" className="opacity-60 hover:opacity-100" style={{ color: baseColors.text }}>Category</a>
+          <span className="opacity-40" style={{ color: baseColors.text }}>/</span>
+          <span style={{ color: baseColors.text }}>Current</span>
         </nav>
       )
     case 'Tabs':
       return (
         <div className="w-full">
-          <div className="flex border-b" style={{ borderColor: themeColors.border }}>
+          <div className="flex border-b" style={{ borderColor: baseColors.border }}>
             <button 
-              className="px-4 py-2 text-sm font-medium border-b-2"
+              className="text-sm font-medium border-b-2"
               style={{ 
-                borderBottomColor: themeColors.primary,
-                color: themeColors.primary
+                padding: themeStyles.padding.md,
+                borderBottomColor: primaryColor,
+                color: primaryColor
               }}
             >
               Tab 1
             </button>
             <button 
-              className="px-4 py-2 text-sm font-medium opacity-60 hover:opacity-100"
-              style={{ color: themeColors.text }}
+              className="text-sm font-medium opacity-60 hover:opacity-100"
+              style={{ 
+                padding: themeStyles.padding.md,
+                color: baseColors.text 
+              }}
             >
               Tab 2
             </button>
             <button 
-              className="px-4 py-2 text-sm font-medium opacity-60 hover:opacity-100"
-              style={{ color: themeColors.text }}
+              className="text-sm font-medium opacity-60 hover:opacity-100"
+              style={{ 
+                padding: themeStyles.padding.md,
+                color: baseColors.text 
+              }}
             >
               Tab 3
             </button>
@@ -1094,48 +1036,58 @@ function ComponentPreview({
       )
     case 'Pagination':
       return (
-        <div className="flex items-center gap-1">
+        <div style={{ display: 'flex', alignItems: 'center', gap: themeStyle.gap }}>
           <button 
-            className="px-3 py-1 text-sm border rounded"
+            className="text-sm rounded"
             style={{ 
-              borderColor: themeColors.border,
-              color: themeColors.text
+              padding: themeStyles.padding.sm,
+              border: `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`,
+              color: baseColors.text,
+              borderRadius: themeStyle.borderRadius
             }}
           >
             Previous
           </button>
           <button 
-            className="px-3 py-1 text-sm rounded"
+            className="text-sm rounded"
             style={{ 
-              backgroundColor: themeColors.primary,
-              color: '#FFFFFF'
+              padding: themeStyles.padding.sm,
+              backgroundColor: primaryColor,
+              color: '#FFFFFF',
+              borderRadius: themeStyle.borderRadius
             }}
           >
             1
           </button>
           <button 
-            className="px-3 py-1 text-sm border rounded"
+            className="text-sm rounded"
             style={{ 
-              borderColor: themeColors.border,
-              color: themeColors.text
+              padding: themeStyles.padding.sm,
+              border: `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`,
+              color: baseColors.text,
+              borderRadius: themeStyle.borderRadius
             }}
           >
             2
           </button>
           <button 
-            className="px-3 py-1 text-sm border rounded"
+            className="text-sm rounded"
             style={{ 
-              borderColor: themeColors.border,
-              color: themeColors.text
+              padding: themeStyles.padding.sm,
+              border: `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`,
+              color: baseColors.text,
+              borderRadius: themeStyle.borderRadius
             }}
           >
             3
           </button>
           <button 
-            className="px-3 py-1 text-sm border rounded"
+            className="text-sm rounded"
             style={{ 
-              borderColor: themeColors.border,
-              color: themeColors.text
+              padding: themeStyles.padding.sm,
+              border: `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`,
+              color: baseColors.text,
+              borderRadius: themeStyle.borderRadius
             }}
           >
             Next
@@ -1145,11 +1097,12 @@ function ComponentPreview({
     default:
       return (
         <div 
-          className="p-4 border text-center"
+          className="text-center"
           style={{ 
-            backgroundColor: themeColors.bg,
-            borderColor: themeColors.border,
-            color: themeColors.text,
+            padding: themeStyles.padding.lg,
+            backgroundColor: baseColors.bg,
+            border: `${themeStyle.borderWidth} ${themeStyle.borderStyle} ${baseColors.border}`,
+            color: baseColors.text,
             ...componentStyle
           }}
         >
@@ -1171,7 +1124,7 @@ interface ComponentStyles {
 }
 
 export default function SystemComponents({ designSystemName, availableSystems, onSwitchSystem }: SystemComponentsProps) {
-  const [selectedTheme, setSelectedTheme] = useState<Theme>('dark')
+  const [selectedTheme, setSelectedTheme] = useState<Theme>('material')
   const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false)
   const [editingComponent, setEditingComponent] = useState<string | null>(null)
   const [componentStyles, setComponentStyles] = useState<Record<string, ComponentStyles>>({})
@@ -1384,12 +1337,12 @@ export default function SystemComponents({ designSystemName, availableSystems, o
             <div 
               className="w-4 h-4 rounded-full border-2"
               style={{ 
-                backgroundColor: THEMES.find(t => t.id === selectedTheme)?.colors.primary || '#715AFF',
-                borderColor: THEMES.find(t => t.id === selectedTheme)?.colors.primary || '#715AFF'
+                backgroundColor: getPrimaryColor(tokens),
+                borderColor: getPrimaryColor(tokens)
               }}
             />
             <span className="text-sm text-white font-medium">
-              {THEMES.find(t => t.id === selectedTheme)?.name || 'Dark'} Theme
+              {THEMES.find(t => t.id === selectedTheme)?.name || 'Material Design'} Theme
             </span>
             <svg 
               className={`w-4 h-4 text-gray-400 transition-transform ${isThemeDropdownOpen ? 'rotate-180' : ''}`}
@@ -1424,8 +1377,8 @@ export default function SystemComponents({ designSystemName, availableSystems, o
                     <div 
                       className="w-5 h-5 rounded-full border-2 flex-shrink-0"
                       style={{ 
-                        backgroundColor: theme.colors.primary,
-                        borderColor: theme.colors.primary
+                        backgroundColor: getPrimaryColor(tokens),
+                        borderColor: getPrimaryColor(tokens)
                       }}
                     />
                     <span className="text-sm font-medium">{theme.name}</span>
