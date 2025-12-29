@@ -24,6 +24,7 @@ const COMPONENT_CATEGORIES: Record<ComponentCategory, { title: string; descripti
     title: 'Components',
     description: 'Atomic UI elements. They do NOT compose other components. They may have states and variants.',
     components: [
+      { name: 'Toast', description: 'A type of alert which appears in a layer above other content, visually similar to a mobile or desktop push notification', category: 'components' },
       { name: 'Accordion', description: 'Vertical stack of interactive headings to toggle content display', category: 'components' },
       { name: 'Alert', description: 'A way of informing the user of important changes in a prominent way', category: 'components' },
       { name: 'Avatar', description: 'A graphical representation of a user: usually a photo, illustration, or initial', category: 'components' },
@@ -46,7 +47,6 @@ const COMPONENT_CATEGORIES: Record<ComponentCategory, { title: string; descripti
       { name: 'Separator', description: 'A separator between two elements, usually consisting of a horizontal or vertical line', category: 'components' },
       { name: 'Skeleton', description: 'A placeholder layout for content which hasn\'t yet loaded', category: 'components' },
       { name: 'Tabs', description: 'Tabbed interfaces are a way of navigating between multiple panels', category: 'components' },
-      { name: 'Toast', description: 'A type of alert which appears in a layer above other content, visually similar to a mobile or desktop push notification', category: 'components' },
       { name: 'Tooltip', description: 'A means of displaying a description or extra information about an element', category: 'components' },
       { name: 'Tree view', description: 'A component for displaying nested hierarchical information', category: 'components' },
       { name: 'Video', description: 'Video players are used for displaying video content; they often include controls to control playback', category: 'components' },
@@ -545,128 +545,271 @@ function ComponentPreview({
       }
       
       const toastStyles = getToastStyles()
+      // Remove boxShadow from componentStyle to avoid duplication (we use toastStyles.shadow instead)
+      const { boxShadow: _, ...toastComponentStyle } = componentStyle
+      
+      // Theme-specific toast variants inspired by component.gallery
+      const getToastVariant = () => {
+        // Different styles for different themes, inspired by component.gallery examples
+        if (theme === 'dark') {
+          // Gestalt style - dark with avatar
+          return 'avatar'
+        } else if (theme === 'light') {
+          // Helios style - light with actions
+          return 'actions'
+        } else if (theme === 'blue' || theme === 'purple') {
+          // HeroUI style - simple with icon
+          return 'simple'
+        } else {
+          // Default - border left style
+          return 'border'
+        }
+      }
+      
+      const variant = getToastVariant()
       
       return (
         <div className="space-y-3 w-full">
-          {/* Success Toast */}
-          <div 
-            className="px-4 py-3 rounded-lg flex items-center gap-3 border-l-4"
-            style={{ 
-              backgroundColor: toastStyles.successBg,
-              color: toastStyles.text,
-              borderLeftColor: toastStyles.successBorder,
-              boxShadow: toastStyles.shadow,
-              ...componentStyle
-            }}
-          >
+          {/* Success Toast - varies by theme */}
+          {variant === 'avatar' ? (
+            // Gestalt style - dark toast with avatar (inspired by "Saved to Sushi time")
             <div 
-              className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: '#10B981' }}
+              className="px-4 py-3 rounded-lg flex items-center gap-3"
+              style={{ 
+                backgroundColor: theme === 'dark' ? '#000000' : toastStyles.successBg,
+                color: '#FFFFFF',
+                boxShadow: toastStyles.shadow,
+                ...toastComponentStyle
+              }}
             >
-              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
+              <div 
+                className="w-8 h-8 rounded-full bg-cover bg-center flex-shrink-0"
+                style={{ 
+                  backgroundImage: 'url(https://i.pravatar.cc/150?img=12)'
+                }}
+              />
+              <div className="flex-1">
+                <p className="text-sm font-semibold">Saved to <strong>Design System</strong></p>
+              </div>
+              <button className="opacity-60 hover:opacity-100 transition-opacity text-white">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold">Success</p>
-              <p className="text-xs opacity-90 mt-0.5">Your changes have been saved</p>
+          ) : variant === 'actions' ? (
+            // Helios style - light toast with title, description, and actions
+            <div 
+              className="px-4 py-4 rounded-lg"
+              style={{ 
+                backgroundColor: toastStyles.successBg,
+                color: toastStyles.text,
+                boxShadow: toastStyles.shadow,
+                ...toastComponentStyle
+              }}
+            >
+              <div className="flex items-start gap-3 mb-3">
+                <div 
+                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                  style={{ backgroundColor: '#10B981' }}
+                >
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold mb-1">Success toast</p>
+                  <p className="text-xs opacity-80 leading-relaxed">Your changes have been saved successfully. You can continue working.</p>
+                </div>
+                <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex items-center gap-2 pt-2 border-t" style={{ borderColor: theme === 'light' ? '#E5E7EB' : '#374151' }}>
+                <button 
+                  className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+                  style={{ 
+                    backgroundColor: theme === 'light' ? '#111827' : '#FFFFFF',
+                    color: theme === 'light' ? '#FFFFFF' : '#111827'
+                  }}
+                >
+                  Button
+                </button>
+                <button 
+                  className="px-3 py-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+                  style={{ color: theme === 'light' ? '#4F46E5' : '#818CF8' }}
+                >
+                  + Link text
+                </button>
+              </div>
             </div>
-            <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+          ) : variant === 'simple' ? (
+            // HeroUI style - simple with icon
+            <div 
+              className="px-4 py-3 rounded-lg flex items-center gap-3"
+              style={{ 
+                backgroundColor: toastStyles.successBg,
+                color: toastStyles.text,
+                boxShadow: toastStyles.shadow,
+                ...toastComponentStyle
+              }}
+            >
+              <div 
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: '#10B981' }}
+              >
+                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold">Toast Title</p>
+              </div>
+              <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          ) : (
+            // Default - border left style
+            <div 
+              className="px-4 py-3 rounded-lg flex items-center gap-3 border-l-4"
+              style={{ 
+                backgroundColor: toastStyles.successBg,
+                color: toastStyles.text,
+                borderLeftColor: toastStyles.successBorder,
+                boxShadow: toastStyles.shadow,
+                ...toastComponentStyle
+              }}
+            >
+              <div 
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: '#10B981' }}
+              >
+                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold">Success</p>
+                <p className="text-xs opacity-90 mt-0.5">Your changes have been saved</p>
+              </div>
+              <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
           
-          {/* Error Toast */}
-          <div 
-            className="px-4 py-3 rounded-lg flex items-center gap-3 border-l-4"
-            style={{ 
-              backgroundColor: toastStyles.errorBg,
-              color: toastStyles.text,
-              borderLeftColor: toastStyles.errorBorder,
-              boxShadow: toastStyles.shadow,
-              ...componentStyle
-            }}
-          >
+          {/* Error Toast - varies by theme */}
+          {variant === 'avatar' ? (
             <div 
-              className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: '#EF4444' }}
+              className="px-4 py-3 rounded-lg flex items-center gap-3"
+              style={{ 
+                backgroundColor: theme === 'dark' ? '#1F2937' : toastStyles.errorBg,
+                color: theme === 'dark' ? '#FFFFFF' : toastStyles.text,
+                boxShadow: toastStyles.shadow,
+                ...toastComponentStyle
+              }}
             >
-              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+              <div 
+                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: '#EF4444' }}
+              >
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold">Error occurred</p>
+              </div>
+              <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: theme === 'dark' ? '#FFFFFF' : toastStyles.text }}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold">Error</p>
-              <p className="text-xs opacity-90 mt-0.5">Something went wrong</p>
-            </div>
-            <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          
-          {/* Warning Toast */}
-          <div 
-            className="px-4 py-3 rounded-lg flex items-center gap-3 border-l-4"
-            style={{ 
-              backgroundColor: toastStyles.warningBg,
-              color: toastStyles.text,
-              borderLeftColor: toastStyles.warningBorder,
-              boxShadow: toastStyles.shadow,
-              ...componentStyle
-            }}
-          >
+          ) : variant === 'actions' ? (
             <div 
-              className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: '#F59E0B' }}
+              className="px-4 py-4 rounded-lg"
+              style={{ 
+                backgroundColor: toastStyles.errorBg,
+                color: toastStyles.text,
+                boxShadow: toastStyles.shadow,
+                ...toastComponentStyle
+              }}
             >
-              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
+              <div className="flex items-start gap-3 mb-3">
+                <div 
+                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                  style={{ backgroundColor: '#EF4444' }}
+                >
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold mb-1">Error toast</p>
+                  <p className="text-xs opacity-80 leading-relaxed">Something went wrong. Please try again or contact support.</p>
+                </div>
+                <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex items-center gap-2 pt-2 border-t" style={{ borderColor: theme === 'light' ? '#E5E7EB' : '#374151' }}>
+                <button 
+                  className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+                  style={{ 
+                    backgroundColor: theme === 'light' ? '#111827' : '#FFFFFF',
+                    color: theme === 'light' ? '#FFFFFF' : '#111827'
+                  }}
+                >
+                  Retry
+                </button>
+                <button 
+                  className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 transition-colors"
+                  style={{ color: theme === 'light' ? '#DC2626' : '#FCA5A5' }}
+                >
+                  + Report issue
+                </button>
+              </div>
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold">Warning</p>
-              <p className="text-xs opacity-90 mt-0.5">Please review your changes</p>
-            </div>
-            <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          
-          {/* Info Toast */}
-          <div 
-            className="px-4 py-3 rounded-lg flex items-center gap-3 border-l-4"
-            style={{ 
-              backgroundColor: toastStyles.infoBg,
-              color: toastStyles.text,
-              borderLeftColor: toastStyles.infoBorder,
-              boxShadow: toastStyles.shadow,
-              ...componentStyle
-            }}
-          >
+          ) : (
             <div 
-              className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: '#3B82F6' }}
+              className="px-4 py-3 rounded-lg flex items-center gap-3 border-l-4"
+              style={{ 
+                backgroundColor: toastStyles.errorBg,
+                color: toastStyles.text,
+                borderLeftColor: toastStyles.errorBorder,
+                boxShadow: toastStyles.shadow,
+                ...toastComponentStyle
+              }}
             >
-              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-              </svg>
+              <div 
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: '#EF4444' }}
+              >
+                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold">Error</p>
+                <p className="text-xs opacity-90 mt-0.5">Something went wrong</p>
+              </div>
+              <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold">Information</p>
-              <p className="text-xs opacity-90 mt-0.5">New update available</p>
-            </div>
-            <button className="opacity-60 hover:opacity-100 transition-opacity" style={{ color: toastStyles.text }}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+          )}
         </div>
       )
     case 'Alert':
