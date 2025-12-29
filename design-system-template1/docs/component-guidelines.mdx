@@ -1,0 +1,254 @@
+import { Meta } from '@storybook/blocks'
+
+<Meta title="Documentation/Component Guidelines" />
+
+# Component Guidelines
+
+Guidelines for using and extending design system components.
+
+## Component Usage
+
+### Import from Design System
+
+Always import components from the design system:
+
+```tsx
+// ✅ Good
+import { Button, TextField } from '@/design-system'
+
+// ❌ Bad - Don't import from internal paths
+import { Button } from '@/design-system/primitives/button/button'
+```
+
+### Use TypeScript
+
+All components are fully typed. Use TypeScript for better developer experience:
+
+```tsx
+import { Button, ButtonProps } from '@/design-system'
+
+function MyButton(props: ButtonProps) {
+  return <Button {...props} />
+}
+```
+
+## Component Patterns
+
+### Variants
+
+Many components support variants. Use the `variant` prop:
+
+```tsx
+<Button variant="primary">Primary</Button>
+<Button variant="secondary">Secondary</Button>
+<Button variant="tertiary">Tertiary</Button>
+```
+
+### Sizes
+
+Components support size variants:
+
+```tsx
+<Button size="sm">Small</Button>
+<Button size="md">Medium</Button>
+<Button size="lg">Large</Button>
+```
+
+### Composition
+
+Compose components to build complex UIs:
+
+```tsx
+<Card>
+  <CardHeader>
+    <CardTitle>Title</CardTitle>
+    <CardDescription>Description</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <TextField label="Email" />
+  </CardContent>
+  <CardFooter>
+    <Button>Submit</Button>
+  </CardFooter>
+</Card>
+```
+
+## Form Components
+
+### Use Form Fields
+
+Prefer form field components over raw primitives:
+
+```tsx
+// ✅ Good - Includes label, error handling
+<TextField label="Email" error="Invalid email" />
+
+// ❌ Bad - Manual label/error handling
+<div>
+  <label>Email</label>
+  <Input />
+  <span>Error</span>
+</div>
+```
+
+### Form Validation
+
+Handle validation at the form level:
+
+```tsx
+function MyForm() {
+  const [errors, setErrors] = useState({})
+  
+  return (
+    <form>
+      <TextField
+        label="Email"
+        error={errors.email}
+        required
+      />
+    </form>
+  )
+}
+```
+
+## Accessibility
+
+### Labels
+
+Always provide labels for form inputs:
+
+```tsx
+// ✅ Good
+<TextField label="Email" />
+
+// ❌ Bad
+<Input placeholder="Email" />
+```
+
+### ARIA Attributes
+
+Components include ARIA attributes automatically. Don't override unless necessary:
+
+```tsx
+// ✅ Good - Component handles ARIA
+<Button>Click me</Button>
+
+// ❌ Bad - Overriding ARIA
+<Button aria-label="Custom">Click me</Button>
+```
+
+### Keyboard Navigation
+
+All interactive components support keyboard navigation. Test with:
+- Tab navigation
+- Enter/Space for buttons
+- Arrow keys for menus
+
+## Styling
+
+### Use Design System Classes
+
+Use Tailwind classes with `ds-` prefix:
+
+```tsx
+// ✅ Good
+<div className="ds-flex ds-gap-4 ds-p-4">
+
+// ❌ Bad - Inline styles
+<div style={{ display: 'flex', gap: '1rem', padding: '1rem' }}>
+```
+
+### Custom Styling
+
+Extend components with className:
+
+```tsx
+<Button className="ds-w-full">Full Width</Button>
+```
+
+### Don't Override Core Styles
+
+Avoid overriding component internals:
+
+```tsx
+// ✅ Good - Extend
+<Button className="ds-w-full">Button</Button>
+
+// ❌ Bad - Override internals
+<Button className="!ds-bg-red-500">Button</Button>
+```
+
+## Best Practices
+
+### One Component Per Role
+
+Use one canonical component per role:
+
+```tsx
+// ✅ Good - Use design system Button
+import { Button } from '@/design-system'
+
+// ❌ Bad - Create duplicate
+function MyButton() { return <button>...</button> }
+```
+
+### Progressive Enhancement
+
+Start with primitives, add complexity as needed:
+
+```tsx
+// Start simple
+<Input />
+
+// Add form field features
+<TextField label="Email" />
+
+// Add validation
+<TextField label="Email" error={error} />
+```
+
+### Composition Over Configuration
+
+Compose components rather than adding many props:
+
+```tsx
+// ✅ Good - Compose
+<Card>
+  <CardHeader>...</CardHeader>
+  <CardContent>...</CardContent>
+</Card>
+
+// ❌ Bad - One component with many props
+<Card header="..." content="..." />
+```
+
+## Testing
+
+### Test Component Behavior
+
+Test component behavior, not implementation:
+
+```tsx
+// ✅ Good
+expect(screen.getByRole('button')).toBeInTheDocument()
+
+// ❌ Bad
+expect(container.querySelector('.button')).toBeInTheDocument()
+```
+
+### Accessibility Testing
+
+Use accessibility testing tools:
+
+```tsx
+import { axe, toHaveNoViolations } from 'jest-axe'
+
+expect.extend(toHaveNoViolations)
+
+test('should have no accessibility violations', async () => {
+  const { container } = render(<Button>Click</Button>)
+  const results = await axe(container)
+  expect(results).toHaveNoViolations()
+})
+```
+

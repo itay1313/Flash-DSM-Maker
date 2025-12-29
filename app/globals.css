@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.react-flow__node {
+  cursor: grab;
+}
+
+.react-flow__node:active {
+  cursor: grabbing;
+}
+
+.react-flow__edge-path {
+  stroke-width: 2;
+  transition: stroke-width 0.2s, stroke 0.2s;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke-width: 3;
+  stroke: #5887FF; /* palette-cornflower */
+}
+
+.react-flow__handle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #715AFF; /* palette-slate - primary color */
+  border: 2px solid #030712;
+}
+
+.react-flow__handle:hover {
+  background: #5887FF; /* palette-cornflower */
+  width: 12px;
+  height: 12px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Ensure ReactFlow canvas doesn't overflow */
+.react-flow {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Position React Flow pane */
+.react-flow__pane {
+  left: 38px !important;
+  top: -39px !important;
+}
+
+/* Position MiniMap at bottom right */
+.react-flow__minimap {
+  position: absolute !important;
+  bottom: 16px !important;
+  right: 16px !important;
+  top: auto !important;
+  left: auto !important;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Modal animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Custom slider styles */
+input[type="range"].slider {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="range"].slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  cursor: pointer;
+  border: 2px solid #715AFF;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"].slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  cursor: pointer;
+  border: 2px solid #715AFF;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+

@@ -1,0 +1,87 @@
+import { Meta } from '@storybook/blocks'
+
+<Meta title="Documentation/Getting Started" />
+
+# Getting Started
+
+Welcome to the Design System! This guide will help you get started using our components in your application.
+
+## Installation
+
+The design system is built into this repository. All components are located in the `/design-system` directory.
+
+```bash
+# Install dependencies
+npm install
+```
+
+## Basic Usage
+
+Import components from the design system:
+
+```tsx
+import { Button, Input, TextField } from '@/design-system'
+
+function MyComponent() {
+  return (
+    <div>
+      <Button>Click me</Button>
+      <TextField label="Email" placeholder="Enter your email" />
+    </div>
+  )
+}
+```
+
+## Design Principles
+
+### One Source of Truth
+- All design tokens are defined as CSS variables in `app/globals.css`
+- Components consume tokens via Tailwind utilities
+- No hardcoded values in components
+
+### Accessibility First
+- All components follow WCAG 2.1 AA standards
+- Keyboard navigation supported
+- Screen reader friendly
+- Focus management built-in
+
+### Type Safety
+- Full TypeScript support
+- Strongly typed component APIs
+- IntelliSense autocomplete
+
+### No Context Coupling
+- Components are self-contained
+- No global state dependencies
+- Easy to test and reuse
+
+## Component Structure
+
+```
+design-system/
+├── primitives/     # Base components (Button, Input, etc.)
+├── form/          # Form field components (TextField, SelectField, etc.)
+├── feedback/      # Loading, error states (Spinner, Toast, etc.)
+├── navigation/    # Navigation components (Navbar, Sidebar, etc.)
+├── composite/     # Complex components (ChatInput, Table, etc.)
+└── layout/        # Layout components (Grid, Card, etc.)
+```
+
+## Styling
+
+Components use Tailwind CSS with design tokens. The `ds-` prefix is used for design system classes to avoid conflicts.
+
+```tsx
+// ✅ Good - Uses design system classes
+<Button className="ds-bg-primary ds-text-text-inverse">Click</Button>
+
+// ❌ Bad - Inline styles
+<Button style={{ backgroundColor: '#000' }}>Click</Button>
+```
+
+## Next Steps
+
+- Read about [Design Tokens](./design-tokens)
+- Check out [Component Guidelines](./component-guidelines)
+- Explore components in Storybook
+
