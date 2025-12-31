@@ -8,7 +8,6 @@ import SidePanel from './SidePanel'
 import LeftSidebar from './LeftSidebar'
 import ComponentsPage from './pages/ComponentsPage'
 import TokensPage from './pages/TokensPage'
-import TemplatesPage from './pages/TemplatesPage'
 import ExportPage from './pages/ExportPage'
 import SettingsPage from './pages/SettingsPage'
 import VersionHistoryPage from './pages/VersionHistoryPage'
@@ -53,6 +52,41 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
     const systemId = designSystem?.id || 'new'
     router.push(`/ds/${systemId}/${view}`)
   }, [designSystem?.id, router])
+
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if target is not an input or textarea
+      if (
+        document.activeElement?.tagName === 'INPUT' ||
+        document.activeElement?.tagName === 'TEXTAREA' ||
+        (document.activeElement as HTMLElement)?.isContentEditable
+      ) {
+        return
+      }
+
+      if ((e.metaKey || e.ctrlKey) && /^[1-7]$/.test(e.key)) {
+        e.preventDefault()
+        const viewMap: Record<string, string> = {
+          '1': 'flow',
+          '2': 'tokens',
+          '3': 'components',
+          '4': 'versions',
+          '5': 'sync',
+          '6': 'export',
+          '7': 'settings'
+        }
+        const targetView = viewMap[e.key]
+        if (targetView) {
+          handleViewChange(targetView)
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleViewChange])
+
   const [isCreating, setIsCreating] = useState(false)
   const [nextNodeType, setNextNodeType] = useState<string | null>(null)
   const [isFlowComplete, setIsFlowComplete] = useState(false)
@@ -280,7 +314,6 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
         edges: edges,
         components: designSystem?.components || [],
         tokens: designSystem?.tokens || [],
-        templates: designSystem?.templates || [],
       }
 
       console.log('Saving design system:', systemToSave)
@@ -577,7 +610,6 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
             />
           )}
           {activeView === 'tokens' && <TokensPage />}
-          {activeView === 'templates' && <TemplatesPage />}
           {activeView === 'versions' && <VersionHistoryPage />}
           {activeView === 'sync' && <SyncPage />}
           {activeView === 'export' && <ExportPage />}

@@ -15,7 +15,15 @@ export default function DesignSystemViewPage() {
   const viewParam = params.view as string
   
   // Valid views
-  const validViews = ['flow', 'components', 'tokens', 'templates', 'versions', 'sync', 'export', 'settings']
+  const validViews = ['flow', 'components', 'tokens', 'versions', 'sync', 'export', 'settings']
+  
+  // Redirect templates to flow (templates feature removed)
+  useEffect(() => {
+    if (viewParam === 'templates') {
+      router.replace(`/ds/${systemId}/flow`)
+    }
+  }, [viewParam, systemId, router])
+  
   const view = validViews.includes(viewParam) ? viewParam : 'flow'
 
   useEffect(() => {
