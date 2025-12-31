@@ -14,7 +14,6 @@ export interface SavedDesignSystem {
   edges?: any[]
   components?: any[]
   tokens?: any[]
-  templates?: any[]
 }
 
 interface DashboardProps {

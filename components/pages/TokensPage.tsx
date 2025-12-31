@@ -1,134 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-
-type TokenLayer = 'semantic'
-type TokenCategory = 'colors' | 'typography' | 'spacing' | 'radius' | 'shadows' | 'theme' | 'motion' | 'icons'
-type TokenState = 'default' | 'hover' | 'focus' | 'disabled'
-
-interface Binding {
-  targetType: 'component' | 'module'
-  targetId: string // e.g., 'Button'
-  propertyPath: string // e.g., 'styles.bg'
-  note?: string
-  isNew?: boolean // Temporary flag for animation
-}
-
-interface Token {
-  name: string
-  value: string // Main value (used for CSS var)
-  lightValue?: string
-  darkValue?: string
-  styleObject?: Record<string, string | number> // For Typography/Motion
-  iconData?: { pack: string; name: string; sizeRef: string }
-  type: 'color' | 'font' | 'size' | 'radius' | 'shadow' | 'theme' | 'motion' | 'icon'
-  state?: TokenState
-  layer: TokenLayer
-  category: TokenCategory
-  bindings?: Binding[]
-}
-
-interface TokenGroup {
-  category: TokenCategory
-  layer: TokenLayer
-  tokens: Token[]
-}
-
-const DEFAULT_TOKENS: Record<TokenLayer, TokenGroup[]> = {
-  semantic: [
-    {
-      layer: 'semantic',
-      category: 'colors',
-      tokens: [
-        // Primitive colors (merged from Core)
-        { name: 'color-white', value: '#ffffff', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'color-black', value: '#000000', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'color-gray-50', value: '#f5f5f5', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'color-gray-100', value: '#e5e5e5', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'color-gray-300', value: '#b3b3b3', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'color-gray-600', value: '#666666', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'color-gray-900', value: '#1a1a1a', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'color-blue-500', value: '#3b82f6', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'color-red-500', value: '#ef4444', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'color-green-500', value: '#22c55e', type: 'color', layer: 'semantic', category: 'colors' },
-        // Semantic colors
-        { name: 'text-primary', value: 'var(--color-gray-900)', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'text-secondary', value: 'var(--color-gray-600)', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'text-inverse', value: 'var(--color-white)', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'bg-app', value: 'var(--color-gray-50)', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'bg-surface', value: 'var(--color-white)', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'bg-subtle', value: 'var(--color-gray-100)', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'border-default', value: 'var(--color-gray-300)', type: 'color', layer: 'semantic', category: 'colors' },
-        { 
-          name: 'accent-primary', 
-          value: 'var(--color-blue-500)', 
-          type: 'color', 
-          layer: 'semantic', 
-          category: 'colors',
-          bindings: [
-            { targetType: 'component', targetId: 'Button', propertyPath: 'styles.bg', note: 'Primary Action' },
-            { targetType: 'component', targetId: 'Badge', propertyPath: 'styles.bg', note: 'New Status' }
-          ]
-        },
-        { 
-          name: 'accent-success', 
-          value: 'var(--color-green-500)', 
-          type: 'color', 
-          layer: 'semantic', 
-          category: 'colors',
-          bindings: [
-            { targetType: 'component', targetId: 'Switch', propertyPath: 'styles.bg', note: 'Active State' }
-          ]
-        },
-        { name: 'accent-danger', value: 'var(--color-red-500)', type: 'color', layer: 'semantic', category: 'colors' },
-        // Component-specific tokens
-        { name: 'btn-primary-bg', value: 'var(--accent-primary)', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'btn-primary-text', value: 'var(--text-inverse)', type: 'color', layer: 'semantic', category: 'colors' },
-        { name: 'card-bg', value: 'var(--bg-surface)', type: 'color', layer: 'semantic', category: 'colors' },
-      ],
-    },
-    {
-      layer: 'semantic',
-      category: 'typography',
-      tokens: [
-        { name: 'font-sans', value: 'Inter, system-ui, Arial', type: 'font', layer: 'semantic', category: 'typography' },
-        { name: 'font-mono', value: 'Menlo, monospace', type: 'font', layer: 'semantic', category: 'typography' },
-        { name: 'font-size-xs', value: '12px', type: 'size', layer: 'semantic', category: 'typography' },
-        { name: 'font-size-sm', value: '14px', type: 'size', layer: 'semantic', category: 'typography' },
-        { name: 'font-size-md', value: '16px', type: 'size', layer: 'semantic', category: 'typography' },
-        { name: 'font-size-lg', value: '18px', type: 'size', layer: 'semantic', category: 'typography' },
-      ],
-    },
-    {
-      layer: 'semantic',
-      category: 'spacing',
-      tokens: [
-        { name: 'space-2', value: '4px', type: 'size', layer: 'semantic', category: 'spacing' },
-        { name: 'space-4', value: '8px', type: 'size', layer: 'semantic', category: 'spacing' },
-        { name: 'space-6', value: '12px', type: 'size', layer: 'semantic', category: 'spacing' },
-        { name: 'space-8', value: '16px', type: 'size', layer: 'semantic', category: 'spacing' },
-      ],
-    },
-    {
-      layer: 'semantic',
-      category: 'radius',
-      tokens: [
-        { name: 'radius-sm', value: '4px', type: 'radius', layer: 'semantic', category: 'radius' },
-        { name: 'radius-md', value: '8px', type: 'radius', layer: 'semantic', category: 'radius' },
-        { name: 'radius-lg', value: '12px', type: 'radius', layer: 'semantic', category: 'radius' },
-        { name: 'card-radius', value: 'var(--radius-lg)', type: 'radius', layer: 'semantic', category: 'radius' },
-      ],
-    },
-    {
-      layer: 'semantic',
-      category: 'shadows',
-      tokens: [
-        { name: 'shadow-sm', value: '0 2px 4px rgba(0,0,0,.08)', type: 'shadow', layer: 'semantic', category: 'shadows' },
-        { name: 'shadow-md', value: '0 6px 16px rgba(0,0,0,.12)', type: 'shadow', layer: 'semantic', category: 'shadows' },
-      ],
-    },
-  ],
-}
+import { TokenLayer, TokenCategory, TokenState, Binding, Token, TokenGroup, DEFAULT_TOKENS } from '@/lib/constants/tokens'
 
 const CATEGORY_LABELS: Record<TokenCategory, string> = {
   colors: 'Colors',
@@ -163,6 +36,24 @@ const AVAILABLE_COMPONENTS = [
   'PricingTable',
 ]
 
+const PROPERTY_DESCRIPTIONS: Record<string, string> = {
+  'styles.bg': 'Component Background',
+  'styles.text': 'Text Color',
+  'styles.border': 'Border Color',
+  'styles.radius': 'Corner Radius',
+  'styles.padding': 'Inner Spacing',
+  'styles.gap': 'Element Spacing',
+  'container.bg': 'Outer Container Background',
+  'container.radius': 'Outer Container Radius',
+  'layout.gap': 'Grid/Layout Spacing',
+  'content.typography': 'Content Font Style',
+  'styles.typography': 'Main Typography',
+  'styles.transitionDuration': 'Animation Speed',
+  'styles.easing': 'Animation Easing',
+  'styles.iconName': 'Icon Symbol',
+  'styles.iconSize': 'Icon Dimensions',
+}
+
 const ALLOWED_PROPERTIES: Record<string, string[]> = {
   color: ['styles.bg', 'styles.text', 'styles.border', 'container.bg'],
   size: ['styles.padding', 'styles.gap', 'styles.radius', 'layout.gap'],
@@ -173,15 +64,56 @@ const ALLOWED_PROPERTIES: Record<string, string[]> = {
 }
 
 export default function TokensPage() {
-  const [activeTab] = useState<TokenLayer>('semantic')
+  const [activeTab, setActiveTab] = useState<TokenLayer>('primitives')
   const [tokens, setTokens] = useState<Record<TokenLayer, TokenGroup[]>>(DEFAULT_TOKENS)
+  const [history, setHistory] = useState<Record<TokenLayer, TokenGroup[]>[]>([])
+  const [redoStack, setRedoStack] = useState<Record<TokenLayer, TokenGroup[]>[]>([])
+  const [historyIndex, setHistoryIndex] = useState(-1)
+  
+  const pushToHistory = (stateToPush: Record<TokenLayer, TokenGroup[]>) => {
+    const newHistory = history.slice(0, historyIndex + 1)
+    newHistory.push(JSON.parse(JSON.stringify(stateToPush)))
+    if (newHistory.length > 20) newHistory.shift()
+    setHistory(newHistory)
+    setHistoryIndex(newHistory.length - 1)
+    setRedoStack([]) // Clear redo stack on new action
+  }
+
+  const handleUndo = () => {
+    if (historyIndex >= 0) {
+      const prevState = history[historyIndex]
+      const currentTokens = JSON.parse(JSON.stringify(tokens))
+      setRedoStack([currentTokens, ...redoStack])
+      setTokens(JSON.parse(JSON.stringify(prevState)))
+      setHistoryIndex(historyIndex - 1)
+    }
+  }
+
+  const handleRedo = () => {
+    if (redoStack.length > 0) {
+      const nextState = redoStack[0]
+      const remainingRedo = redoStack.slice(1)
+      const currentTokens = JSON.parse(JSON.stringify(tokens))
+      
+      const newHistory = history.slice(0, historyIndex + 1)
+      newHistory.push(currentTokens)
+      
+      setHistory(newHistory)
+      setHistoryIndex(newHistory.length - 1)
+      setTokens(JSON.parse(JSON.stringify(nextState)))
+      setRedoStack(remainingRedo)
+    }
+  }
+
   const [editingToken, setEditingToken] = useState<{ layer: TokenLayer; groupIndex: number; tokenIndex: number } | null>(null)
+  const [beforeEditState, setBeforeEditState] = useState<Record<TokenLayer, TokenGroup[]> | null>(null)
   const [editValue, setEditValue] = useState('')
   const [editModalPosition, setEditModalPosition] = useState<{ x: number; y: number } | null>(null)
   
   // Binding State
   const [isBindingsExpanded, setIsBindingsExpanded] = useState(true)
   const [showAddBinding, setShowAddBinding] = useState(false)
+  const [bindingSearch, setBindingSearch] = useState('')
   const [newBinding, setNewBinding] = useState<Binding>({
     targetType: 'component',
     targetId: AVAILABLE_COMPONENTS[0],
@@ -202,84 +134,109 @@ export default function TokensPage() {
 
   // Load tokens from localStorage on mount
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+        if (
+          document.activeElement?.tagName === 'INPUT' ||
+          document.activeElement?.tagName === 'TEXTAREA' ||
+          (document.activeElement as HTMLElement)?.isContentEditable
+        ) {
+          return
+        }
+        e.preventDefault()
+        handleUndo()
+      } else if ((e.metaKey || e.ctrlKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+        if (
+          document.activeElement?.tagName === 'INPUT' ||
+          document.activeElement?.tagName === 'TEXTAREA' ||
+          (document.activeElement as HTMLElement)?.isContentEditable
+        ) {
+          return
+        }
+        e.preventDefault()
+        handleRedo()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [tokens, historyIndex, redoStack])
+
+  // Load tokens from localStorage on mount
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('dsm-tokens-v2')
       if (saved) {
         try {
           const parsed = JSON.parse(saved)
           if (parsed && typeof parsed === 'object') {
-            // Migration: Merge everything into semantic
-            if (parsed.core || parsed.foundations || parsed.system || parsed.component || parsed.primitives) {
+            // Migration: Check for old formats
+            if (parsed.core || parsed.foundations || parsed.system || parsed.component) {
               const migrated: Record<TokenLayer, TokenGroup[]> = {
+                primitives: [],
                 semantic: [],
               }
               
-              // Collect all tokens from all layers
-              const allGroups: TokenGroup[] = []
-              
-              // Add primitives/core/foundations
+              // Handle Primitives/Core/Foundations
               const oldPrimitives = parsed.primitives || parsed.core || parsed.foundations || []
               if (Array.isArray(oldPrimitives)) {
-                allGroups.push(...oldPrimitives.map((group: TokenGroup) => ({
+                migrated.primitives = oldPrimitives.map((group: TokenGroup) => ({
                   ...group,
-                  layer: 'semantic' as TokenLayer,
+                  layer: 'primitives' as TokenLayer,
                   tokens: group.tokens.map((token: Token) => ({
                     ...token,
-                    layer: 'semantic' as TokenLayer,
+                    layer: 'primitives' as TokenLayer,
                   })),
-                })))
+                }))
               }
               
-              // Add semantic/system
+              // Handle Semantic/System
               const oldSemantic = parsed.semantic || parsed.system || []
               if (Array.isArray(oldSemantic)) {
-                allGroups.push(...oldSemantic.map((group: TokenGroup) => ({
+                migrated.semantic = oldSemantic.map((group: TokenGroup) => ({
                   ...group,
                   layer: 'semantic' as TokenLayer,
                   tokens: group.tokens.map((token: Token) => ({
                     ...token,
                     layer: 'semantic' as TokenLayer,
                   })),
-                })))
+                }))
               }
               
-              // Add component tokens
+              // Handle Component tokens (merge into semantic)
               if (parsed.component && Array.isArray(parsed.component)) {
-                allGroups.push(...parsed.component.map((group: TokenGroup) => ({
+                const componentGroups = parsed.component.map((group: TokenGroup) => ({
                   ...group,
                   layer: 'semantic' as TokenLayer,
                   tokens: group.tokens.map((token: Token) => ({
                     ...token,
                     layer: 'semantic' as TokenLayer,
                   })),
-                })))
+                }))
+                
+                // Merge into semantic groups by category
+                const mergedSemantic = new Map<string, TokenGroup>()
+                migrated.semantic.forEach(g => mergedSemantic.set(g.category, g))
+                
+                componentGroups.forEach((group: TokenGroup) => {
+                  if (mergedSemantic.has(group.category)) {
+                    mergedSemantic.get(group.category)!.tokens.push(...group.tokens)
+                  } else {
+                    mergedSemantic.set(group.category, group)
+                  }
+                })
+                
+                migrated.semantic = Array.from(mergedSemantic.values())
               }
               
-              // Merge groups by category
-              const mergedGroups = new Map<string, TokenGroup>()
-              allGroups.forEach((group) => {
-                const key = group.category
-                if (mergedGroups.has(key)) {
-                  const existing = mergedGroups.get(key)!
-                  existing.tokens.push(...group.tokens)
-                } else {
-                  mergedGroups.set(key, { ...group })
-                }
-              })
-              
-              migrated.semantic = Array.from(mergedGroups.values())
-              
-              // Ensure we have at least the default structure
-              if (migrated.semantic.length === 0) {
-                setTokens(DEFAULT_TOKENS)
-                localStorage.setItem('dsm-tokens-v2', JSON.stringify(DEFAULT_TOKENS))
-              } else {
-                setTokens(migrated)
-                localStorage.setItem('dsm-tokens-v2', JSON.stringify(migrated))
+              setTokens(migrated)
+              localStorage.setItem('dsm-tokens-v2', JSON.stringify(migrated))
+            } else if (parsed.primitives || parsed.semantic) {
+              // Already in new format (supports either layer or both)
+              const validData: Record<TokenLayer, TokenGroup[]> = {
+                primitives: Array.isArray(parsed.primitives) ? parsed.primitives : DEFAULT_TOKENS.primitives,
+                semantic: Array.isArray(parsed.semantic) ? parsed.semantic : DEFAULT_TOKENS.semantic,
               }
-            } else if (parsed.semantic) {
-              // Already in new format (only semantic)
-              setTokens(parsed)
+              setTokens(validData)
             } else {
               // Invalid structure, use defaults
               setTokens(DEFAULT_TOKENS)
@@ -314,17 +271,22 @@ export default function TokensPage() {
     if (typeof window !== 'undefined' && document.documentElement) {
       const root = document.documentElement
       
-      // Apply all tokens (all merged into semantic)
-      tokens.semantic?.forEach((group) => {
+      // Apply Primitives first (raw values)
+      tokens.primitives?.forEach((group) => {
         group.tokens.forEach((token) => {
           const cssVarName = `--${token.name}`
           // Only set if value doesn't start with var() (to avoid circular references for raw values)
           if (!token.value.startsWith('var(')) {
             root.style.setProperty(cssVarName, token.value)
-          } else {
-            // For var() references, set them as well
-            root.style.setProperty(cssVarName, token.value)
           }
+        })
+      })
+
+      // Apply Semantic tokens (contextual usage)
+      tokens.semantic?.forEach((group) => {
+        group.tokens.forEach((token) => {
+          const cssVarName = `--${token.name}`
+          root.style.setProperty(cssVarName, token.value)
         })
       })
     }
@@ -346,6 +308,7 @@ export default function TokensPage() {
 
   const handleEditClick = (layer: TokenLayer, groupIndex: number, tokenIndex: number, e: React.MouseEvent) => {
     const token = tokens[layer][groupIndex].tokens[tokenIndex]
+    setBeforeEditState(JSON.parse(JSON.stringify(tokens)))
     const buttonRect = e.currentTarget.getBoundingClientRect()
     
     let x = buttonRect.right + 10
@@ -381,17 +344,22 @@ export default function TokensPage() {
     setEditingToken(null)
     setEditModalPosition(null)
     setEditValue('')
+    setBeforeEditState(null)
   }
 
   const handleSaveEdit = () => {
-    if (editingToken && editValue.trim()) {
+    if (editingToken && editValue.trim() && beforeEditState) {
+      pushToHistory(beforeEditState)
       handleValueChange(editValue.trim())
+      handleCloseEditModal()
+    } else {
       handleCloseEditModal()
     }
   }
 
   const handleAddBinding = () => {
     if (editingToken && newBinding.propertyPath) {
+      pushToHistory(tokens)
       const updated = { ...tokens }
       const token = updated[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex]
       
@@ -436,6 +404,7 @@ export default function TokensPage() {
 
   const handleRemoveBinding = (index: number) => {
     if (editingToken) {
+      pushToHistory(tokens)
       const updated = { ...tokens }
       const token = updated[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex]
       if (token.bindings) {
@@ -484,6 +453,7 @@ export default function TokensPage() {
       return
     }
 
+    pushToHistory(tokens)
     const updated = { ...tokens }
     const groupIndex = updated[addingToken.layer].findIndex(g => g.category === addingToken.category)
     
@@ -895,17 +865,71 @@ export default function TokensPage() {
               Manage all your design tokens in one unified system. Define colors, typography, spacing, and more.
             </p>
           </div>
-          <button
-            onClick={() => setShowImportModal(true)}
-            className="px-4 py-2 bg-palette-slate hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-            </svg>
-            Import CSS Variables
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center bg-gray-900 border border-gray-800 rounded-lg p-1 mr-2">
+              <button
+                onClick={handleUndo}
+                disabled={historyIndex < 0}
+                className="p-2 text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                title="Undo (Ctrl+Z)"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+              </button>
+              <div className="w-px h-4 bg-gray-800 mx-1" />
+              <button
+                onClick={handleRedo}
+                disabled={redoStack.length === 0}
+                className="p-2 text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                title="Redo (Ctrl+Shift+Z / Ctrl+Y)"
+              >
+                <svg className="w-4 h-4 scale-x-[-1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+              </button>
+            </div>
+            <button
+              onClick={() => setShowImportModal(true)}
+              className="px-4 py-2 bg-palette-slate hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Import CSS Variables
+            </button>
+          </div>
         </div>
 
+        {/* Layer Tabs */}
+        <div className="mb-6 flex space-x-2 border-b border-gray-800">
+          <button
+            onClick={() => setActiveTab('primitives')}
+            className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
+              activeTab === 'primitives'
+                ? 'border-palette-cornflower text-palette-cornflower'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-700'
+            }`}
+          >
+            <div className="flex flex-col items-start">
+              <span>Primitives</span>
+              <span className="text-[10px] opacity-50 font-normal">Raw Values</span>
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab('semantic')}
+            className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
+              activeTab === 'semantic'
+                ? 'border-palette-cornflower text-palette-cornflower'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-700'
+            }`}
+          >
+            <div className="flex flex-col items-start">
+              <span>Semantic</span>
+              <span className="text-[10px] opacity-50 font-normal">Contextual Usage</span>
+            </div>
+          </button>
+        </div>
 
         {/* Token Groups */}
         <div className="space-y-6">
@@ -932,7 +956,10 @@ export default function TokensPage() {
                             <span className="text-xs text-gray-500">({token.state})</span>
                           )}
                           {token.bindings && token.bindings.length > 0 && (
-                            <div className="flex -space-x-1 overflow-hidden" title={`${token.bindings.length} active bindings: ${token.bindings.map(b => b.targetId).join(', ')}`}>
+                            <div 
+                              className="flex -space-x-1 overflow-hidden" 
+                              title={`Affects ${token.bindings.length} component${token.bindings.length > 1 ? 's' : ''}:\n${token.bindings.map(b => `• ${b.targetId} (${PROPERTY_DESCRIPTIONS[b.propertyPath] || b.propertyPath})`).join('\n')}`}
+                            >
                               {Array.from(new Set(token.bindings.map(b => b.targetId))).slice(0, 3).map((target, i) => (
                                 <div 
                                   key={i}
@@ -1065,14 +1092,31 @@ export default function TokensPage() {
                       </span>
                     )}
                   </div>
-                  <svg
-                    className={`w-3.5 h-3.5 text-gray-500 group-hover/btn:text-gray-300 transition-all ${isBindingsExpanded ? 'rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <div className="flex items-center gap-3">
+                    {currentEditingToken.bindings && currentEditingToken.bindings.length > 0 && (
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if(confirm('Clear all component links?')) {
+                            const updated = { ...tokens };
+                            updated[editingToken!.layer][editingToken!.groupIndex].tokens[editingToken!.tokenIndex].bindings = [];
+                            setTokens(updated);
+                          }
+                        }}
+                        className="text-[9px] font-black text-red-500/40 hover:text-red-500 uppercase tracking-tighter opacity-0 group-hover/btn:opacity-100 transition-all"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                    <svg
+                      className={`w-3.5 h-3.5 text-gray-500 group-hover/btn:text-gray-300 transition-all ${isBindingsExpanded ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                 </button>
 
                 {isBindingsExpanded && (
@@ -1129,20 +1173,21 @@ export default function TokensPage() {
                           </div>
                         ))
                       ) : !showAddBinding && (
-                        <div className="flex flex-col items-center justify-center py-6 bg-gray-950/30 border border-dashed border-gray-800 rounded-xl">
-                          <div className="w-10 h-10 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-600 mb-2">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.826L10.172 13.828a4 4 0 005.656 0l4-4a4 4 0 10-5.656-5.656l-1.102 1.101" />
+                        <div className="flex flex-col items-center justify-center py-8 bg-indigo-500/[0.02] border border-dashed border-indigo-500/20 rounded-2xl group/empty hover:bg-indigo-500/[0.04] transition-all">
+                          <div className="w-12 h-12 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center text-indigo-500/40 mb-3 group-hover/empty:scale-110 group-hover/empty:text-indigo-500 transition-all">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
                             </svg>
                           </div>
-                          <p className="text-[11px] text-gray-500 font-medium">No component links found</p>
+                          <p className="text-[11px] text-gray-400 font-bold tracking-tight">No active connections</p>
+                          <p className="text-[10px] text-gray-600 mt-1 max-w-[160px] text-center leading-relaxed">Connect this token to components to see live previews update.</p>
                           <button
                             onClick={() => {
                               setShowAddBinding(true)
                               const allowed = ALLOWED_PROPERTIES[currentEditingToken.type] || []
                               setNewBinding(prev => ({ ...prev, propertyPath: allowed[0] || '' }))
                             }}
-                            className="mt-2 text-[11px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors bg-indigo-500/10 px-3 py-1 rounded-full"
+                            className="mt-4 text-[10px] font-black text-white hover:text-white transition-all bg-indigo-600 hover:bg-indigo-700 px-4 py-1.5 rounded-full shadow-lg shadow-indigo-600/20"
                           >
                             + Link Component
                           </button>
@@ -1167,15 +1212,26 @@ export default function TokensPage() {
                           </div>
                           <div className="space-y-1">
                             <label className="block text-[9px] text-gray-500 uppercase font-black tracking-widest">Target</label>
-                            <select
-                              value={newBinding.targetId}
-                              onChange={(e) => setNewBinding({ ...newBinding, targetId: e.target.value })}
-                              className="w-full px-2 py-2 bg-gray-900 border border-gray-800 rounded-lg text-[11px] text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
-                            >
-                              {AVAILABLE_COMPONENTS.map(comp => (
-                                <option key={comp} value={comp}>{comp}</option>
-                              ))}
-                            </select>
+                            <div className="space-y-1">
+                              <input
+                                type="text"
+                                value={bindingSearch}
+                                onChange={(e) => setBindingSearch(e.target.value)}
+                                placeholder="Search..."
+                                className="w-full px-2 py-1.5 bg-gray-900 border border-gray-800 rounded-lg text-[10px] text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50 placeholder:text-gray-700"
+                              />
+                              <select
+                                value={newBinding.targetId}
+                                onChange={(e) => setNewBinding({ ...newBinding, targetId: e.target.value })}
+                                className="w-full px-2 py-2 bg-gray-900 border border-gray-800 rounded-lg text-[11px] text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+                              >
+                                {AVAILABLE_COMPONENTS
+                                  .filter(comp => comp.toLowerCase().includes(bindingSearch.toLowerCase()))
+                                  .map(comp => (
+                                    <option key={comp} value={comp}>{comp}</option>
+                                  ))}
+                              </select>
+                            </div>
                           </div>
                         </div>
 
@@ -1188,7 +1244,7 @@ export default function TokensPage() {
                           >
                             <option value="" disabled>Select property...</option>
                             {(ALLOWED_PROPERTIES[currentEditingToken.type] || []).map(prop => (
-                              <option key={prop} value={prop}>{prop}</option>
+                              <option key={prop} value={prop}>{PROPERTY_DESCRIPTIONS[prop] || prop}</option>
                             ))}
                           </select>
                         </div>
