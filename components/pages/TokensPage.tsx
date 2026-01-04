@@ -1,7 +1,21 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { TokenLayer, TokenCategory, TokenState, Binding, Token, TokenGroup, DEFAULT_TOKENS } from '@/lib/constants/tokens'
+import { TokenLayer, TokenCategory, TokenState, Binding, Token, TokenGroup, DEFAULT_TOKENS, DisplayCategory, CATEGORY_TO_DISPLAY, DISPLAY_TO_CATEGORIES, getDisplayCategory } from '@/lib/constants/tokens'
+import TokenDetailModal from '@/components/ui/TokenDetailModal'
+import IconLibraryIntegration from '@/components/ui/IconLibraryIntegration'
+import IconBrowser from '@/components/ui/IconBrowser'
+import IconUpload from '@/components/ui/IconUpload'
+import { IconLibrary, IconData, fetchMaterialIcons, fetchTablerIcons, fetchLucideIcons, fetchCustomIcons } from '@/lib/services/iconLibraries'
+
+const DISPLAY_CATEGORY_LABELS: Record<DisplayCategory, string> = {
+  sizing: 'Sizing',
+  colors: 'Colors',
+  typography: 'Typography',
+  icons: 'Icons',
+  shadows: 'Shadows',
+  motion: 'Motion',
+}
 
 const CATEGORY_LABELS: Record<TokenCategory, string> = {
   colors: 'Colors',
@@ -36,7 +50,7 @@ const AVAILABLE_COMPONENTS = [
   'PricingTable',
 ]
 
-const PROPERTY_DESCRIPTIONS: Record<string, string> = {
+export const PROPERTY_DESCRIPTIONS: Record<string, string> = {
   'styles.bg': 'Component Background',
   'styles.text': 'Text Color',
   'styles.border': 'Border Color',
@@ -64,8 +78,18 @@ const ALLOWED_PROPERTIES: Record<string, string[]> = {
 }
 
 export default function TokensPage() {
-  const [activeTab, setActiveTab] = useState<TokenLayer>('primitives')
+  const [activeTab, setActiveTab] = useState<DisplayCategory>('sizing')
   const [tokens, setTokens] = useState<Record<TokenLayer, TokenGroup[]>>(DEFAULT_TOKENS)
+  const [selectedToken, setSelectedToken] = useState<{ layer: TokenLayer; groupIndex: number; tokenIndex: number } | null>(null)
+  const [openMenuToken, setOpenMenuToken] = useState<{ layer: TokenLayer; groupIndex: number; tokenIndex: number } | null>(null)
+  
+  // Icon library state
+  const [selectedIconLibrary, setSelectedIconLibrary] = useState<IconLibrary | null>(null)
+  const [iconViewMode, setIconViewMode] = useState<'gallery' | 'list'>('gallery')
+  const [iconSearchQuery, setIconSearchQuery] = useState('')
+  const [availableIcons, setAvailableIcons] = useState<IconData[]>([])
+  const [isLoadingIcons, setIsLoadingIcons] = useState(false)
+  const [showUploadModal, setShowUploadModal] = useState(false)
   const [history, setHistory] = useState<Record<TokenLayer, TokenGroup[]>[]>([])
   const [redoStack, setRedoStack] = useState<Record<TokenLayer, TokenGroup[]>[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
@@ -131,6 +155,19 @@ export default function TokensPage() {
     state: undefined,
   })
   const [addModalPosition, setAddModalPosition] = useState<{ x: number; y: number } | null>(null)
+
+  // Close ellipsis menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (openMenuToken) {
+        setOpenMenuToken(null)
+      }
+    }
+    if (openMenuToken) {
+      window.addEventListener('click', handleClickOutside)
+      return () => window.removeEventListener('click', handleClickOutside)
+    }
+  }, [openMenuToken])
 
   // Load tokens from localStorage on mount
   useEffect(() => {
@@ -329,6 +366,300 @@ export default function TokensPage() {
     setEditModalPosition({ x, y })
     setEditValue(token.value)
     setEditingToken({ layer, groupIndex, tokenIndex })
+  }
+
+  const handleDuplicateToken = (layer: TokenLayer, groupIndex: number, tokenIndex: number) => {
+    pushToHistory(tokens)
+    const originalToken = tokens[layer][groupIndex].tokens[tokenIndex]
+    
+    // Generate unique name
+    let newName = `${originalToken.name}-copy`
+    let counter = 1
+    const allTokens: Token[] = []
+    Object.values(tokens).forEach((groups: TokenGroup[]) => {
+      groups.forEach(group => allTokens.push(...group.tokens))
+    })
+    
+    while (allTokens.some(t => t.name === newName)) {
+      counter++
+      newName = `${originalToken.name}-copy-${counter}`
+    }
+    
+    const duplicatedToken: Token = {
+      ...originalToken,
+      name: newName,
+      bindings: originalToken.bindings ? originalToken.bindings.map(b => ({ ...b })) : undefined,
+    }
+    
+    const updated = { ...tokens }
+    updated[layer][groupIndex].tokens.push(duplicatedToken)
+    setTokens(updated)
+    
+    // Save to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dsm-tokens-v2', JSON.stringify(updated))
+    }
+  }
+
+  const handleDeleteToken = (layer: TokenLayer, groupIndex: number, tokenIndex: number) => {
+    const token = tokens[layer][groupIndex].tokens[tokenIndex]
+    
+    // Check if token has bindings
+    if (token.bindings && token.bindings.length > 0) {
+      const confirmed = window.confirm(
+        `This token is used in ${token.bindings.length} place(s). Are you sure you want to delete it?`
+      )
+      if (!confirmed) return
+    } else {
+      const confirmed = window.confirm(`Are you sure you want to delete "${token.name}"?`)
+      if (!confirmed) return
+    }
+    
+    pushToHistory(tokens)
+    const updated = { ...tokens }
+    updated[layer][groupIndex].tokens.splice(tokenIndex, 1)
+    setTokens(updated)
+    
+    // Save to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dsm-tokens-v2', JSON.stringify(updated))
+    }
+  }
+
+  const generateVariantName = (originalName: string): string => {
+    const allTokens: Token[] = []
+    Object.values(tokens).forEach((groups: TokenGroup[]) => {
+      groups.forEach(group => allTokens.push(...group.tokens))
+    })
+    
+    let version = 2
+    let newName = `${originalName}-v${version}`
+    
+    while (allTokens.some(t => t.name === newName)) {
+      version++
+      newName = `${originalName}-v${version}`
+    }
+    
+    return newName
+  }
+
+  // Icon library handlers
+  const handleIconLibrarySelect = async (library: IconLibrary | null) => {
+    setSelectedIconLibrary(library)
+    setIconSearchQuery('')
+    
+    if (!library) {
+      setAvailableIcons([])
+      return
+    }
+
+    setIsLoadingIcons(true)
+    try {
+      let icons: IconData[] = []
+      switch (library) {
+        case 'material':
+          icons = await fetchMaterialIcons()
+          break
+        case 'tabler':
+          icons = await fetchTablerIcons()
+          break
+        case 'lucide':
+          icons = await fetchLucideIcons()
+          break
+      }
+      setAvailableIcons(icons)
+    } catch (error) {
+      console.error('Error fetching icons:', error)
+      alert('Failed to load icons. Please try again.')
+    } finally {
+      setIsLoadingIcons(false)
+    }
+  }
+
+  const handleCustomIconIntegration = async (url: string) => {
+    setIsLoadingIcons(true)
+    try {
+      const icons = await fetchCustomIcons(url)
+      setAvailableIcons(icons)
+      setSelectedIconLibrary('custom')
+    } catch (error) {
+      console.error('Error fetching custom icons:', error)
+      alert('Failed to load icons from custom integration. Please check the URL and try again.')
+    } finally {
+      setIsLoadingIcons(false)
+    }
+  }
+
+  const handleIconSelect = (icon: IconData) => {
+    pushToHistory(tokens)
+    
+    // Find or create icons group
+    let targetLayer: TokenLayer = 'primitives'
+    let groupIndex = -1
+    
+    Object.entries(tokens).forEach(([layer, groups]) => {
+      const idx = groups.findIndex(g => g.category === 'icons')
+      if (idx >= 0 && groupIndex < 0) {
+        targetLayer = layer as TokenLayer
+        groupIndex = idx
+      }
+    })
+
+    // Create group if it doesn't exist
+    if (groupIndex < 0) {
+      const updated = { ...tokens }
+      updated.primitives.push({
+        layer: 'primitives',
+        category: 'icons',
+        tokens: [],
+      })
+      groupIndex = updated.primitives.length - 1
+      setTokens(updated)
+    }
+
+    // Generate unique token name
+    const allTokens: Token[] = []
+    Object.values(tokens).forEach((groups: TokenGroup[]) => {
+      groups.forEach(group => allTokens.push(...group.tokens))
+    })
+    
+    let tokenName = `icon-${icon.library}-${icon.name}`
+    let counter = 1
+    while (allTokens.some(t => t.name === tokenName)) {
+      tokenName = `icon-${icon.library}-${icon.name}-${counter}`
+      counter++
+    }
+
+    // Create icon token
+    const newToken: Token = {
+      name: tokenName,
+      value: icon.name,
+      type: 'icon',
+      layer: targetLayer,
+      category: 'icons',
+      iconData: {
+        pack: icon.library === 'material' ? 'Material Icons' : icon.library === 'tabler' ? 'Tabler Icons' : icon.library === 'lucide' ? 'Lucide Icons' : 'Custom',
+        name: icon.name,
+        sizeRef: '16px',
+        library: icon.library,
+        sourceUrl: icon.url,
+        svgContent: icon.svg,
+      },
+    }
+
+    const updated = { ...tokens }
+    updated[targetLayer][groupIndex].tokens.push(newToken)
+    setTokens(updated)
+
+    // Save to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dsm-tokens-v2', JSON.stringify(updated))
+    }
+  }
+
+  const handleIconUpload = (name: string, svgContent: string, file: File) => {
+    pushToHistory(tokens)
+    
+    // Find or create icons group
+    let targetLayer: TokenLayer = 'primitives'
+    let groupIndex = -1
+    
+    Object.entries(tokens).forEach(([layer, groups]) => {
+      const idx = groups.findIndex(g => g.category === 'icons')
+      if (idx >= 0 && groupIndex < 0) {
+        targetLayer = layer as TokenLayer
+        groupIndex = idx
+      }
+    })
+
+    // Create group if it doesn't exist
+    if (groupIndex < 0) {
+      const updated = { ...tokens }
+      updated.primitives.push({
+        layer: 'primitives',
+        category: 'icons',
+        tokens: [],
+      })
+      groupIndex = updated.primitives.length - 1
+      setTokens(updated)
+    }
+
+    // Generate unique token name
+    const allTokens: Token[] = []
+    Object.values(tokens).forEach((groups: TokenGroup[]) => {
+      groups.forEach(group => allTokens.push(...group.tokens))
+    })
+    
+    let tokenName = `icon-${name}`
+    let counter = 1
+    while (allTokens.some(t => t.name === tokenName)) {
+      tokenName = `icon-${name}-${counter}`
+      counter++
+    }
+
+    // Create icon token from upload
+    const newToken: Token = {
+      name: tokenName,
+      value: name,
+      type: 'icon',
+      layer: targetLayer,
+      category: 'icons',
+      iconData: {
+        pack: 'Custom',
+        name: name,
+        sizeRef: '16px',
+        library: 'uploaded',
+        svgContent: svgContent,
+      },
+    }
+
+    const updated = { ...tokens }
+    updated[targetLayer][groupIndex].tokens.push(newToken)
+    setTokens(updated)
+
+    // Save to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dsm-tokens-v2', JSON.stringify(updated))
+    }
+  }
+
+  const handleTokenSave = (
+    updatedToken: Token, 
+    location: { layer: TokenLayer; groupIndex: number; tokenIndex: number },
+    selectedBindings?: Binding[]
+  ) => {
+    pushToHistory(tokens)
+    const updated = { ...tokens }
+    
+    // If selectedBindings is provided, create a new variant token
+    if (selectedBindings && selectedBindings.length > 0) {
+      const originalToken = updated[location.layer][location.groupIndex].tokens[location.tokenIndex]
+      const variantName = generateVariantName(originalToken.name)
+      
+      // Create new token variant
+      const variantToken: Token = {
+        ...updatedToken,
+        name: variantName,
+        bindings: selectedBindings.map(b => ({ ...b })),
+      }
+      
+      // Add variant to the same group
+      updated[location.layer][location.groupIndex].tokens.push(variantToken)
+      
+      // Keep original token unchanged
+    } else {
+      // No bindings or direct update - just update the token
+      updated[location.layer][location.groupIndex].tokens[location.tokenIndex] = updatedToken
+    }
+    
+    setTokens(updated)
+    
+    // Save to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dsm-tokens-v2', JSON.stringify(updated))
+    }
+    
+    setSelectedToken(null)
   }
 
   const handleValueChange = (newValue: string) => {
@@ -550,8 +881,26 @@ export default function TokensPage() {
     }
   }
 
-  const currentTokens = tokens[activeTab] || []
+  // Get all tokens grouped by display category
+  const getTokensByDisplayCategory = (displayCategory: DisplayCategory): Token[] => {
+    const categories = DISPLAY_TO_CATEGORIES[displayCategory]
+    const allTokens: Token[] = []
+    
+    // Collect tokens from both layers that match the display category
+    Object.values(tokens).forEach((groups: TokenGroup[]) => {
+      groups.forEach(group => {
+        if (categories.includes(group.category)) {
+          allTokens.push(...group.tokens)
+        }
+      })
+    })
+    
+    return allTokens
+  }
+
+  const currentTokens = getTokensByDisplayCategory(activeTab)
   const currentEditingToken = editingToken ? tokens[editingToken.layer][editingToken.groupIndex].tokens[editingToken.tokenIndex] : null
+  const selectedTokenData = selectedToken ? tokens[selectedToken.layer][selectedToken.groupIndex].tokens[selectedToken.tokenIndex] : null
 
   const renderEditInput = () => {
     if (!currentEditingToken || !editingToken) return null
@@ -852,6 +1201,9 @@ export default function TokensPage() {
             </div>
           </div>
         )
+      
+      default:
+        return null
     }
   }
 
@@ -901,110 +1253,369 @@ export default function TokensPage() {
           </div>
         </div>
 
-        {/* Layer Tabs */}
-        <div className="mb-6 flex space-x-2 border-b border-gray-800">
-          <button
-            onClick={() => setActiveTab('primitives')}
-            className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
-              activeTab === 'primitives'
-                ? 'border-palette-cornflower text-palette-cornflower'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-700'
-            }`}
-          >
-            <div className="flex flex-col items-start">
-              <span>Primitives</span>
-              <span className="text-[10px] opacity-50 font-normal">Raw Values</span>
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab('semantic')}
-            className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
-              activeTab === 'semantic'
-                ? 'border-palette-cornflower text-palette-cornflower'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-700'
-            }`}
-          >
-            <div className="flex flex-col items-start">
-              <span>Semantic</span>
-              <span className="text-[10px] opacity-50 font-normal">Contextual Usage</span>
-            </div>
-          </button>
+        {/* Category Tabs */}
+        <div className="mb-6 flex space-x-2 border-b border-gray-800 overflow-x-auto">
+          {(Object.keys(DISPLAY_CATEGORY_LABELS) as DisplayCategory[]).map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveTab(category)}
+              className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                activeTab === category
+                  ? 'border-palette-cornflower text-palette-cornflower'
+                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-700'
+              }`}
+            >
+              {DISPLAY_CATEGORY_LABELS[category]}
+            </button>
+          ))}
         </div>
 
-        {/* Token Groups */}
-        <div className="space-y-6">
-          {currentTokens.map((group, groupIndex) => (
-            <div key={`${group.layer}-${group.category}`} className="bg-gray-900 border border-gray-800 rounded-lg p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">{CATEGORY_LABELS[group.category]}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {group.tokens.map((token, tokenIndex) => (
-                  <div
-                    key={`${token.name}-${token.state || ''}`}
-                    className="flex items-center justify-between p-4 bg-gray-950 border border-gray-800 rounded-lg hover:border-indigo-500/50 transition-colors group"
+        {/* Icons Tab - Special Layout */}
+        {activeTab === 'icons' ? (
+          <div className="space-y-6">
+            {/* Integration Selector */}
+            <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+              <h2 className="text-lg font-semibold text-white mb-4">Icon Libraries</h2>
+              <IconLibraryIntegration
+                selectedLibrary={selectedIconLibrary}
+                onSelectLibrary={handleIconLibrarySelect}
+                onCustomIntegration={handleCustomIconIntegration}
+              />
+            </div>
+
+            {/* Toolbar */}
+            {selectedIconLibrary && (
+              <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+                <div className="flex items-center gap-4">
+                  {/* Search Box */}
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      placeholder="Search icons..."
+                      value={iconSearchQuery}
+                      onChange={(e) => setIconSearchQuery(e.target.value)}
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </div>
+
+                  {/* Upload Button */}
+                  <button
+                    onClick={() => setShowUploadModal(true)}
+                    className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-white text-sm font-medium transition-colors flex items-center gap-2"
                   >
-                    <div className="flex items-center space-x-3 flex-1 min-w-0">
-                      {token.type === 'color' && (
-                        <div
-                          className="w-8 h-8 rounded border border-gray-700 flex-shrink-0"
-                          style={{ backgroundColor: token.value }}
-                        />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-white truncate flex items-center gap-2">
-                          --{token.name}
-                          {token.state && (
-                            <span className="text-xs text-gray-500">({token.state})</span>
-                          )}
-                          {token.bindings && token.bindings.length > 0 && (
-                            <div 
-                              className="flex -space-x-1 overflow-hidden" 
-                              title={`Affects ${token.bindings.length} component${token.bindings.length > 1 ? 's' : ''}:\n${token.bindings.map(b => `• ${b.targetId} (${PROPERTY_DESCRIPTIONS[b.propertyPath] || b.propertyPath})`).join('\n')}`}
-                            >
-                              {Array.from(new Set(token.bindings.map(b => b.targetId))).slice(0, 3).map((target, i) => (
-                                <div 
-                                  key={i}
-                                  className="w-5 h-5 rounded-full bg-indigo-600 border-2 border-gray-950 flex items-center justify-center text-[8px] font-black text-white"
-                                >
-                                  {target.charAt(0)}
-                                </div>
-                              ))}
-                              {new Set(token.bindings.map(b => b.targetId)).size > 3 && (
-                                <div className="w-5 h-5 rounded-full bg-gray-800 border-2 border-gray-950 flex items-center justify-center text-[8px] font-bold text-gray-400">
-                                  +{new Set(token.bindings.map(b => b.targetId)).size - 3}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        <div className="text-xs text-gray-500 font-mono truncate" title={getComputedValue(token)}>
-                          {getComputedValue(token)}
-                        </div>
-                      </div>
-                    </div>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    Upload Icon
+                  </button>
+
+                  {/* View Toggle */}
+                  <div className="flex items-center gap-1 bg-gray-800 border border-gray-700 rounded-lg p-1">
                     <button
-                      onClick={(e) => handleEditClick(activeTab, groupIndex, tokenIndex, e)}
-                      className="p-2 text-gray-400 hover:text-palette-cornflower hover:bg-gray-800 rounded transition-colors flex-shrink-0 ml-2 opacity-0 group-hover:opacity-100"
-                      title="Edit token"
+                      onClick={() => setIconViewMode('gallery')}
+                      className={`p-2 rounded transition-colors ${
+                        iconViewMode === 'gallery'
+                          ? 'bg-indigo-600 text-white'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                      title="Gallery view"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => setIconViewMode('list')}
+                      className={`p-2 rounded transition-colors ${
+                        iconViewMode === 'list'
+                          ? 'bg-indigo-600 text-white'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                      title="List view"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                       </svg>
                     </button>
                   </div>
-                ))}
-                {/* Add Token Button */}
-                <button
-                  onClick={(e) => handleAddTokenClick(activeTab, group.category, e)}
-                  className="flex items-center justify-center p-4 bg-gray-950 border-2 border-dashed border-gray-700 rounded-lg hover:border-indigo-500/50 hover:bg-gray-900 transition-colors group"
+                </div>
+              </div>
+            )}
+
+            {/* Icon Browser */}
+            {selectedIconLibrary && (
+              <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                <IconBrowser
+                  icons={availableIcons}
+                  onSelectIcon={handleIconSelect}
+                  viewMode={iconViewMode}
+                  searchQuery={iconSearchQuery}
+                  onSearchChange={setIconSearchQuery}
+                  isLoading={isLoadingIcons}
+                />
+              </div>
+            )}
+
+            {/* Existing Icons List */}
+            {currentTokens.length > 0 && (
+              <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                <h2 className="text-lg font-semibold text-white mb-4">Your Icons</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {currentTokens.map((token) => {
+                    // Find the token's location in the tokens structure
+                    let tokenLocation: { layer: TokenLayer; groupIndex: number; tokenIndex: number } | null = null
+                    Object.entries(tokens).forEach(([layer, groups]) => {
+                      groups.forEach((group, groupIndex) => {
+                        const tokenIndex = group.tokens.findIndex(t => t.name === token.name && t.layer === layer)
+                        if (tokenIndex >= 0 && !tokenLocation) {
+                          tokenLocation = { layer: layer as TokenLayer, groupIndex, tokenIndex }
+                        }
+                      })
+                    })
+                    
+                    if (!tokenLocation) return null
+                    
+                    const loc: { layer: TokenLayer; groupIndex: number; tokenIndex: number } = tokenLocation
+                    
+                    return (
+                      <div
+                        key={`${token.name}-${token.state || ''}-${token.layer}`}
+                        onClick={() => setSelectedToken(loc)}
+                        className="flex items-center justify-between p-4 bg-gray-950 border border-gray-800 rounded-lg hover:border-indigo-500/50 transition-colors group cursor-pointer relative"
+                      >
+                        <div className="flex items-center space-x-3 flex-1 min-w-0">
+                          {token.iconData?.svgContent && (
+                            <div 
+                              className="w-8 h-8 flex items-center justify-center flex-shrink-0 text-gray-300"
+                              dangerouslySetInnerHTML={{ __html: token.iconData.svgContent }}
+                            />
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-medium text-white truncate">
+                              --{token.name}
+                            </div>
+                            <div className="text-xs text-gray-500 font-mono truncate">
+                              {token.iconData?.pack || 'Icon'}
+                            </div>
+                          </div>
+                        </div>
+                        {/* Ellipsis Menu */}
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity relative">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              const isOpen = openMenuToken?.layer === loc.layer && 
+                                            openMenuToken?.groupIndex === loc.groupIndex && 
+                                            openMenuToken?.tokenIndex === loc.tokenIndex
+                              setOpenMenuToken(isOpen ? null : loc)
+                            }}
+                            className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition-colors"
+                            title="More options"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                            </svg>
+                          </button>
+                          {openMenuToken && 
+                           openMenuToken.layer === loc.layer &&
+                           openMenuToken.groupIndex === loc.groupIndex &&
+                           openMenuToken.tokenIndex === loc.tokenIndex && (
+                            <div className="absolute right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50 min-w-[120px]">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleDuplicateToken(loc.layer, loc.groupIndex, loc.tokenIndex)
+                                  setOpenMenuToken(null)
+                                }}
+                                className="w-full px-3 py-2 text-left text-sm text-white hover:bg-gray-700 rounded-t-lg flex items-center gap-2"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Duplicate
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleDeleteToken(loc.layer, loc.groupIndex, loc.tokenIndex)
+                                  setOpenMenuToken(null)
+                                }}
+                                className="w-full px-3 py-2 text-left text-sm text-red-400 hover:bg-gray-700 rounded-b-lg flex items-center gap-2"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!selectedIconLibrary && currentTokens.length === 0 && (
+              <div className="bg-gray-900 border border-gray-800 rounded-lg p-12 text-center">
+                <svg className="w-16 h-16 text-gray-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                </svg>
+                <p className="text-gray-400 mb-2">Select an icon library to get started</p>
+                <p className="text-sm text-gray-500">Or upload your own custom icons</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Other Tabs - Standard Layout */
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+            <h2 className="text-lg font-semibold text-white mb-4">{DISPLAY_CATEGORY_LABELS[activeTab]}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {currentTokens.map((token) => {
+              // Find the token's location in the tokens structure
+              let tokenLocation: { layer: TokenLayer; groupIndex: number; tokenIndex: number } | null = null
+              Object.entries(tokens).forEach(([layer, groups]) => {
+                groups.forEach((group, groupIndex) => {
+                  const tokenIndex = group.tokens.findIndex(t => t.name === token.name && t.layer === layer)
+                  if (tokenIndex >= 0 && !tokenLocation) {
+                    tokenLocation = { layer: layer as TokenLayer, groupIndex, tokenIndex }
+                  }
+                })
+              })
+              
+              if (!tokenLocation) return null
+              
+              const loc: { layer: TokenLayer; groupIndex: number; tokenIndex: number } = tokenLocation
+              
+              return (
+                <div
+                  key={`${token.name}-${token.state || ''}-${token.layer}`}
+                  onClick={() => setSelectedToken(loc)}
+                  className="flex items-center justify-between p-4 bg-gray-950 border border-gray-800 rounded-lg hover:border-indigo-500/50 transition-colors group cursor-pointer relative"
                 >
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
+                    {token.type === 'color' && (
+                      <div
+                        className="w-8 h-8 rounded border border-gray-700 flex-shrink-0"
+                        style={{ backgroundColor: token.value }}
+                      />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-medium text-white truncate flex items-center gap-2">
+                        --{token.name}
+                        {token.state && (
+                          <span className="text-xs text-gray-500">({token.state})</span>
+                        )}
+                        {token.bindings && token.bindings.length > 0 && (
+                          <div 
+                            className="flex -space-x-1 overflow-hidden" 
+                            title={`Affects ${token.bindings.length} component${token.bindings.length > 1 ? 's' : ''}:\n${token.bindings.map(b => `• ${b.targetId} (${PROPERTY_DESCRIPTIONS[b.propertyPath] || b.propertyPath})`).join('\n')}`}
+                          >
+                            {Array.from(new Set(token.bindings.map(b => b.targetId))).slice(0, 3).map((target, i) => (
+                              <div 
+                                key={i}
+                                className="w-5 h-5 rounded-full bg-indigo-600 border-2 border-gray-950 flex items-center justify-center text-[8px] font-black text-white"
+                              >
+                                {target.charAt(0)}
+                              </div>
+                            ))}
+                            {new Set(token.bindings.map(b => b.targetId)).size > 3 && (
+                              <div className="w-5 h-5 rounded-full bg-gray-800 border-2 border-gray-950 flex items-center justify-center text-[8px] font-bold text-gray-400">
+                                +{new Set(token.bindings.map(b => b.targetId)).size - 3}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-500 font-mono truncate" title={getComputedValue(token)}>
+                        {getComputedValue(token)}
+                      </div>
+                    </div>
+                  </div>
+                  {/* Ellipsis Menu */}
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity relative">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        const isOpen = openMenuToken?.layer === loc.layer && 
+                                      openMenuToken?.groupIndex === loc.groupIndex && 
+                                      openMenuToken?.tokenIndex === loc.tokenIndex
+                        setOpenMenuToken(isOpen ? null : loc)
+                      }}
+                      className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition-colors"
+                      title="More options"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                      </svg>
+                    </button>
+                    {openMenuToken?.layer === loc.layer && 
+                     openMenuToken?.groupIndex === loc.groupIndex && 
+                     openMenuToken?.tokenIndex === loc.tokenIndex && (
+                      <div className="absolute right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50 min-w-[120px]">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDuplicateToken(loc.layer, loc.groupIndex, loc.tokenIndex)
+                            setOpenMenuToken(null)
+                          }}
+                          className="w-full px-3 py-2 text-left text-sm text-white hover:bg-gray-700 rounded-t-lg flex items-center gap-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Duplicate
+                        </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteToken(loc.layer, loc.groupIndex, loc.tokenIndex)
+                              setOpenMenuToken(null)
+                            }}
+                          className="w-full px-3 py-2 text-left text-sm text-red-400 hover:bg-gray-700 rounded-b-lg flex items-center gap-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+            {/* Add Token Button */}
+            <button
+              onClick={(e) => {
+                // Determine which category to use for adding
+                const categories = DISPLAY_TO_CATEGORIES[activeTab]
+                const category = categories[0] // Use first category in the mapping
+                // Find a group with this category to add to
+                let targetLayer: TokenLayer = 'primitives'
+                let targetGroupIndex = -1
+                Object.entries(tokens).forEach(([layer, groups]) => {
+                  const groupIndex = groups.findIndex(g => categories.includes(g.category))
+                  if (groupIndex >= 0 && targetGroupIndex < 0) {
+                    targetLayer = layer as TokenLayer
+                    targetGroupIndex = groupIndex
+                  }
+                })
+                if (targetGroupIndex >= 0) {
+                  handleAddTokenClick(targetLayer, category, e)
+                }
+              }}
+              className="flex items-center justify-center p-4 bg-gray-950 border-2 border-dashed border-gray-700 rounded-lg hover:border-indigo-500/50 hover:bg-gray-900 transition-colors group"
+            >
                   <svg className="w-5 h-5 text-gray-400 group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </button>
-              </div>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Edit Modal */}
@@ -1482,6 +2093,25 @@ export default function TokensPage() {
           </div>
         </>
       )}
+
+      {/* Token Detail Modal */}
+      {selectedToken && (
+        <TokenDetailModal
+          token={selectedTokenData}
+          tokenLocation={selectedToken}
+          isOpen={!!selectedToken}
+          onClose={() => setSelectedToken(null)}
+          onSave={handleTokenSave}
+          tokens={tokens}
+        />
+      )}
+
+      {/* Icon Upload Modal */}
+      <IconUpload
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onSave={handleIconUpload}
+      />
 
       {/* Import CSS Variables Modal */}
       {showImportModal && (

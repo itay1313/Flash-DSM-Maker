@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { DesignSystemPreview } from './ui/DesignSystemPreview'
 
+import { Module } from '@/lib/types/modules'
+
 export interface SavedDesignSystem {
   id: string
   projectName: string
@@ -14,6 +16,7 @@ export interface SavedDesignSystem {
   edges?: any[]
   components?: any[]
   tokens?: any[]
+  modules?: Module[]
 }
 
 interface DashboardProps {

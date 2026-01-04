@@ -8,6 +8,7 @@ import SidePanel from './SidePanel'
 import LeftSidebar from './LeftSidebar'
 import ComponentsPage from './pages/ComponentsPage'
 import TokensPage from './pages/TokensPage'
+import ModulesPage from './pages/ModulesPage'
 import ExportPage from './pages/ExportPage'
 import SettingsPage from './pages/SettingsPage'
 import VersionHistoryPage from './pages/VersionHistoryPage'
@@ -610,6 +611,7 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
             />
           )}
           {activeView === 'tokens' && <TokensPage />}
+          {activeView === 'modules' && <ModulesPage />}
           {activeView === 'versions' && <VersionHistoryPage />}
           {activeView === 'sync' && <SyncPage />}
           {activeView === 'export' && <ExportPage />}
