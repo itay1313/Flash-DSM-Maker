@@ -11,7 +11,7 @@ interface SystemComponentsProps {
 
 type Theme = 'saas' | 'brutalist' | 'glass' | 'minimal' | 'cyber'
 
-type ComponentCategory = 'components' | 'controls' | 'modules' | 'video'
+type ComponentCategory = 'components' | 'controls' | 'video'
 
 interface ComponentCard {
   name: string
@@ -75,22 +75,6 @@ const COMPONENT_CATEGORIES: Record<ComponentCategory, { title: string; descripti
       { name: 'Text input', description: 'A form control that accepts a single line of text', category: 'controls' },
       { name: 'Textarea', description: 'A form control for editing multi-line text', category: 'controls' },
       { name: 'Toggle', description: 'A control used to switch between two states: often on or off', category: 'controls' },
-    ],
-  },
-  modules: {
-    title: 'Modules',
-    description: 'Composed patterns built from Components + Controls. They represent recognizable UI structures.',
-    components: [
-      { name: 'Drawer', description: 'A panel which slides out from the edge of the screen', category: 'modules' },
-      { name: 'Dropdown menu', description: 'A menu in which options are hidden by default but can be shown by interacting with a button', category: 'modules' },
-      { name: 'Empty state', description: 'An indication to the user that there is no data to display in the current view', category: 'modules' },
-      { name: 'Fieldset', description: 'A wrapper for related form fields', category: 'modules' },
-      { name: 'Form', description: 'A grouping of input controls that allow a user to submit information to a server', category: 'modules' },
-      { name: 'Header', description: 'An element that appears across the top of all pages on a website or application', category: 'modules' },
-      { name: 'Footer', description: 'Commonly appearing at the bottom of a page or section, a footer is used to display copyright and legal information', category: 'modules' },
-      { name: 'Hero', description: 'A large banner, usually appearing as one of the first items on a page', category: 'modules' },
-      { name: 'Pagination', description: 'Pagination is the process of splitting information over multiple pages', category: 'modules' },
-      { name: 'Table', description: 'A component for displaying large amounts of data in rows and columns', category: 'modules' },
     ],
   },
   video: {
@@ -1241,7 +1225,6 @@ export default function SystemComponents({ designSystemName, availableSystems, o
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     components: true,
     controls: true,
-    modules: false,
     video: false,
     colors: false,
     typography: false,
@@ -1439,7 +1422,7 @@ Always use Tailwind CSS for styling and ensure components match this structural 
             />
           </div>
           <div className="flex items-center gap-1 p-1 bg-gray-900/80 border border-gray-800 rounded-lg backdrop-blur-md">
-            {(['all', 'components', 'controls', 'modules', 'video'] as const).map((cat) => (
+            {(['all', 'components', 'controls', 'video'] as const).map((cat) => (
               <button
                 key={cat}
                 onClick={() => setFilterCategory(cat)}

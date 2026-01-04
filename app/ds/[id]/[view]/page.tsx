@@ -15,7 +15,7 @@ export default function DesignSystemViewPage() {
   const viewParam = params.view as string
   
   // Valid views
-  const validViews = ['flow', 'components', 'tokens', 'versions', 'sync', 'export', 'settings']
+  const validViews = ['flow', 'components', 'tokens', 'modules', 'versions', 'sync', 'export', 'settings']
   
   // Redirect templates to flow (templates feature removed)
   useEffect(() => {
