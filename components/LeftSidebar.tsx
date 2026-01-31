@@ -3,9 +3,18 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
+// Local assets from public/assets/design-system/ - ONLY THESE
+const imgCheckBoxOutlineBlank = "/assets/design-system/check_box_outline_blank.svg"
+const imgNearby = "/assets/design-system/nearby.svg"
+const imgGridView = "/assets/design-system/grid_view.svg"
+const imgDocs = "/assets/design-system/docs.svg"
+const imgDiversity4 = "/assets/design-system/diversity_4.svg"
+const imgAccountCircle = "/assets/design-system/account_circle.svg"
+const imgSettings = "/assets/design-system/settings.svg"
+
 interface SidebarItem {
   id: string
-  icon: React.ReactNode
+  icon: string
   label: string
   description?: string
   shortcut?: string
@@ -17,14 +26,16 @@ interface LeftSidebarProps {
   onViewChange?: (view: string) => void
   isCollapsed?: boolean
   onToggleCollapse?: () => void
-  onShowPrompt?: () => void
-  hasGeneratedPrompt?: boolean
 }
 
-export default function LeftSidebar({ activeView, onViewChange, isCollapsed = false, onToggleCollapse, onShowPrompt, hasGeneratedPrompt = false }: LeftSidebarProps) {
+export default function LeftSidebar({ 
+  activeView, 
+  onViewChange, 
+  isCollapsed = false, 
+  onToggleCollapse 
+}: LeftSidebarProps) {
   const pathname = usePathname()
   
-  // Extract system ID from pathname (e.g., /ds/[id]/[view])
   const pathParts = pathname?.split('/') || []
   const systemId = pathParts[2] || 'new'
 
@@ -143,14 +154,16 @@ export default function LeftSidebar({ activeView, onViewChange, isCollapsed = fa
     }
   ]
 
-  return (
-    <div className="relative">
-      {/* Collapse Toggle Button */}
-      <button
-        onClick={onToggleCollapse}
-        className={`absolute top-1/2 -translate-y-1/2 z-50 w-6 h-12 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-r-lg flex items-center justify-center transition-all duration-300 group shadow-lg ${
-          isCollapsed ? 'left-0' : 'left-full -translate-x-1/2'
-        }`}
+  const renderItem = (item: SidebarItem) => {
+    const href = `/ds/${systemId}/${item.id}`
+    const isActive = activeView === item.id
+    
+    return (
+      <Link
+        key={item.id}
+        href={href}
+        onClick={() => onViewChange?.(item.id)}
+        className="w-11 h-11 rounded-lg transition-all relative group flex items-center justify-center"
       >
         <svg 
           className={`w-4 h-4 text-gray-400 group-hover:text-white transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}
@@ -240,33 +253,26 @@ export default function LeftSidebar({ activeView, onViewChange, isCollapsed = fa
         ))}
       </div>
 
-      {/* Prompt Button */}
-      {onShowPrompt && (
-        <div className={`mt-auto pt-4 border-t border-gray-800 w-full px-2 transition-opacity duration-300 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
-          <button
-            onClick={onShowPrompt}
-            className={`w-full p-3 rounded-lg transition-all relative group ${
-              hasGeneratedPrompt
-                ? 'bg-palette-slate/20 text-palette-cornflower border border-palette-slate/30'
-                : 'text-gray-500 hover:text-gray-300 hover:bg-gray-900/50'
-            }`}
-            title="View Generated Prompt"
-          >
-            <div className="flex items-center justify-center">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            {/* Tooltip */}
-            <div className="absolute left-full ml-3 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-lg border border-gray-700">
-              Generated Prompt
-              <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-800"></div>
+        {/* User & Settings Section - Bottom */}
+        <div className="mt-auto flex flex-col gap-3 items-center w-full">
+          <button className="w-11 h-11 flex items-center justify-center cursor-pointer hover:opacity-100 opacity-40 transition-opacity rounded-lg">
+            <div className="w-6 h-6 flex items-center justify-center">
+              <img alt="Profile" className="max-w-full max-h-full w-full h-full object-contain" src={imgAccountCircle} />
             </div>
           </button>
+          <Link
+            href={`/ds/${systemId}/settings`}
+            onClick={() => onViewChange?.('settings')}
+            className={`w-11 h-11 flex items-center justify-center cursor-pointer hover:opacity-100 transition-opacity rounded-lg ${
+              activeView === 'settings' ? 'opacity-100' : 'opacity-40'
+            }`}
+          >
+            <div className="w-6 h-6 flex items-center justify-center">
+              <img alt="Settings" className="max-w-full max-h-full w-full h-full object-contain" src={imgSettings} />
+            </div>
+          </Link>
         </div>
-      )}
       </div>
     </div>
   )
 }
-

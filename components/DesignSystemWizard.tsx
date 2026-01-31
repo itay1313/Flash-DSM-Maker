@@ -458,112 +458,89 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-950">
+    <div className="flex flex-col h-screen bg-gray-950 relative overflow-hidden">
+      {/* Background gradients - Global */}
+      <div className="absolute right-0 top-0 w-1/2 h-1/2 pointer-events-none z-0 opacity-30">
+        <img alt="Background gradient effect" className="block w-full h-full object-cover" src="https://www.figma.com/api/mcp/asset/956cf506-0262-4c9f-aa8c-3a55857c5093" />
+      </div>
+      <div className="absolute right-0 top-1/4 w-1/3 h-1/3 pointer-events-none z-0 opacity-20">
+        <img alt="Background gradient effect" className="block w-full h-full object-cover" src="https://www.figma.com/api/mcp/asset/fcb858a2-0b01-403e-94de-a6774e3d3ea9" />
+      </div>
+
       {/* Top Bar */}
-      <div className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center space-x-4">
+      <div className="flex h-[74px] items-center justify-between px-6 py-2 z-20">
+        <div className="flex gap-2.5 items-end">
           <Link
             href="/"
-            className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors mr-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </Link>
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-palette-slate rounded-[8px] shadow-lg shadow-palette-slate/30">
-              <span className="text-white font-bold text-sm tracking-tight">DSM</span>
-            </div>
-            <div>
-              {isEditingTitle ? (
-                <input
-                  type="text"
-                  value={titleValue}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  onBlur={handleTitleBlur}
-                  onKeyDown={handleTitleKeyDown}
-                  autoFocus
-                  className="text-white/90 text-[28px] font-normal italic font-serif bg-transparent border-b-2 border-palette-slate/50 focus:border-palette-slate focus:outline-none px-1 py-0 min-w-[200px]"
-                  style={{ fontFamily: 'Instrument Serif, serif' }}
-                />
-              ) : (
-                <h1 
-                  onClick={handleTitleClick}
-                  className="text-white/90 text-[28px] font-normal italic font-serif cursor-text hover:text-white transition-colors px-1 py-0 rounded hover:bg-white/5"
-                  style={{ fontFamily: 'Instrument Serif, serif' }}
-                >
-                  {titleValue || getProjectName()}
-                </h1>
-              )}
-              <p className="text-xs text-gray-500">Design System Wizard</p>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          {nextNodeType ? (
-            <button
-              onClick={() => handleCreateNode(nextNodeType)}
-              disabled={isCreating}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
-            >
-              {isCreating ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Creating...</span>
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  <span>Add {getNextNodeLabel()}</span>
-                </>
-              )}
-            </button>
+          <h1 className="font-['EightiesComeback_VAR',serif] text-[28px] text-[#d0d0d0] tracking-[1.4px] font-light leading-none">
+            Flash DS
+          </h1>
+          <span className="font-['Inter',sans-serif] font-bold text-[16px] text-[#d0d0d0]">/</span>
+          {isEditingTitle ? (
+            <input
+              type="text"
+              value={titleValue}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              onBlur={handleTitleBlur}
+              onKeyDown={handleTitleKeyDown}
+              autoFocus
+              className="text-[#d0d0d0] text-[16px] font-normal bg-transparent border-b border-accent-magenta focus:outline-none px-1 py-0 min-w-[150px]"
+            />
           ) : (
-            <div className="px-4 py-2 bg-gray-700 text-gray-400 rounded-lg text-sm font-medium flex items-center space-x-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Flow Complete</span>
-            </div>
+            <span 
+              onClick={handleTitleClick}
+              className="font-['Inter',sans-serif] text-[16px] text-[#d0d0d0] cursor-text hover:text-white transition-colors"
+            >
+              {titleValue || getProjectName()}
+            </span>
           )}
-          <button
-            onClick={() => {
-              generatePrompt()
-            }}
-            disabled={!isFlowComplete}
-            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 disabled:bg-gray-700 disabled:text-gray-400 text-white rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <span>Generate</span>
+          <button className="w-[16px] h-[16px] flex items-center justify-center opacity-60 hover:opacity-100 transition-opacity">
+            <img alt="Dropdown" className="block max-w-none size-full" src="/assets/design-system/keyboard_arrow_down.svg" />
           </button>
+        </div>
+        <div className="flex gap-4 items-center">
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="px-4 py-2 bg-palette-slate hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-[8px] text-sm font-medium transition-all shadow-lg shadow-palette-slate/20 hover:shadow-xl hover:shadow-palette-slate/30 flex items-center space-x-2"
+            className="flex gap-[8px] h-[40px] items-center justify-center overflow-clip px-[24px] py-[8px] relative rounded-[12px] shadow-[0px_2px_3px_0px_rgba(0,0,0,0.35)] hover:opacity-90 transition-opacity"
+            style={{ 
+              backgroundImage: "radial-gradient(ellipse 65px 40px at 50% 0%, rgba(37,86,104,1) 0%, rgba(31,68,81,1) 25%, rgba(25,50,59,1) 50%, rgba(19,31,36,1) 75%, rgba(13,13,13,1) 100%)"
+            }}
           >
-            {isSaving ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Saving...</span>
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Save</span>
-              </>
-            )}
+            <div className="relative size-[24px]">
+              <img alt="Figma icon" className="block max-w-none size-full" src="/assets/design-system/figma.svg" />
+            </div>
+            <span className="font-sans font-normal text-[16px] text-gray-100">
+              {isSaving ? 'Saving...' : 'Export'}
+            </span>
+            <div className="absolute inset-0 pointer-events-none rounded-[inherit] shadow-[inset_0px_1px_0px_0px_rgba(255,255,255,0.3),inset_0px_-1px_0px_0px_rgba(255,255,255,0.18)]" />
+          </button>
+          <button
+            onClick={() => generatePrompt()}
+            className="flex gap-[8px] h-[40px] items-center justify-center overflow-clip px-[24px] py-[8px] relative rounded-[12px] shadow-[0px_2px_3px_0px_rgba(0,0,0,0.35)] hover:opacity-90 transition-opacity"
+            style={{ 
+              backgroundImage: "radial-gradient(ellipse 65px 40px at 50% 0%, rgba(37,86,104,1) 0%, rgba(31,68,81,1) 25%, rgba(25,50,59,1) 50%, rgba(19,31,36,1) 75%, rgba(13,13,13,1) 100%)"
+            }}
+          >
+            <div className="relative size-[24px]">
+              <img alt="Publish icon" className="block max-w-none size-full" src="/assets/design-system/publish.svg" />
+            </div>
+            <span className="font-sans font-normal text-[16px] text-gray-100">
+              Publish
+            </span>
+            <div className="absolute inset-0 pointer-events-none rounded-[inherit] shadow-[inset_0px_1px_0px_0px_rgba(255,255,255,0.3),inset_0px_-1px_0px_0px_rgba(255,255,255,0.18)]" />
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className={`flex flex-1 ${activeView === 'flow' ? 'overflow-hidden' : ''} overflow-y-auto`}>
+      <div className="flex flex-1 overflow-hidden z-10">
         {/* Left Sidebar */}
         <LeftSidebar 
           activeView={activeView} 
@@ -580,9 +557,9 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
         />
         
         {/* Main Content Area */}
-        <div className={`flex-1 relative ${activeView === 'flow' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-          {activeView === 'flow' && (
-            <>
+        <div className="flex-1 relative overflow-hidden flex">
+          <div className="flex-1 overflow-y-auto">
+            {activeView === 'flow' && (
               <FlowCanvas 
                 ref={flowCanvasRef}
                 onNodeSelect={(node) => {
@@ -597,18 +574,29 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
                 selectedNodeId={selectedNode?.id}
                 onNodeUpdate={handleNodeUpdate}
               />
-            </>
-          )}
-          {activeView === 'components' && (
-            <SystemComponents
-              designSystemName={
-                savedSystems.find((s) => s.id === currentSystemId)?.projectName ||
-                designSystem?.projectName ||
-                'Untitled Design System'
-              }
-              availableSystems={savedSystems.map((s) => ({ id: s.id, projectName: s.projectName }))}
-              onSwitchSystem={handleSwitchSystem}
-            />
+            )}
+            {activeView === 'components' && (
+              <ComponentsPage />
+            )}
+            {activeView === 'tokens' && <TokensPage />}
+            {activeView === 'templates' && <TemplatesPage />}
+            {activeView === 'versions' && <VersionHistoryPage />}
+            {activeView === 'sync' && <SyncPage />}
+            {activeView === 'export' && <ExportPage />}
+            {activeView === 'settings' && <SettingsPage />}
+          </div>
+
+          {/* Side Panel - only show on flow view when a node is selected */}
+          {activeView === 'flow' && selectedNode && (
+            <div className="w-80 bg-gray-900 border-l border-gray-800 overflow-y-auto z-20">
+              <SidePanel 
+                selectedNode={selectedNode} 
+                onNodeUpdate={handleNodeUpdate}
+                onShowAIModal={() => setShowAIModal(true)}
+                onCreateNextNode={nextNodeType ? handleCreateNextNode : undefined}
+                nextNodeLabel={getNextNodeLabel()}
+              />
+            </div>
           )}
           {activeView === 'tokens' && <TokensPage />}
           {activeView === 'modules' && <ModulesPage />}
@@ -617,19 +605,6 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
           {activeView === 'export' && <ExportPage />}
           {activeView === 'settings' && <SettingsPage />}
         </div>
-
-        {/* Side Panel - only show on flow view when a node is selected */}
-        {activeView === 'flow' && selectedNode && (
-          <div className="w-80 bg-gray-900 border-l border-gray-800 overflow-y-auto">
-            <SidePanel 
-              selectedNode={selectedNode} 
-              onNodeUpdate={handleNodeUpdate}
-              onShowAIModal={() => setShowAIModal(true)}
-              onCreateNextNode={nextNodeType ? handleCreateNextNode : undefined}
-              nextNodeLabel={getNextNodeLabel()}
-            />
-          </div>
-        )}
       </div>
 
       {/* Project AI Modal */}

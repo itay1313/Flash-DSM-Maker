@@ -1,29 +1,6 @@
 export type TokenLayer = 'primitives' | 'semantic'
 export type TokenCategory = 'colors' | 'typography' | 'spacing' | 'radius' | 'shadows' | 'theme' | 'motion' | 'icons'
-export type DisplayCategory = 'sizing' | 'colors' | 'typography' | 'icons' | 'shadows' | 'motion'
 export type TokenState = 'default' | 'hover' | 'focus' | 'disabled'
-
-// Map internal categories to display categories
-export const CATEGORY_TO_DISPLAY: Record<TokenCategory, DisplayCategory> = {
-  spacing: 'sizing',
-  radius: 'sizing',
-  colors: 'colors',
-  typography: 'typography',
-  icons: 'icons',
-  shadows: 'shadows',
-  motion: 'motion',
-  theme: 'colors', // Map theme to colors for display
-}
-
-// Map display categories back to internal categories
-export const DISPLAY_TO_CATEGORIES: Record<DisplayCategory, TokenCategory[]> = {
-  sizing: ['spacing', 'radius'],
-  colors: ['colors', 'theme'],
-  typography: ['typography'],
-  icons: ['icons'],
-  shadows: ['shadows'],
-  motion: ['motion'],
-}
 
 export interface Binding {
   targetType: 'component' | 'module'
@@ -33,22 +10,13 @@ export interface Binding {
   isNew?: boolean
 }
 
-export type IconLibrary = 'material' | 'tabler' | 'lucide' | 'custom' | 'uploaded'
-
 export interface Token {
   name: string
   value: string
   lightValue?: string
   darkValue?: string
   styleObject?: Record<string, string | number>
-  iconData?: { 
-    pack: string
-    name: string
-    sizeRef: string
-    library?: IconLibrary
-    sourceUrl?: string
-    svgContent?: string
-  }
+  iconData?: { pack: string; name: string; sizeRef: string }
   type: 'color' | 'font' | 'size' | 'radius' | 'shadow' | 'theme' | 'motion' | 'icon'
   state?: TokenState
   layer: TokenLayer
@@ -162,9 +130,4 @@ export const DEFAULT_TOKENS: Record<TokenLayer, TokenGroup[]> = {
       ],
     },
   ]
-}
-
-// Helper function to get display category from a token
-export function getDisplayCategory(token: Token): DisplayCategory {
-  return CATEGORY_TO_DISPLAY[token.category]
 }
