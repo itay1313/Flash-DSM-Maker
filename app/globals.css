@@ -6,6 +6,30 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    /* Color Tokens */
+    --color-background-primary: #0d0d0d;
+    --color-background-secondary: #252525;
+    --color-background-card: #191919;
+    
+    --color-accent-magenta: #ff20dd;
+    --color-accent-orange: #ff6b35;
+    --color-accent-cyan: #00d4ff;
+    
+    --color-glow-pink: #FF37E4;
+    --color-glow-peach: #FFCEA3;
+    --color-glow-cyan: #A3E7FF;
+    
+    /* Spacing (for reference) */
+    --spacing-base: 4px;
+    
+    /* Gradients */
+    --gradient-border: linear-gradient(135deg, #ff20dd 0%, #ff6b35 50%, #00d4ff 100%);
+    --gradient-border-alt: linear-gradient(135deg, #FF20DD 0%, #B90000 100%);
+  }
+}
+
 @layer utilities {
   .gradient-border {
     position: relative;
@@ -99,6 +123,8 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -160,5 +186,55 @@ input[type="range"].slider::-moz-range-thumb {
   cursor: pointer;
   border: 2px solid #715AFF;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Custom scrollbar styles */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #525252;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #404040 #1a1a1a;
+}
+
+/* Color input styling */
+input[type="color"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 12px;
+}
+
+input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: 12px;
 }
 

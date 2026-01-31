@@ -1,5 +1,5 @@
 import React from 'react'
-import { typography } from './typography'
+import { typography } from './typographyClasses'
 
 interface FlowNodeFieldProps {
   label: string
@@ -9,8 +9,8 @@ interface FlowNodeFieldProps {
 
 export function FlowNodeField({ label, children, className = '' }: FlowNodeFieldProps) {
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
-      <span className={typography.label}>
+    <div className={`flex flex-col gap-1.5 ${className}`}>
+      <span className="text-[9px] font-bold uppercase tracking-wider text-white/60">
         {label}
       </span>
       {children}
@@ -48,8 +48,8 @@ export function FlowNodeInput({
   rightAction,
 }: FlowNodeInputProps) {
   // Textareas should be full width, regular inputs can have constrained width
-  const widthClass = type === 'textarea' ? 'w-full' : 'w-full md:w-[240px]'
-  const baseClasses = `${widthClass} relative inline-flex items-start px-3 py-3 rounded-[8px] bg-white/10 border border-white/0 ${
+  const widthClass = 'w-full'
+  const baseClasses = `${widthClass} relative inline-flex items-start px-2 py-2 rounded bg-white/10 border border-white/0 text-xs ${
     selected ? 'cursor-text' : ''
   } ${className}`
 
@@ -64,13 +64,13 @@ export function FlowNodeInput({
             onFocus={onFocus}
             autoFocus
             rows={rows}
-            className={`w-full bg-transparent ${typography.input} placeholder:text-white/40 focus:outline-none caret-white resize-none ${rightAction ? 'pr-12' : 'pr-2'}`}
+            className={`w-full bg-transparent text-xs text-white/90 placeholder:text-white/40 focus:outline-none caret-white resize-none ${rightAction ? 'pr-10' : 'pr-1'}`}
             style={{ 
-              height: `${rows * 1.5}rem`,
-              minHeight: `${rows * 1.5}rem`,
-              maxHeight: `${rows * 1.5}rem`,
+              height: `${rows * 1.2}rem`,
+              minHeight: `${rows * 1.2}rem`,
+              maxHeight: `${rows * 1.2}rem`,
               overflow: 'auto',
-              lineHeight: '1.5rem'
+              lineHeight: '1.2rem'
             }}
             onClick={(e) => e.stopPropagation()}
             placeholder={placeholder}
@@ -83,7 +83,7 @@ export function FlowNodeInput({
             onBlur={onBlur}
             onFocus={onFocus}
             autoFocus
-            className={`w-full bg-transparent ${typography.input} placeholder:text-white/40 focus:outline-none caret-white ${rightAction ? 'pr-12' : 'pr-2'}`}
+            className={`w-full bg-transparent text-xs text-white/90 placeholder:text-white/40 focus:outline-none caret-white ${rightAction ? 'pr-10' : 'pr-1'}`}
             onClick={(e) => e.stopPropagation()}
             placeholder={placeholder}
           />
@@ -100,20 +100,20 @@ export function FlowNodeInput({
   return (
     <div className={baseClasses} onClick={onClick}>
       <span
-        className={`${value ? typography.body : typography.bodyMuted} ${type === 'textarea' ? 'line-clamp-2 flex-1 block' : ''} ${rightAction ? 'pr-12' : 'pr-2'}`}
+        className={`text-xs ${value ? 'text-white/90' : 'text-white/40'} ${type === 'textarea' ? 'line-clamp-2 flex-1 block' : ''} ${rightAction ? 'pr-10' : 'pr-1'}`}
         style={type === 'textarea' ? { 
-          minHeight: `${rows * 1.5}rem`,
-          maxHeight: `${rows * 1.5}rem`,
-          height: `${rows * 1.5}rem`,
+          minHeight: `${rows * 1.2}rem`,
+          maxHeight: `${rows * 1.2}rem`,
+          height: `${rows * 1.2}rem`,
           display: 'block',
           overflow: 'hidden',
-          lineHeight: '1.5rem'
+          lineHeight: '1.2rem'
         } : {}}
       >
         {value || placeholder}
       </span>
       {rightAction && (
-        <div className="absolute bottom-2 right-2">
+        <div className="absolute bottom-1.5 right-1.5">
           {rightAction}
         </div>
       )}

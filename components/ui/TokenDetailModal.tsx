@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Token, TokenLayer, Binding, TokenState } from '@/lib/constants/tokens'
-import { PROPERTY_DESCRIPTIONS } from '@/components/pages/TokensPage'
+import { Token, TokenLayer, Binding, TokenState, PROPERTY_DESCRIPTIONS } from '@/lib/constants/tokens'
 import TokenCustomizationFlow from './TokenCustomizationFlow'
 
 interface TokenDetailModalProps {

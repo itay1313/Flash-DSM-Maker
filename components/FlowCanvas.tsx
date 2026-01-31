@@ -351,15 +351,17 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(
   return (
     <div className="w-full h-full bg-gray-950 relative overflow-hidden">
       {nodes.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-          <div className="text-center">
-            <div className="mb-4">
-              <svg className="w-16 h-16 mx-auto text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="text-center pointer-events-auto">
+            <div className="mb-6">
+              <svg className="w-20 h-20 mx-auto text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-500 mb-2">Start Building Your Flow</h3>
-            <p className="text-sm text-gray-600">Click "Add Node" in the top bar to create your first node</p>
+            <h3 className="text-2xl font-light text-gray-400 mb-3" style={{ fontFamily: "'EightiesComeback_VAR:Light_Condensed', sans-serif" }}>
+              Flow Builder Loading...
+            </h3>
+            <p className="text-sm text-gray-600 uppercase tracking-widest font-black">Initializing your design system flow</p>
           </div>
         </div>
       )}

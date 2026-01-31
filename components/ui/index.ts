@@ -1,5 +1,16 @@
 // Typography System
-export { typography } from './typography'
+export { typography } from './typographyClasses'
+export { 
+  Typography,
+  H1, H2, H3, H4, H5, H6,
+  Subtitle,
+  Body, BodyLarge, BodySmall,
+  Caption,
+  Label
+} from './Typography'
+
+// Background Components
+export { BackgroundGlow } from './BackgroundGlow'
 
 // Flow Node UI Components
 export { FlowNodeCard, FlowNodeHeader, FlowNodeBody } from './FlowNodeCard'

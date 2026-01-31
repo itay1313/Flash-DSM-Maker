@@ -10,6 +10,26 @@ export interface Binding {
   isNew?: boolean
 }
 
+export const PROPERTY_DESCRIPTIONS: Record<string, string> = {
+  'backgroundColor': 'Background Color',
+  'color': 'Text Color',
+  'borderColor': 'Border Color',
+  'borderRadius': 'Border Radius',
+  'boxShadow': 'Box Shadow',
+  'fontSize': 'Font Size',
+  'fontWeight': 'Font Weight',
+  'fontFamily': 'Font Family',
+  'lineHeight': 'Line Height',
+  'letterSpacing': 'Letter Spacing',
+  'padding': 'Padding',
+  'margin': 'Margin',
+  'width': 'Width',
+  'height': 'Height',
+  'gap': 'Gap',
+  'opacity': 'Opacity',
+  'transition': 'Transition',
+}
+
 export interface Token {
   name: string
   value: string

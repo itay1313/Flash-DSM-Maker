@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { typography } from './ui/typography'
+import { typography } from './ui/typographyClasses'
 import { DesignSystemPreview } from './ui/DesignSystemPreview'
 import { DashboardPreview } from './ui/DashboardPreview'
 

@@ -56,17 +56,17 @@ export default function ProjectDetailsNode({ data, selected, id }: NodeProps<Pro
         e.stopPropagation()
         setShowAIGuide(true)
       }}
-      className="p-1.5 rounded-[6px] bg-white/10 hover:bg-white/15 transition-colors"
+      className="p-1 rounded bg-white/10 hover:bg-white/15 transition-colors"
       title="Use AI to generate description"
     >
-      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
       </svg>
     </button>
   )
 
   const uploadIcon = (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
     </svg>
   )
@@ -100,7 +100,7 @@ export default function ProjectDetailsNode({ data, selected, id }: NodeProps<Pro
             onFocus={() => handleFieldClick('shortDescription')}
             onBlur={handleBlur}
             type="textarea"
-            rows={4}
+            rows={3}
             rightAction={aiButton}
           />
         </FlowNodeField>

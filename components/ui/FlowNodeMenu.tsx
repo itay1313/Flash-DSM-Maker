@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { typography } from './typography'
+import { typography } from './typographyClasses'
 
 export interface MenuItem {
   label: string

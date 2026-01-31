@@ -1,5 +1,5 @@
 import React from 'react'
-import { typography } from './typography'
+import { typography } from './typographyClasses'
 
 interface FlowNodeFileCardProps {
   name: string
@@ -20,7 +20,7 @@ export function FlowNodeFileCard({ name, subtitle, icon, onChange, selected = fa
 
   return (
     <div 
-      className={`p-3 rounded-[8px] bg-white/10 border border-white/0 ${selected && onChange ? 'cursor-pointer hover:bg-white/15 transition-colors' : ''} ${className}`}
+      className={`p-3 rounded bg-white/10 border border-white/0 ${selected && onChange ? 'cursor-pointer hover:bg-white/15 transition-colors' : ''} ${className}`}
       onClick={handleClick}
     >
       <div className="flex items-center justify-between">

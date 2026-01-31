@@ -1,5 +1,5 @@
 import React from 'react'
-import { typography } from './typography'
+import { typography } from './typographyClasses'
 
 interface FlowNodeButtonProps {
   children: React.ReactNode
@@ -23,18 +23,16 @@ export function FlowNodeButton({
   size = 'default',
 }: FlowNodeButtonProps) {
   const sizeClasses = size === 'small' 
-    ? 'px-2 py-1.5' 
-    : 'px-3 py-3'
-  
-  const typographyClass = size === 'small' ? typography.buttonSmall : typography.button
+    ? 'px-2 py-1' 
+    : 'px-2.5 py-2'
   
   const baseClasses = variant === 'default'
-    ? `${size === 'default' ? 'w-full md:w-[240px]' : ''} ${sizeClasses} rounded-[8px] bg-white/10 border border-white/0 transition-colors flex items-center justify-center gap-2 ${typographyClass} ${
+    ? `w-full ${sizeClasses} rounded bg-white/10 border border-white/0 transition-colors flex items-center justify-center gap-1.5 text-xs font-medium text-white/90 ${
         selected && !disabled
           ? 'hover:bg-white/15 hover:border-white/20 cursor-pointer'
           : 'cursor-default'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`
-    : `${size === 'default' ? 'w-full md:w-[240px]' : ''} ${sizeClasses} rounded-[8px] bg-white/10 border border-white/0 transition-colors flex items-center justify-center gap-2 ${typographyClass} ${
+    : `w-full ${sizeClasses} rounded bg-white/10 border border-white/0 transition-colors flex items-center justify-center gap-1.5 text-xs font-medium text-white/90 ${
         selected && !disabled
           ? 'hover:bg-white/15 hover:border-white/20 cursor-pointer'
           : 'cursor-default'

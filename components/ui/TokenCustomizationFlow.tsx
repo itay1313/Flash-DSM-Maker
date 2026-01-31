@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Token, Binding, TokenLayer } from '@/lib/constants/tokens'
-import { PROPERTY_DESCRIPTIONS } from '@/components/pages/TokensPage'
+import { Token, Binding, TokenLayer, PROPERTY_DESCRIPTIONS } from '@/lib/constants/tokens'
 
 interface TokenCustomizationFlowProps {
   originalToken: Token

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 // Local assets from public/assets/design-system/
-const imgDoubleArrowRight = "/assets/design-system/Arrow icon.svg"
+const imgDoubleArrowRight = "/assets/design-system/Arrow_icon.svg"
 
 interface TabBarProps {
   tabs: { id: string; label: string }[]

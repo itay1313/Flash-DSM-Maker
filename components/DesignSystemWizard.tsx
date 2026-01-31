@@ -14,6 +14,7 @@ import SettingsPage from './pages/SettingsPage'
 import VersionHistoryPage from './pages/VersionHistoryPage'
 import SyncPage from './pages/SyncPage'
 import ProjectAIModal from './ProjectAIModal'
+import PublishModal from './PublishModal'
 import { Node } from 'reactflow'
 import { SavedDesignSystem } from './Dashboard'
 import SystemComponents from './SystemComponents'
@@ -94,7 +95,9 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
   const [generatedPrompt, setGeneratedPrompt] = useState<string | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
   const [showAIModal, setShowAIModal] = useState(false)
+  const [showPublishModal, setShowPublishModal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
   const [savedSystems, setSavedSystems] = useState<SavedDesignSystem[]>([])
   const [currentSystemId, setCurrentSystemId] = useState<string | null>(designSystem?.id || null)
   const flowCanvasRef = useRef<FlowCanvasRef>(null)
@@ -157,6 +160,29 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
       setNextNodeType(next)
     }
   }, [])
+
+  // Auto-create first node if flow is empty
+  useEffect(() => {
+    if (activeView === 'flow' && flowCanvasRef.current) {
+      const checkAndCreateFirstNode = async () => {
+        const nodes = flowCanvasRef.current?.getNodes() || []
+        if (nodes.length === 0 && !isCreating) {
+          // Create the first node (Project Details)
+          setIsCreating(true)
+          try {
+            await flowCanvasRef.current?.createNode('projectDetails')
+            updateNextNodeType()
+          } finally {
+            setIsCreating(false)
+          }
+        }
+      }
+      
+      // Small delay to ensure FlowCanvas is mounted
+      const timer = setTimeout(checkAndCreateFirstNode, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [activeView, updateNextNodeType])
 
   // Generate prompt from all node data
   const generatePrompt = useCallback(() => {
@@ -292,6 +318,55 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
     if (!nextNodeType) return null
     const nodeType = NODE_TYPES.find((nt) => nt.id === nextNodeType)
     return nodeType?.label || null
+  }
+
+  // Handle publish action
+  const handlePublish = async (framework: string, method: 'download' | 'github') => {
+    setIsPublishing(true)
+    
+    try {
+      // Get all design system data
+      const nodes = flowCanvasRef.current?.getNodes() || []
+      const edges = flowCanvasRef.current?.getEdges() || []
+      
+      // Gather all components and tokens
+      // In a real implementation, you would generate code for each framework
+      const projectData = {
+        framework,
+        method,
+        nodes,
+        edges,
+        components: [], // Get from ComponentsPage
+        tokens: [], // Get from TokensPage
+      }
+      
+      console.log('Publishing design system:', projectData)
+      
+      if (method === 'download') {
+        // Generate and download ZIP file
+        // This would involve creating files for the selected framework
+        alert(`Generating ${framework} design system package...\n\nThis will download a ZIP file with all components, tokens, and configuration files optimized for ${framework}.`)
+        
+        // TODO: Implement actual ZIP generation and download
+        // For now, just show a success message
+        setTimeout(() => {
+          alert('Design system package generated successfully!')
+        }, 1500)
+      } else {
+        // GitHub sync
+        alert(`Connecting to GitHub...\n\nYou'll be prompted to authenticate and select a repository to publish your ${framework} design system.`)
+        
+        // TODO: Implement GitHub OAuth and repository sync
+        setTimeout(() => {
+          alert('GitHub sync coming soon!')
+        }, 1500)
+      }
+    } catch (error) {
+      console.error('Publish error:', error)
+      alert('Failed to publish design system. Please try again.')
+    } finally {
+      setIsPublishing(false)
+    }
   }
 
   // Save design system
@@ -470,14 +545,14 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
       {/* Top Bar */}
       <div className="flex h-[74px] items-center justify-between px-6 py-2 z-20">
         <div className="flex gap-2.5 items-end">
-          <Link
-            href="/"
+          <button
+            onClick={onClose}
             className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors mr-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-          </Link>
+          </button>
           <h1 className="font-['EightiesComeback_VAR',serif] text-[28px] text-[#d0d0d0] tracking-[1.4px] font-light leading-none">
             Flash DS
           </h1>
@@ -506,8 +581,7 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
         </div>
         <div className="flex gap-4 items-center">
           <button
-            onClick={handleSave}
-            disabled={isSaving}
+            onClick={() => handleViewChange('export')}
             className="flex gap-[8px] h-[40px] items-center justify-center overflow-clip px-[24px] py-[8px] relative rounded-[12px] shadow-[0px_2px_3px_0px_rgba(0,0,0,0.35)] hover:opacity-90 transition-opacity"
             style={{ 
               backgroundImage: "radial-gradient(ellipse 65px 40px at 50% 0%, rgba(37,86,104,1) 0%, rgba(31,68,81,1) 25%, rgba(25,50,59,1) 50%, rgba(19,31,36,1) 75%, rgba(13,13,13,1) 100%)"
@@ -517,13 +591,14 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
               <img alt="Figma icon" className="block max-w-none size-full" src="/assets/design-system/figma.svg" />
             </div>
             <span className="font-sans font-normal text-[16px] text-gray-100">
-              {isSaving ? 'Saving...' : 'Export'}
+              Export
             </span>
             <div className="absolute inset-0 pointer-events-none rounded-[inherit] shadow-[inset_0px_1px_0px_0px_rgba(255,255,255,0.3),inset_0px_-1px_0px_0px_rgba(255,255,255,0.18)]" />
           </button>
           <button
-            onClick={() => generatePrompt()}
-            className="flex gap-[8px] h-[40px] items-center justify-center overflow-clip px-[24px] py-[8px] relative rounded-[12px] shadow-[0px_2px_3px_0px_rgba(0,0,0,0.35)] hover:opacity-90 transition-opacity"
+            onClick={() => setShowPublishModal(true)}
+            disabled={isPublishing}
+            className="flex gap-[8px] h-[40px] items-center justify-center overflow-clip px-[24px] py-[8px] relative rounded-[12px] shadow-[0px_2px_3px_0px_rgba(0,0,0,0.35)] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ 
               backgroundImage: "radial-gradient(ellipse 65px 40px at 50% 0%, rgba(37,86,104,1) 0%, rgba(31,68,81,1) 25%, rgba(25,50,59,1) 50%, rgba(19,31,36,1) 75%, rgba(13,13,13,1) 100%)"
             }}
@@ -532,7 +607,7 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
               <img alt="Publish icon" className="block max-w-none size-full" src="/assets/design-system/publish.svg" />
             </div>
             <span className="font-sans font-normal text-[16px] text-gray-100">
-              Publish
+              {isPublishing ? 'Publishing...' : 'Publish'}
             </span>
             <div className="absolute inset-0 pointer-events-none rounded-[inherit] shadow-[inset_0px_1px_0px_0px_rgba(255,255,255,0.3),inset_0px_-1px_0px_0px_rgba(255,255,255,0.18)]" />
           </button>
@@ -547,11 +622,17 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
           onViewChange={handleViewChange}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          onShowPrompt={() => {
-            if (!generatedPrompt) {
-              generatePrompt()
+          onShowPrompt={async () => {
+            // If on flow view and has next node type, create it
+            if (activeView === 'flow' && nextNodeType) {
+              await handleCreateNode(nextNodeType)
+            } else {
+              // Otherwise show the prompt modal
+              if (!generatedPrompt) {
+                generatePrompt()
+              }
+              setShowPrompt(true)
             }
-            setShowPrompt(true)
           }}
           hasGeneratedPrompt={!!generatedPrompt}
         />
@@ -579,7 +660,7 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
               <ComponentsPage />
             )}
             {activeView === 'tokens' && <TokensPage />}
-            {activeView === 'templates' && <TemplatesPage />}
+            {activeView === 'modules' && <ModulesPage />}
             {activeView === 'versions' && <VersionHistoryPage />}
             {activeView === 'sync' && <SyncPage />}
             {activeView === 'export' && <ExportPage />}
@@ -598,12 +679,6 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
               />
             </div>
           )}
-          {activeView === 'tokens' && <TokensPage />}
-          {activeView === 'modules' && <ModulesPage />}
-          {activeView === 'versions' && <VersionHistoryPage />}
-          {activeView === 'sync' && <SyncPage />}
-          {activeView === 'export' && <ExportPage />}
-          {activeView === 'settings' && <SettingsPage />}
         </div>
       </div>
 
@@ -689,6 +764,13 @@ export default function DesignSystemWizard({ designSystem, onSave, onClose, init
           </div>
         </>
       )}
+
+      {/* Publish Modal */}
+      <PublishModal
+        isOpen={showPublishModal}
+        onClose={() => setShowPublishModal(false)}
+        onPublish={handlePublish}
+      />
     </div>
   )
 }

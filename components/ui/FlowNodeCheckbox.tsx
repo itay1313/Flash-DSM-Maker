@@ -1,5 +1,5 @@
 import React from 'react'
-import { typography } from './typography'
+import { typography } from './typographyClasses'
 
 interface FlowNodeCheckboxProps {
   label: string
@@ -12,11 +12,11 @@ interface FlowNodeCheckboxProps {
 export function FlowNodeCheckbox({ label, checked, onChange, selected = false, className = '' }: FlowNodeCheckboxProps) {
   return (
     <div
-      className={`flex items-center space-x-2 ${selected ? 'cursor-pointer hover:bg-white/5 rounded px-1 py-0.5 transition-colors' : ''} ${className}`}
+      className={`flex items-center space-x-1.5 ${selected ? 'cursor-pointer hover:bg-white/5 rounded px-1 py-0.5 transition-colors' : ''} ${className}`}
       onClick={selected ? onChange : undefined}
     >
       <div
-        className={`w-4 h-4 border-2 rounded flex-shrink-0 flex items-center justify-center transition-colors ${
+        className={`w-3.5 h-3.5 border-2 rounded flex-shrink-0 flex items-center justify-center transition-colors ${
           checked
             ? 'bg-palette-slate border-palette-slate'
             : 'border-gray-500'
@@ -32,7 +32,7 @@ export function FlowNodeCheckbox({ label, checked, onChange, selected = false, c
           </svg>
         )}
       </div>
-      <span className={typography.body}>
+      <span className="text-xs text-white/90">
         {label}
       </span>
     </div>

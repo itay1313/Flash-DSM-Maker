@@ -1,6 +1,6 @@
 import React from 'react'
 import { FlowNodeMenu, MenuItem } from './FlowNodeMenu'
-import { typography } from './typography'
+import { typography } from './typographyClasses'
 
 interface FlowNodeCardProps {
   children: React.ReactNode
@@ -11,8 +11,8 @@ interface FlowNodeCardProps {
 export function FlowNodeCard({ children, selected, className = '' }: FlowNodeCardProps) {
   return (
     <div
-      className={`min-w-[280px] inline-flex flex-col gap-2 rounded-[20px] border border-[rgba(0,0,0,0.40)] bg-white/10 px-1 pt-2 pb-1 shadow-[0_16px_20px_-8px_rgba(0,0,0,0.25)] ${
-        selected ? 'shadow-[0_16px_20px_-8px_rgba(99,102,241,0.35)]' : ''
+      className={`min-w-[200px] max-w-[280px] inline-flex flex-col gap-1.5 rounded-lg border border-black/40 bg-white/10 px-1 pt-1.5 pb-1 shadow-card ${
+        selected ? 'shadow-card-hover' : ''
       } ${className}`}
     >
       {children}
@@ -50,11 +50,11 @@ export function FlowNodeHeader({ title, menuItems, children }: FlowNodeHeaderPro
   ]
 
   return (
-    <div className="flex items-center justify-between px-3 py-2">
-      <h4 className={typography.title}>
+    <div className="flex items-center justify-between px-2 py-1.5">
+      <h4 className="text-xs font-semibold text-white/90">
         {title}
       </h4>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-1.5">
         {children || (
           <FlowNodeMenu items={menuItems || defaultMenuItems} />
         )}
@@ -70,7 +70,7 @@ interface FlowNodeBodyProps {
 
 export function FlowNodeBody({ children, className = '' }: FlowNodeBodyProps) {
   return (
-    <div className={`flex flex-col gap-5 rounded-[16px] bg-black/10 px-3 py-3 md:px-4 md:py-4 ${className}`}>
+    <div className={`flex flex-col gap-3 rounded-lg bg-black/10 px-2.5 py-2.5 ${className}`}>
       {children}
     </div>
   )

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { typography } from './typography'
+import { typography } from './typographyClasses'
 
 interface FlowNodeCollapsibleProps {
   label: string

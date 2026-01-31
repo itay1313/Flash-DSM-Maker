@@ -1,5 +1,5 @@
 import React from 'react'
-import { typography } from './typography'
+import { typography } from './typographyClasses'
 
 interface FlowNodeRadioProps {
   label: string
